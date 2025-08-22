@@ -159,10 +159,11 @@ document.addEventListener('DOMContentLoaded', () => {
         verifyApiKeyButton.disabled = true;
 
         try {
-            // Kita tidak perlu API khusus untuk verifikasi, cukup cek apakah ada di daftar
-            // Untuk demo ini, kita akan mock verifikasi
             const res = await fetch(`${API_BASE_URL}/apikeys`);
-            if (!res.ok) throw new Error(`Gagal memuat API Keys: Status ${res.status}`);
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(`Gagal memuat API Keys untuk verifikasi: Status ${res.status}. Detail: ${errorText.substring(0, 100)}...`);
+            }
             const apiKeys = await res.json();
             const validKey = apiKeys.find(k => k.key === key);
 
@@ -212,7 +213,10 @@ document.addEventListener('DOMContentLoaded', () => {
         domainCategorySelect.innerHTML = '<option value="">-- Memuat Kategori --</option>';
         try {
             const res = await fetch(`${API_BASE_URL}/domainCategories`);
-            if (!res.ok) throw new Error(`Gagal memuat kategori domain: Status ${res.status}`);
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(`Gagal memuat kategori domain: Status ${res.status}. Detail: ${errorText.substring(0, 100)}...`);
+            }
             const categories = await res.json();
             
             if (categories.length === 0) {
@@ -268,7 +272,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await res.json();
 
             if (!res.ok) {
-                throw new Error(result.message || 'Terjadi kesalahan saat membuat subdomain.');
+                const errorDetail = result.message || await res.text();
+                throw new Error(errorDetail);
             }
 
             showToast('Subdomain berhasil dibuat!', 'success');
@@ -355,8 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Initial Check ---
     if (userApiKey) {
-        // Jika API Key sudah ada di sessionStorage, coba verifikasi lagi (opsional, bisa juga langsung tampilkan)
-        // Untuk saat ini, kita akan langsung menampilkan layar manajemen domain
+        // Jika API Key sudah ada di sessionStorage, langsung tampilkan layar manajemen domain
         apikeyScreen.style.display = 'none';
         domainManagementScreen.style.display = 'block';
         loadDomainCategoriesForSelect();

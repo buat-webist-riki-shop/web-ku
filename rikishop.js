@@ -378,6 +378,9 @@ function showProductDetail(product, serviceType) {
     buyNowLink.className = 'buy-now';
     buyNowLink.textContent = 'Beli Sekarang';
 
+    // Gunakan nomor kontak produk jika ada, fallback ke WA_ADMIN_NUMBER
+    const targetWhatsAppNumber = product.contactNumber ? product.contactNumber.replace(/^\+/, '') : WA_ADMIN_NUMBER;
+    
     let buyNowMessage = '';
     if (serviceType === 'Stock Akun' && product.images && product.images.length > 0) {
         buyNowMessage = `Halo Kak Admin Rikishopreal ✨\n\nSaya tertarik untuk memesan Akun ini:\n\nProduk: *${product.nama}*\nHarga: *${formatRupiah(product.harga)}*\n\nSebagai referensi, ini link gambarnya:\n${product.images[0]}\n\nMohon info ketersediaan dan panduan pembayarannya ya. Terima kasih! 🙏`;
@@ -387,7 +390,7 @@ function showProductDetail(product, serviceType) {
         buyNowMessage = `Halo Kak Admin Rikishopreal ✨\n\nSaya tertarik untuk memesan produk ini:\n\nProduk: *${product.nama}*\nHarga: *${formatRupiah(product.harga)}*\n\nMohon info selanjutnya untuk proses pembayaran ya. Terima kasih! 🙏`;
     }
     
-    buyNowLink.href = `https://wa.me/${WA_ADMIN_NUMBER}?text=${encodeURIComponent(buyNowMessage)}`;
+    buyNowLink.href = `https://wa.me/${targetWhatsAppNumber}?text=${encodeURIComponent(buyNowMessage)}`;
     buyNowLink.target = "_blank";
     detailProductActions.appendChild(buyNowLink);
 

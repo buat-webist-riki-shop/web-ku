@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const nameInput = document.getElementById('product-name');
     const priceInput = document.getElementById('product-price');
     const descriptionInput = document.getElementById('product-description');
+    const contactNumberInput = document.getElementById('product-contact-number'); // NEW
     const scriptMenuSection = document.getElementById('scriptMenuSection');
     const scriptMenuContentInput = document.getElementById('script-menu-content');
     const stockPhotoSection = document.getElementById('stock-photo-section');
@@ -197,6 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
             nama: nameInput.value.trim(),
             harga: parseInt(priceInput.value, 10),
             deskripsiPanjang: descriptionInput.value.trim(),
+            contactNumber: contactNumberInput.value.trim(), // NEW
             images: photosInput.value.split(',').map(l => l.trim()).filter(Boolean),
             createdAt: new Date().toISOString()
         };
@@ -207,6 +209,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!productData.nama || isNaN(productData.harga) || productData.harga < 0 || !productData.deskripsiPanjang) {
             return showToast('Semua kolom wajib diisi dan harga harus angka positif.', 'error');
         }
+        if (productData.contactNumber && !/^\+\d{1,3}\d{7,15}$/.test(productData.contactNumber)) { // Validasi nomor telepon
+            return showToast('Nomor kontak tidak valid. Gunakan format dengan kode negara (ex: +62812...).', 'error');
+        }
+
         addButton.textContent = 'Memproses...';
         addButton.disabled = true;
         try {
@@ -231,6 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
             nameInput.value = '';
             priceInput.value = '';
             descriptionInput.value = '';
+            contactNumberInput.value = ''; // NEW
             photosInput.value = '';
             scriptMenuContentInput.value = '';
             categorySelect.value = 'Panel'; 
@@ -331,10 +338,12 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 priceDisplay = `<span>${formatRupiah(prod.harga)}</span>`;
             }
+
+            const contactNumberDisplay = prod.contactNumber ? `<br><small>Kontak: ${prod.contactNumber}</small>` : '';
             
             item.innerHTML = `
                 <div class="item-header">
-                    <span>${prod.nama} - ${priceDisplay} ${isNew ? '<span class="new-badge">NEW</span>' : ''}</span>
+                    <span>${prod.nama} - ${priceDisplay} ${isNew ? '<span class="new-badge">NEW</span>' : ''} ${contactNumberDisplay}</span>
                     <div class="item-actions">
                         <button type="button" class="edit-btn" data-id="${prod.id}"><i class="fas fa-edit"></i> Edit</button>
                         <button type="button" class="delete-btn"><i class="fas fa-trash-alt"></i> Hapus</button>
@@ -407,6 +416,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const editNameInput = document.getElementById('edit-name');
         const editPriceInput = document.getElementById('edit-price');
         const editDescInput = document.getElementById('edit-desc');
+        const editContactNumberInput = document.getElementById('edit-contact-number'); // NEW
         const editPhotoSection = document.getElementById('edit-photo-section');
         const editPhotoGrid = document.getElementById('edit-photo-grid');
         const addPhotoInput = document.getElementById('add-photo-input');
@@ -431,6 +441,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 editNameInput.value = product.nama;
                 editPriceInput.value = product.harga;
                 editDescInput.value = product.deskripsiPanjang ? product.deskripsiPanjang.replace(/ \|\| /g, '\n') : '';
+                editContactNumberInput.value = product.contactNumber || ''; // NEW
                 
                 if (category === 'Stock Akun' || category === 'Logo') {
                     editPhotoSection.style.display = 'block';
@@ -495,6 +506,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const newName = editNameInput.value.trim();
             const newPrice = parseInt(editPriceInput.value, 10);
             const newDesc = editDescInput.value.trim().replace(/\n/g, ' || ');
+            const newContactNumber = editContactNumberInput.value.trim(); // NEW
             
             let newImages = null;
             if (categoryToUpdate === 'Stock Akun' || categoryToUpdate === 'Logo') {
@@ -509,6 +521,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isNaN(newPrice) || newPrice < 0 || !newName || !newDesc) {
                 return showToast('Data tidak valid (Nama, Harga, Deskripsi harus diisi dan harga harus angka positif).', 'error');
             }
+            if (newContactNumber && !/^\+\d{1,3}\d{7,15}$/.test(newContactNumber)) { // Validasi nomor telepon
+                return showToast('Nomor kontak tidak valid. Gunakan format dengan kode negara (ex: +62812...).', 'error');
+            }
             
             saveEditBtn.textContent = 'Menyimpan...';
             saveEditBtn.disabled = true;
@@ -517,7 +532,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const res = await fetch(`${API_BASE_URL}/updateProduct`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id, category: categoryToUpdate, newName, newPrice, newDesc, newImages, newMenuContent })
+                    body: JSON.stringify({ id, category: categoryToUpdate, newName, newPrice, newDesc, newImages, newMenuContent, newContactNumber })
                 });
                 const result = await res.json();
 
@@ -538,10 +553,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                         priceDisplay = `<span>${formatRupiah(updatedProduct.harga)}</span>`;
                     }
+                    const contactNumberDisplay = updatedProduct.contactNumber ? `<br><small>Kontak: ${updatedProduct.contactNumber}</small>` : '';
 
                     // Buat elemen span sementara untuk menampung HTML baru
                     const tempSpan = document.createElement('span');
-                    tempSpan.innerHTML = `${updatedProduct.nama} - ${priceDisplay}`;
+                    tempSpan.innerHTML = `${updatedProduct.nama} - ${priceDisplay} ${contactNumberDisplay}`;
                     
                     // Ganti konten item yang relevan
                     itemToUpdate.querySelector('.item-header span').innerHTML = tempSpan.innerHTML;
@@ -735,7 +751,7 @@ document.addEventListener('DOMContentLoaded', () => {
             resetBulkPriceBtn.disabled = true;
 
             try {
-                const res = await fetch(`${API_BASE_URL}/updateProduct`, { 
+                const res = await fetch(`${API_BASE_URL}/updateProductsInCategory`, { 
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ category, newPrice: newBulkPrice })
@@ -822,7 +838,10 @@ document.addEventListener('DOMContentLoaded', () => {
         apiKeyListDiv.innerHTML = '<p>Memuat API Keys...</p>';
         try {
             const res = await fetch(`${API_BASE_URL}/apikeys`);
-            if (!res.ok) throw new Error(`Gagal memuat API Keys: Status ${res.status}`);
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(`Gagal memuat API Keys: Status ${res.status}. Detail: ${errorText.substring(0, 100)}...`);
+            }
             const apiKeys = await res.json();
             renderApiKeys(apiKeys);
         } catch (error) {
@@ -920,7 +939,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ name, duration })
             });
             const result = await res.json();
-            if (!res.ok) throw new Error(result.message);
+            if (!res.ok) {
+                const errorDetail = result.message || await res.text();
+                throw new Error(errorDetail);
+            }
             showToast(`API Key "${name}" berhasil dibuat.`, 'success');
             apiKeyNameInput.value = '';
             apiKeyDurationSelect.value = 'day';
@@ -939,7 +961,10 @@ document.addEventListener('DOMContentLoaded', () => {
         domainCategoryListDiv.innerHTML = '<p>Memuat kategori domain...</p>';
         try {
             const res = await fetch(`${API_BASE_URL}/domainCategories`);
-            if (!res.ok) throw new Error(`Gagal memuat kategori domain: Status ${res.status}`);
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(`Gagal memuat kategori domain: Status ${res.status}. Detail: ${errorText.substring(0, 100)}...`);
+            }
             const domainCategories = await res.json();
             renderDomainCategories(domainCategories);
         } catch (error) {
@@ -991,7 +1016,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         body: JSON.stringify({ name: nameToDelete })
                     });
                     const result = await res.json();
-                    if (!res.ok) throw new Error(result.message);
+                    if (!res.ok) {
+                        const errorDetail = result.message || await res.text();
+                        throw new Error(errorDetail);
+                    }
                     showToast(result.message, 'success');
                     loadDomainCategories(); // Muat ulang daftar
                 } catch (error) {
@@ -1023,7 +1051,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ name, zone, apitoken })
             });
             const result = await res.json();
-            if (!res.ok) throw new Error(result.message);
+            if (!res.ok) {
+                const errorDetail = result.message || await res.text();
+                throw new Error(errorDetail);
+            }
             showToast(`Kategori domain "${name}" berhasil ditambahkan.`, 'success');
             domainCategoryNameInput.value = '';
             domainCategoryZoneInput.value = '';

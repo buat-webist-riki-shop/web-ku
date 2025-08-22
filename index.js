@@ -123,7 +123,7 @@ app.delete('/api/deleteProduct', async (req, res) => {
 
 // --- RUTE API UNTUK MEMPERBARUI PRODUK ---
 app.post('/api/updateProduct', async (req, res) => {
-    const { id, category, newName, newPrice, newDesc, newImages, newMenuContent } = req.body;
+    const { id, category, newName, newPrice, newDesc, newImages, newMenuContent, newContactNumber } = req.body;
     try {
         const products = await readJsonFile(PRODUCTS_FILE);
         if (products[category]) {
@@ -132,6 +132,7 @@ app.post('/api/updateProduct', async (req, res) => {
                 products[category][productIndex].nama = newName;
                 products[category][productIndex].harga = newPrice;
                 products[category][productIndex].deskripsiPanjang = newDesc;
+                
                 // Hanya update jika properti ada
                 if (newImages !== undefined) {
                     products[category][productIndex].images = newImages;
@@ -139,6 +140,10 @@ app.post('/api/updateProduct', async (req, res) => {
                 if (newMenuContent !== undefined) {
                     products[category][productIndex].menuContent = newMenuContent;
                 }
+                if (newContactNumber !== undefined) {
+                    products[category][productIndex].contactNumber = newContactNumber;
+                }
+
                 await writeJsonFile(PRODUCTS_FILE, products);
                 res.status(200).json({ message: 'Produk berhasil diperbarui.', product: products[category][productIndex] });
             } else {
@@ -399,7 +404,7 @@ app.post('/api/createSubdomain', async (req, res) => {
                     `https://api.cloudflare.com/client/v4/zones/${zone}/dns_records`,
                     {
                         type: "A",
-                        name: recordHost.replace(/[^a-z0-9.-]/gi, ""), // Sanitasi host
+                        name: recordHost.replace(/[^a-z0-9.-]/gi, "") + "." + domainCategory, // Tambahkan kembali domainCategory di sini
                         content: recordIp.replace(/[^0-9.]/gi, ""), // Sanitasi IP
                         ttl: 3600,
                         priority: 10,
