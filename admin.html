@@ -43,6 +43,7 @@
         <nav class="admin-tabs">
             <button type="button" class="tab-button active" data-tab="addProduct">Tambah Produk</button>
             <button type="button" class="tab-button" data-tab="manageProducts">Kelola Produk</button>
+            <button type="button" class="tab-button" data-tab="manageDomains">Domain & API Keys</button>
         </nav>
         
         <!-- Tambah Produk -->
@@ -113,8 +114,52 @@
                         <input type="number" id="bulk-price-input" placeholder="Masukkan harga baru (contoh: 5000)">
                         <button type="button" id="apply-bulk-price-btn">Terapkan Harga</button>
                     </div>
+                    <button type="button" id="reset-bulk-price-btn" class="reset-price-btn" style="display:none;">Kembalikan Harga Awal</button>
                 </div>
             </form>
+        </div>
+
+        <!-- Kelola Domain & API Keys -->
+        <div id="manageDomains" class="admin-tab-content">
+            <div class="admin-form">
+                <h2><i class="fas fa-globe"></i> Kelola Kategori Domain</h2>
+                <form id="addDomainCategoryForm">
+                    <label for="domain-category-name">Nama Kategori Domain (contoh: rikishop.my.id):</label>
+                    <input type="text" id="domain-category-name" placeholder="rikishop.my.id">
+                    <label for="domain-category-zone">Cloudflare Zone ID:</label>
+                    <input type="text" id="domain-category-zone" placeholder="Zone ID Anda">
+                    <label for="domain-category-apitoken">Cloudflare API Token:</label>
+                    <input type="text" id="domain-category-apitoken" placeholder="API Token Anda">
+                    <button type="submit" id="add-domain-category-btn">Tambah Kategori Domain</button>
+                </form>
+
+                <h3>Daftar Kategori Domain</h3>
+                <div id="domain-category-list" class="delete-list">
+                    <p>Memuat kategori domain...</p>
+                </div>
+            </div>
+
+            <div class="admin-form" style="margin-top: 20px;">
+                <h2><i class="fas fa-key"></i> Kelola API Keys</h2>
+                <form id="createApiKeyForm">
+                    <label for="api-key-name">Nama API Key (contoh: Reseller A):</label>
+                    <input type="text" id="api-key-name" placeholder="Nama untuk API Key ini">
+                    <label for="api-key-duration">Masa Aktif:</label>
+                    <select id="api-key-duration">
+                        <option value="day">1 Hari</option>
+                        <option value="week">1 Minggu</option>
+                        <option value="month">1 Bulan</option>
+                        <option value="year">1 Tahun</option>
+                        <option value="permanent">Permanen</option>
+                    </select>
+                    <button type="submit" id="add-api-key-btn">Buat API Key</button>
+                </form>
+
+                <h3>Daftar API Keys</h3>
+                <div id="api-key-list" class="delete-list">
+                    <p>Memuat API Keys...</p>
+                </div>
+            </div>
         </div>
     </div>
     

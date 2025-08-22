@@ -1,0 +1,598 @@
+/* ============================================== */
+/* VARIABLE DAN FONT                            */
+/* ============================================== */
+:root {
+    --primary-color: #007aff;
+    --secondary-color: #f2f2f7;
+    --text-color: #1d1d1f;
+    --light-text-color: #8e8e93;
+    --white-color: #fff;
+    --border-color: #d1d1d6;
+    --shadow-color: rgba(0, 0, 0, 0.12);
+    --error-color: #ff3b30;
+    --success-color: #34c759;
+}
+
+.dark-mode {
+    --primary-color: #0a84ff;
+    --secondary-color: #1c1c1e;
+    --text-color: #f2f2f7;
+    --light-text-color: #8e8e93;
+    --white-color: #2c2c2e;
+    --border-color: #48484a;
+    --shadow-color: rgba(0, 0, 0, 0.5);
+    --error-color: #ff453a;
+    --success-color: #32d74b;
+}
+
+/* ============================================== */
+/* ANIMASI                                      */
+/* ============================================== */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-100%); }
+}
+@keyframes scaleUp {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* ============================================== */
+/* LAYOUT DASAR                                 */
+/* ============================================== */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Poppins', sans-serif;
+    background-color: var(--secondary-color);
+    margin: 0;
+    color: var(--text-color);
+    transition: background-color 0.2s ease, color 0.2s ease;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+}
+
+.main-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+/* ============================================== */
+/* API KEY INPUT SCREEN (Mirip Login Screen)    */
+/* ============================================== */
+#apikey-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.login-card { /* Digunakan juga untuk apikey-screen */
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    position: relative;
+    background-color: var(--white-color);
+    padding: 30px 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px var(--shadow-color);
+    border: 1px solid var(--border-color);
+    animation: fadeIn 0.5s ease-out forwards;
+}
+.login-header {
+    margin-bottom: 25px;
+}
+.login-header .profile-pic {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+.login-header h2 {
+    font-size: 1.8em;
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: var(--text-color);
+}
+.login-header p {
+    font-size: 1em;
+    margin-bottom: 0;
+    color: var(--light-text-color);
+}
+.password-input-container { /* Digunakan juga untuk input API Key */
+    position: relative;
+    width: 100%;
+    margin-bottom: 15px;
+}
+.password-input-container input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: 1em;
+    background-color: transparent;
+    color: var(--text-color);
+    transition: box-shadow 0.2s, border-color 0.2s;
+}
+.password-input-container input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
+}
+#verify-api-key-button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 30px;
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    border: none;
+    border-radius: 10px;
+    font-size: 1.05em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+#verify-api-key-button:hover { filter: brightness(1.1); }
+#verify-api-key-button:active { transform: scale(0.97); }
+#verify-api-key-button:disabled { background-color: var(--light-text-color); cursor: not-allowed; }
+
+/* Tombol Tema untuk Layar API Key */
+#apikey-screen .theme-switch {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--secondary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+    box-shadow: 0 2px 5px var(--shadow-color);
+}
+#apikey-screen .theme-switch:hover { filter: brightness(0.95); }
+#apikey-screen .theme-switch i { font-size: 1.1em; transition: transform 0.2s ease; }
+
+/* ============================================== */
+/* DOMAIN MANAGEMENT SCREEN                     */
+/* ============================================== */
+.domain-header {
+    width: 100%;
+    background-color: var(--white-color);
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-sizing: border-box;
+}
+.domain-header h2 {
+    margin: 0;
+    font-size: 1.4em;
+    flex-grow: 1;
+    text-align: center;
+    padding: 0 10px;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-color);
+}
+.domain-header .profile-pic {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+.domain-header .theme-switch { /* Untuk panel domain (header) */
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background-color: var(--secondary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+    box-shadow: 0 2px 5px var(--shadow-color);
+}
+.domain-header .theme-switch:hover { filter: brightness(0.95); }
+.domain-header .theme-switch i { font-size: 1.0em; transition: transform 0.2s ease; }
+
+/* Tabs */
+.domain-tabs {
+    width: 100%;
+    display: flex;
+    background-color: var(--white-color);
+    border-radius: 12px;
+    padding: 5px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    margin-top: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    box-sizing: border-box;
+}
+.tab-button {
+    flex: 1;
+    min-width: 120px;
+    border: none;
+    background-color: transparent;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: background-color 0.2s ease, color 0.2s ease;
+    box-sizing: border-box;
+}
+.tab-button.active {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+}
+.domain-tab-content {
+    display: none;
+    width: 100%;
+    margin-top: 20px;
+    box-sizing: border-box;
+    padding: 0 15px;
+}
+.domain-tab-content.active {
+    display: block;
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Domain Form */
+.domain-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    background: var(--white-color);
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-sizing: border-box;
+}
+.domain-form h2 {
+    text-align: center;
+    margin-bottom: 10px;
+    color: var(--text-color);
+}
+.domain-form h2 i {
+    margin-right: 10px;
+    color: var(--primary-color);
+}
+.domain-form label {
+    display: block;
+    margin-top: 20px;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 0.9em;
+    color: var(--text-color);
+}
+.domain-form input,
+.domain-form select {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    font-size: 1em;
+    background: transparent;
+    color: var(--text-color);
+    transition: box-shadow 0.2s, border-color 0.2s;
+}
+.domain-form input:focus,
+.domain-form select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0,122,255,0.25);
+    outline: none;
+}
+.domain-form button {
+    background: var(--primary-color);
+    color: var(--white-color);
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.05em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    margin-top: 30px;
+}
+.domain-form button:hover { background: #0056cc; }
+.domain-form button:disabled { background-color: var(--light-text-color); cursor: not-allowed; }
+
+/* Daftar Domain yang Dibuat */
+.domain-list {
+    margin-top: 15px;
+}
+.domain-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background: var(--secondary-color);
+    margin: 10px 0;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 5px var(--shadow-color);
+    word-break: break-all;
+}
+.domain-item .domain-display {
+    font-weight: 500;
+    color: var(--text-color);
+    margin-bottom: 5px;
+}
+.domain-item .domain-meta {
+    font-size: 0.85em;
+    color: var(--light-text-color);
+    margin-bottom: 10px;
+}
+.domain-item .item-actions {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-top: 10px;
+    justify-content: flex-end;
+}
+.domain-item .copy-button {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.85em;
+    margin-top: 0;
+    flex: none;
+    width: auto;
+}
+.domain-item .copy-button:hover {
+    filter: brightness(1.1);
+}
+
+/* ============================================== */
+/* MODAL & TOAST                                */
+/* ============================================== */
+#toast-container {
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    pointer-events: none;
+}
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: var(--text-color);
+    padding: 12px 20px;
+    border-radius: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    font-size: 0.95em;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(0,0,0,0.05);
+    animation: fadeIn 0.5s ease forwards;
+    pointer-events: auto;
+}
+.toast.success { background-color: rgba(52, 199, 89, 0.9); color: white; }
+.toast.error { background-color: rgba(255, 59, 48, 0.9); color: white; }
+.toast.info { background-color: rgba(0, 122, 255, 0.9); color: white; }
+.toast.fade-out { animation: fadeOut 0.5s ease forwards; }
+
+.modal {
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity 0.3s ease;
+    box-sizing: border-box;
+}
+.modal.is-visible { visibility: visible; opacity: 1; }
+.modal-content {
+    background-color: var(--white-color);
+    border-radius: 12px;
+    width: 90%;
+    max-width: 550px;
+    margin: auto;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    padding: 25px;
+    position: relative;
+    transform: scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    box-sizing: border-box;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+.modal.is-visible .modal-content { transform: scale(1); }
+.close-button {
+    font-size: 2rem;
+    color: var(--light-text-color);
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    cursor: pointer;
+}
+.close-button:hover { color: var(--text-color); }
+
+/* Styling untuk Custom Confirmation Modal */
+.confirm-modal-content {
+    text-align: center;
+    padding: 20px;
+    max-width: 300px;
+}
+.confirm-message {
+    font-size: 1.1em;
+    margin-bottom: 25px;
+    color: var(--text-color);
+}
+.confirm-actions {
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+    margin-top: 20px;
+}
+.confirm-actions button {
+    flex: 1;
+    margin-top: 0;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 1em;
+    transition: all 0.2s ease;
+}
+.confirm-ok-btn {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+}
+.confirm-ok-btn:hover {
+    filter: brightness(1.1);
+}
+.confirm-cancel-btn {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+.confirm-cancel-btn:hover {
+    background-color: var(--border-color);
+}
+
+/* Domain Success Modal */
+.domain-success-modal-content {
+    text-align: center;
+    padding: 30px;
+}
+.domain-success-modal-content h2 {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.domain-success-modal-content .success-icon {
+    color: var(--success-color);
+    font-size: 1.5em;
+    margin-right: 10px;
+}
+.success-details p {
+    text-align: left;
+    margin-bottom: 10px;
+    color: var(--text-color);
+}
+.success-details p b {
+    color: var(--primary-color);
+    min-width: 60px; /* Lebar minimum untuk label */
+    display: inline-block;
+}
+.domain-success-modal-content .copy-button {
+    width: calc(100% - 20px); /* Sesuaikan lebar */
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 15px;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.domain-success-modal-content .copy-button:hover {
+    filter: brightness(1.1);
+}
+
+/* Responsivitas */
+@media (max-width: 768px) {
+    .domain-tabs {
+        flex-direction: column;
+        padding: 5px 0;
+    }
+    .tab-button {
+        margin: 5px auto;
+        padding: 12px 10px;
+        font-size: 0.9em;
+        max-width: 90%;
+    }
+    .domain-tab-content {
+        padding: 0 10px;
+    }
+    .domain-header h2 {
+        font-size: 1.2em;
+    }
+    .domain-success-modal-content .copy-button {
+        padding: 10px;
+        font-size: 0.9em;
+    }
+    .domain-success-modal-content .success-details p {
+        font-size: 0.9em;
+    }
+    .success-details p b {
+        min-width: 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-container {
+        padding: 10px;
+    }
+    .login-card, .domain-form {
+        padding: 20px 15px;
+    }
+    .login-header h2, .domain-form h2 {
+        font-size: 1.5em;
+    }
+    .domain-form label {
+        font-size: 0.85em;
+    }
+    .domain-form input, .domain-form select, .domain-form button {
+        padding: 10px;
+        font-size: 0.9em;
+    }
+    .toast {
+        padding: 10px 15px;
+        font-size: 0.8em;
+    }
+    .modal-content {
+        padding: 15px;
+    }
+}
