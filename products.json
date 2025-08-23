@@ -1,6 +1,15 @@
 {
     "Panel": [
         {
+            "id": 69,
+            "nama": "Panel || 40gb",
+            "harga": 50000,
+            "hargaAsli": 50000,
+            "deskripsiPanjang": "Bagus lah",
+            "createdAt": "2025-08-23T12:27:26.362Z",
+            "nomorWA": ""
+        },
+        {
             "id": 1,
             "nama": "Panel Ram 1GB",
             "harga": 3000,
