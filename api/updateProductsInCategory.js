@@ -6,7 +6,12 @@ export default async function handler(request, response) {
     }
 
     try {
-        const { id, category, newName, hargaAsli, harga, newDesc, newImages, newMenuContent, nomorWA, discountPrice, discountEndDate } = request.body;
+        // CHANGED: Destructure all new price fields from the request
+        const { 
+            id, category, newName, hargaAsli, harga, 
+            discountPrice, discountEndDate, 
+            newDesc, newImages, newMenuContent, nomorWA 
+        } = request.body;
 
         if (!id || !category) {
             return response.status(400).json({ message: 'ID produk dan kategori wajib diisi.' });
@@ -36,13 +41,14 @@ export default async function handler(request, response) {
         productsJson[category] = productsJson[category].map(product => {
             if (product.id === id) {
                 productFound = true;
+                // CHANGED: Update all product properties including new discount fields
                 product.nama = newName;
                 product.hargaAsli = hargaAsli;
                 product.harga = harga;
-                product.deskripsiPanjang = newDesc;
-                product.nomorWA = nomorWA;
                 product.discountPrice = discountPrice ? Number(discountPrice) : null;
                 product.discountEndDate = discountEndDate || null;
+                product.deskripsiPanjang = newDesc;
+                product.nomorWA = nomorWA;
 
                 if (newImages !== null && typeof newImages !== 'undefined') product.images = newImages;
                 if (newMenuContent !== null && typeof newMenuContent !== 'undefined') product.menuContent = newMenuContent;

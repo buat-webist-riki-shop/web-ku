@@ -18,6 +18,7 @@ export default async function handler(request, response) {
 
         const octokit = new Octokit({ auth: GITHUB_TOKEN });
 
+        // 1. Dapatkan konten file saat ini
         const { data: fileData } = await octokit.repos.getContent({
             owner: REPO_OWNER,
             repo: REPO_NAME,
@@ -31,16 +32,17 @@ export default async function handler(request, response) {
              return response.status(404).json({ message: 'Kategori tidak ditemukan.' });
         }
 
-        // Kembalikan harga ke hargaAsli dan hapus info diskon
+        // 2. Kembalikan harga ke hargaAsli dan hapus info diskon
         productsJson[category] = productsJson[category].map(product => {
             if (product.hargaAsli && product.hargaAsli > 0) {
-                product.harga = product.hargaAsli;
-                product.discountPrice = null;
-                product.discountEndDate = null;
+                product.harga = product.hargaAsli; // Kembalikan harga jual
+                product.discountPrice = null;      // Hapus harga diskon
+                product.discountEndDate = null;    // Hapus tanggal akhir diskon
             }
             return product;
         });
 
+        // 3. Update file di GitHub
         await octokit.repos.createOrUpdateFileContents({
             owner: REPO_OWNER,
             repo: REPO_NAME,
