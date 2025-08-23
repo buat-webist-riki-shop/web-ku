@@ -176,7 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 apikeyScreen.style.display = 'none';
                 domainManagementScreen.style.display = 'block';
                 showToast('Verifikasi API Key berhasil!', 'success');
-                // Load initial data for domain management
                 loadDomainCategoriesForSelect();
                 document.querySelector('.tab-button[data-tab="createDomain"]').click();
             } else {
@@ -203,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById(button.dataset.tab).classList.add('active');
 
             if (button.dataset.tab === 'listDomains') {
-                renderCreatedDomains();
+                loadCreatedDomains(); // Mengganti renderCreatedDomains() dengan loadCreatedDomains()
             }
         });
     });
@@ -283,20 +282,13 @@ document.addEventListener('DOMContentLoaded', () => {
             displayNodeName.textContent = result.node;
             domainSuccessModal.classList.add('is-visible');
 
-            // Simpan domain yang dibuat secara lokal (untuk ditampilkan di tab "Daftar Domain Dibuat")
-            saveCreatedDomainLocally({
-                host: host,
-                category: domainCategory,
-                ip: ip,
-                fullDomain: result.domain,
-                fullNode: result.node,
-                createdAt: new Date().toISOString()
-            });
-
+            // Tidak perlu saveCreatedDomainLocally lagi, karena sudah disimpan di backend
+            // Cukup muat ulang daftar jika user beralih ke tab "Daftar Domain Dibuat"
+            
             // Reset form
             hostInput.value = '';
             ipInput.value = '';
-            domainCategorySelect.value = ''; // Reset ke pilihan kosong
+            domainCategorySelect.value = '';
             
         } catch (error) {
             console.error('Error creating subdomain:', error);
@@ -307,20 +299,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Manage Created Domains (Local Storage) ---
-    function getCreatedDomains() {
-        return JSON.parse(localStorage.getItem('createdDomains')) || [];
+    // NEW: Fungsi untuk memuat domain yang dibuat dari backend
+    async function loadCreatedDomains() {
+        createdDomainList.innerHTML = '<p>Memuat domain yang dibuat...</p>';
+        try {
+            const res = await fetch(`${API_BASE_URL}/createdDomains`);
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(`Gagal memuat domain yang dibuat: Status ${res.status}. Detail: ${errorText.substring(0, 100)}...`);
+            }
+            const domains = await res.json();
+            renderCreatedDomains(domains);
+        } catch (error) {
+            console.error('Error loading created domains:', error);
+            showToast(error.message || 'Gagal memuat daftar domain yang dibuat.', 'error');
+            createdDomainList.innerHTML = `<p>Gagal memuat daftar domain yang dibuat. ${error.message || ''}</p>`;
+        }
     }
 
-    function saveCreatedDomainLocally(domain) {
-        const domains = getCreatedDomains();
-        domains.push(domain);
-        localStorage.setItem('createdDomains', JSON.stringify(domains));
-        renderCreatedDomains(); // Perbarui daftar di UI jika tab aktif
-    }
-
-    function renderCreatedDomains() {
-        const domains = getCreatedDomains();
+    // Fungsi untuk merender domain yang dibuat ke UI
+    function renderCreatedDomains(domains) {
         createdDomainList.innerHTML = '';
 
         if (domains.length === 0) {
@@ -331,18 +329,22 @@ document.addEventListener('DOMContentLoaded', () => {
         domains.forEach(domain => {
             const item = document.createElement('div');
             item.className = 'domain-item';
+            item.dataset.id = domain.id; // Simpan ID domain untuk penghapusan
+
             item.innerHTML = `
                 <div class="domain-display"><b>Domain:</b> ${domain.fullDomain}</div>
                 <div class="domain-display"><b>Node:</b> ${domain.fullNode}</div>
-                <div class="domain-meta">IP: ${domain.ip} | Kategori: ${domain.category} | Dibuat: ${new Date(domain.createdAt).toLocaleString('id-ID')}</div>
+                <div class="domain-meta">IP: ${domain.ip} | Kategori: ${domain.domainCategory} | Dibuat: ${new Date(domain.createdAt).toLocaleString('id-ID')}</div>
                 <div class="item-actions">
                     <button type="button" class="copy-button" data-copy-text="${domain.fullDomain}"><i class="fas fa-copy"></i> Salin Domain</button>
                     <button type="button" class="copy-button" data-copy-text="${domain.fullNode}" style="margin-left: 10px;"><i class="fas fa-copy"></i> Salin Node</button>
+                    <button type="button" class="delete-btn" data-id="${domain.id}" style="margin-left: 10px;"><i class="fas fa-trash-alt"></i> Hapus</button>
                 </div>
             `;
             createdDomainList.appendChild(item);
         });
 
+        // Event listener untuk tombol salin di daftar domain
         createdDomainList.querySelectorAll('.copy-button').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const textToCopy = e.currentTarget.dataset.copyText;
@@ -356,15 +358,52 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         });
+
+        // NEW: Event listener untuk tombol hapus di daftar domain
+        createdDomainList.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const domainIdToDelete = e.currentTarget.dataset.id;
+                const parentItem = e.currentTarget.closest('.domain-item');
+                const domainName = parentItem.querySelector('.domain-display').textContent.replace('Domain: ', '');
+
+                const confirmMessageHtml = `Apakah Anda yakin ingin menghapus domain <b>${domainName}</b>?`;
+                const userConfirmed = await showCustomConfirm(confirmMessageHtml);
+
+                if (!userConfirmed) {
+                    showToast('Penghapusan domain dibatalkan.', 'info');
+                    return;
+                }
+
+                showToast('Menghapus domain...', 'info', 5000);
+                try {
+                    const res = await fetch(`${API_BASE_URL}/deleteCreatedDomain`, {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: domainIdToDelete })
+                    });
+                    const result = await res.json();
+                    if (!res.ok) {
+                        const errorDetail = result.message || await res.text();
+                        throw new Error(errorDetail);
+                    }
+                    showToast(result.message, 'success');
+                    parentItem.remove(); // Hapus dari UI langsung
+                    if (createdDomainList.children.length === 0) {
+                        createdDomainList.innerHTML = '<p>Anda belum membuat domain apapun.</p>';
+                    }
+                } catch (error) {
+                    console.error('Error deleting domain:', error);
+                    showToast(error.message || 'Gagal menghapus domain.', 'error');
+                }
+            });
+        });
     }
 
     // --- Initial Check ---
     if (userApiKey) {
-        // Jika API Key sudah ada di sessionStorage, langsung tampilkan layar manajemen domain
         apikeyScreen.style.display = 'none';
         domainManagementScreen.style.display = 'block';
         loadDomainCategoriesForSelect();
-        // Load tab default
         document.querySelector('.tab-button[data-tab="createDomain"]').click();
     }
 });

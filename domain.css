@@ -17,7 +17,7 @@
     --primary-color: #0a84ff;
     --secondary-color: #1c1c1e;
     --text-color: #f2f2f7;
-    --light-text-color: #8e8e93;
+    --light-text-color: #a1a1a6;
     --white-color: #2c2c2e;
     --border-color: #48484a;
     --shadow-color: rgba(0, 0, 0, 0.5);
@@ -366,7 +366,17 @@ body {
     flex: none;
     width: auto;
 }
-.domain-item .copy-button:hover {
+.domain-item .delete-btn { /* Gaya untuk tombol hapus domain */
+    background-color: var(--error-color);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.85em;
+    margin-top: 0;
+    flex: none;
+    width: auto;
+}
+.domain-item .copy-button:hover, .domain-item .delete-btn:hover {
     filter: brightness(1.1);
 }
 
@@ -568,6 +578,14 @@ body {
     }
     .success-details p b {
         min-width: 50px;
+    }
+    .domain-item .item-actions {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .domain-item .copy-button, .domain-item .delete-btn {
+        width: 100%;
+        margin-left: 0 !important; /* Override inline style */
     }
 }
 

@@ -25,20 +25,88 @@ app.use(cors());
 // --- KONFIGURASI DOMAIN CLOUDFLARE (Emulasi .env) ---
 // CATATAN PENTING: Dalam produksi, ini harus dimuat dari variabel lingkungan (.env)
 // Contoh: process.env.CLOUDFLARE_API_TOKEN_RIKISHOP
+// Menggunakan data JSON kategori domain yang baru diberikan oleh user.
+// Perhatian: Ada duplikasi kunci dalam JSON yang diberikan user. Entri terakhir akan menimpa yang sebelumnya.
 const CLOUDFLARE_CONFIG = {
-    "marketrikishop.my.id": {
-        "zone": "33970794e3373167a9c9556ad19fdb6a",
-        "apitoken": "5BuYPtwU__7hJIzfX1euJn3K-ChzZH29VZ_ivbja"
-    },
-    "kangpanel.biz.id": {
-        "zone": "90ab3a017b7b29dd9ee92fdbb5831b0a",
-        "apitoken": "Jf_bwzYFsH89BZ6az61JlUGGu56SmNOqf7WC7KgV"
-    }
+  "mypanelstore.web.id": {
+    "zone": "c61c442d70392500611499c5af816532",
+    "apitoken": "ImdyjF7XVU7ObDbdCr7LwSUZ4eDQJ-QozAbUIWoF" // Mengambil apitoken terakhir dari duplikasi
+  },
+  "privatserver.my.id": {
+    "zone": "699bb9eb65046a886399c91daacb1968",
+    "apitoken": "fnl7ixlJ-Y-7zxJ7EUGEXitfmfLiPGW985iXobdu" // Mengambil apitoken terakhir dari duplikasi
+  },
+  "serverku.biz.id": {
+    "zone": "4e4feaba70b41ed78295d2dcc090dd3a",
+    "apitoken": "d6kmqwlvi0qwCyMxoGuc3EBAYRYvbulhjhR9T0I7" // Mengambil apitoken terakhir dari duplikasi
+  },
+  "panelwebsite.biz.id": {
+    "zone": "2d6aab40136299392d66eed44a7b1122",
+    "apitoken": "ImdyjF7XVU7ObDbdCr7LwSUZ4eDQJ-QozAbUIWoF"
+  },
+  "pteroserver.us.kg": {
+    "zone": "f693559a94aebc553a68c27a3ffe3b55",
+    "apitoken": "ImdyjF7XVU7ObDbdCr7LwSUZ4eDQJ-QozAbUIWoF"
+  },
+  "digitalserver.us.kg": {
+    "zone": "df13e6e4faa4de9edaeb8e1f05cf1a36",
+    "apitoken": "ImdyjF7XVU7ObDbdCr7LwSUZ4eDQJ-QozAbUIWoF"
+  },
+  "shopserver.us.kg": {
+    "zone": "54ca38e266bfdf2dcdb7f51fd79c2db5",
+    "apitoken": "ImdyjF7XVU7ObDbdCr7LwSUZ4eDQJ-QozAbUIWoF"
+  },
+  "bisnis-panel.web.id": {
+    "zone": "5002eff0a93516bcf233c7034c5979b5",
+    "apitoken": "ssPZ-LGjJZWeL3HCmrSWDCGXBOCipolE7ZrteJxR"
+  },
+  "bokep-jepang.biz.id": {
+    "zone": "d22b5af4b6c21d6cebcf654a09766372",
+    "apitoken": "_AVB1AVabMVndz9XuAv0eU37_TIi8nWZLEbqP2_z"
+  },
+  "developer-bot.biz.id": {
+    "zone": "b460d437d312ec9a2df11c9bfa41067e",
+    "apitoken": "7IZuQOewlLUxmcj2NxC0QsIGbXPpVnEv9TKybt7j"
+  },
+  "developerbot.my.id": {
+    "zone": "4120b6b00845ad031e6b7b6501f07cbd",
+    "apitoken": "iknDRCKF9-leVYc82xqvVZ_HK6tIMoirPxr9_xJC"
+  },
+  "doa-ibu.my.id": {
+    "zone": "a78a6b0cffab54d527403b59ac61efed",
+    "apitoken": "kDsR7IXP91Coo5rFmIdQ8H-lVly1WKEGHdlJm_AK"
+  },
+  "doo-ayah.biz.id": {
+    "zone": "2145588922844e662f65a935a02faedf",
+    "apitoken": "n3_BCQoa2_AsWpKJAlnqL1d1BQCSjGW9bkwuy7yg"
+  },
+  "fenscaitlin.web.id": {
+    "zone": "a32c5f8cf43d10f18f57fe0607753ec7",
+    "apitoken": "nqdsa1bzi7z1UR0bKjaWWC3uSMs8J1gB_rj8DGA1"
+  },
+  "ff-freefirecom.my.id": {
+    "zone": "56cb5b16d237366d90b379f2b74fd1ec",
+    "apitoken": "To8b0WOT7qbtj_jOf4stbTN1IyfSFG7qlwWrkKso"
+  },
+  "hostindonesia.biz.id": {
+    "zone": "39b842cf9f16e205198d4d2890c5f26f",
+    "apitoken": "23On8cgpqwtr83ujSbCeRJmDAZyyiNMpF7okgwco"
+  },
+  "kangbot.biz.id": {
+    "zone": "8c21a2699fc88ab81a323fcdd0d43a29",
+    "apitoken": "O0kWzDmDdV_Zub6TF1VPE6RzG7gEeUJNLLlycW-O"
+  },
+  "kangpanel.biz.id": {
+    "zone": "90ab3a017b7b29dd9ee92fdbb5831b0a",
+    "apitoken": "MbuO3DVbNX9aTG2Sj5OLZ67lcZyM0MILLdnzXt8w-O"
+  }
 };
+
 
 const API_KEYS_FILE = path.join(__dirname, 'apikeys.json');
 const DOMAIN_CATEGORIES_FILE = path.join(__dirname, 'domainCategories.json');
 const PRODUCTS_FILE = path.join(__dirname, 'products.json'); // Path ke products.json
+const CREATED_DOMAINS_FILE = path.join(__dirname, 'domains.json'); // NEW: Path untuk menyimpan domain yang dibuat
 
 // Fungsi pembantu untuk membaca/menulis file JSON
 async function readJsonFile(filePath, defaultValue = {}) {
@@ -140,8 +208,11 @@ app.post('/api/updateProduct', async (req, res) => {
                 if (newMenuContent !== undefined) {
                     products[category][productIndex].menuContent = newMenuContent;
                 }
-                if (newContactNumber !== undefined) {
+                // Update contactNumber, jika kosong akan dihapus
+                if (newContactNumber) {
                     products[category][productIndex].contactNumber = newContactNumber;
+                } else {
+                    delete products[category][productIndex].contactNumber;
                 }
 
                 await writeJsonFile(PRODUCTS_FILE, products);
@@ -225,6 +296,32 @@ app.post('/api/resetBulkPriceInCategory', async (req, res) => {
     } catch (error) {
         console.error('Error resetting bulk price:', error);
         res.status(500).json({ message: 'Gagal mengembalikan harga awal.' });
+    }
+});
+
+// --- RUTE API UNTUK MENGUBAH NOMOR KONTAK SEMUA PRODUK DALAM KATEGORI (BULK CONTACT NUMBER) ---
+app.post('/api/updateContactNumbersInCategory', async (req, res) => {
+    const { category, newContactNumber } = req.body;
+    try {
+        const productsData = await readJsonFile(PRODUCTS_FILE);
+        if (productsData[category]) {
+            productsData[category] = productsData[category].map(p => {
+                // Jika newContactNumber kosong, hapus properti contactNumber
+                if (newContactNumber) {
+                    return { ...p, contactNumber: newContactNumber };
+                } else {
+                    const { contactNumber, ...rest } = p; // Hapus contactNumber dari objek
+                    return rest;
+                }
+            });
+            await writeJsonFile(PRODUCTS_FILE, productsData);
+            res.status(200).json({ message: `Nomor kontak semua produk di kategori "${category}" berhasil diubah menjadi ${newContactNumber || 'kosong'}.` });
+        } else {
+            res.status(404).json({ message: 'Kategori tidak ditemukan.' });
+        }
+    } catch (error) {
+        console.error('Error updating bulk contact number:', error);
+        res.status(500).json({ message: 'Gagal menerapkan nomor kontak massal.' });
     }
 });
 
@@ -398,13 +495,13 @@ app.post('/api/createSubdomain', async (req, res) => {
         const { zone, apitoken } = selectedDomain;
 
         // Fungsi internal untuk membuat record DNS
-        const createDnsRecord = async (recordHost, recordIp) => {
+        const createDnsRecord = async (recordHost, recordIp, domainCategoryName) => { // Menerima domainCategoryName
             try {
                 const response = await axios.post(
                     `https://api.cloudflare.com/client/v4/zones/${zone}/dns_records`,
                     {
                         type: "A",
-                        name: recordHost.replace(/[^a-z0-9.-]/gi, "") + "." + domainCategory, // Tambahkan kembali domainCategory di sini
+                        name: recordHost.replace(/[^a-z0-9.-]/gi, "") + "." + domainCategoryName, // Gunakan domainCategoryName
                         content: recordIp.replace(/[^0-9.]/gi, ""), // Sanitasi IP
                         ttl: 3600,
                         priority: 10,
@@ -435,7 +532,7 @@ app.post('/api/createSubdomain', async (req, res) => {
         let successCount = 0;
 
         // Buat record untuk domain utama
-        const domainResult = await createDnsRecord(cleanedHost, ip);
+        const domainResult = await createDnsRecord(cleanedHost, ip, domainCategory); // Kirim domainCategory
         if (domainResult.success) {
             results.push({ name: domainResult.result.name, status: 'success' });
             successCount++;
@@ -444,7 +541,7 @@ app.post('/api/createSubdomain', async (req, res) => {
         }
 
         // Buat record untuk node domain
-        const nodeResult = await createDnsRecord(nodeDomainHost, ip);
+        const nodeResult = await createDnsRecord(nodeDomainHost, ip, domainCategory); // Kirim domainCategory
         if (nodeResult.success) {
             results.push({ name: nodeResult.result.name, status: 'success' });
             successCount++;
@@ -453,6 +550,20 @@ app.post('/api/createSubdomain', async (req, res) => {
         }
 
         if (successCount > 0) {
+            // NEW: Simpan domain yang dibuat ke domains.json
+            const createdDomains = await readJsonFile(CREATED_DOMAINS_FILE, []);
+            createdDomains.push({
+                id: uuidv4(), // ID unik untuk domain yang dibuat
+                apiKeyUsed: apiKey,
+                host: host,
+                domainCategory: domainCategory,
+                ip: ip,
+                fullDomain: fullDomain,
+                fullNode: fullNodeDomain,
+                createdAt: new Date().toISOString()
+            });
+            await writeJsonFile(CREATED_DOMAINS_FILE, createdDomains);
+
             res.status(200).json({ 
                 message: 'Subdomain berhasil dibuat.', 
                 domain: fullDomain, 
@@ -466,6 +577,36 @@ app.post('/api/createSubdomain', async (req, res) => {
     } catch (error) {
         console.error('Error creating subdomain:', error);
         res.status(500).json({ message: 'Terjadi kesalahan server saat membuat subdomain.' });
+    }
+});
+
+// NEW: RUTE API UNTUK MENDAPATKAN SEMUA DOMAIN YANG DIBUAT
+app.get('/api/createdDomains', async (req, res) => {
+    try {
+        const domains = await readJsonFile(CREATED_DOMAINS_FILE, []);
+        res.status(200).json(domains);
+    } catch (error) {
+        console.error('Error fetching created domains:', error);
+        res.status(500).json({ message: 'Gagal mengambil daftar domain yang dibuat.' });
+    }
+});
+
+// NEW: RUTE API UNTUK MENGHAPUS DOMAIN YANG DIBUAT
+app.delete('/api/deleteCreatedDomain', async (req, res) => {
+    const { id } = req.body; // Menggunakan ID unik domain yang dibuat
+    try {
+        let domains = await readJsonFile(CREATED_DOMAINS_FILE, []);
+        const initialLength = domains.length;
+        domains = domains.filter(d => d.id !== id);
+        if (domains.length < initialLength) {
+            await writeJsonFile(CREATED_DOMAINS_FILE, domains);
+            res.status(200).json({ message: 'Domain berhasil dihapus dari daftar.' });
+        } else {
+            res.status(404).json({ message: 'Domain tidak ditemukan di daftar.' });
+        }
+    } catch (error) {
+        console.error('Error deleting created domain:', error);
+        res.status(500).json({ message: 'Gagal menghapus domain dari daftar.' });
     }
 });
 
