@@ -11,11 +11,11 @@ export default async function handler(request, response) {
         const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
         const REPO_OWNER = process.env.REPO_OWNER; // Nama pengguna GitHub Anda
         const REPO_NAME = process.env.REPO_NAME;   // Nama repositori Anda
-        const FILE_PATH = 'products.json';         // Path ke file produk
+        const FILE_PATH = 'settings.json';         // Path ke file produk
 
         const octokit = new Octokit({ auth: GITHUB_TOKEN });
 
-        // 1. Ambil konten file products.json yang ada dari GitHub
+        // 1. Ambil konten file settings.json yang ada dari GitHub
         const { data: fileData } = await octokit.repos.getContent({
             owner: REPO_OWNER,
             repo: REPO_NAME,
@@ -23,7 +23,7 @@ export default async function handler(request, response) {
         });
 
         const content = Buffer.from(fileData.content, 'base64').toString('utf-8');
-        const productsJson = JSON.parse(content);
+        const settingsJson = JSON.parse(content);
 
         // 2. Siapkan data produk baru dari frontend
         const newProductData = request.body;
@@ -31,7 +31,7 @@ export default async function handler(request, response) {
         
         // 3. Cari ID tertinggi untuk generate ID otomatis yang unik
         let maxId = 0;
-        Object.values(productsJson).flat().forEach(product => {
+        Object.values(settingsJson).flat().forEach(product => {
             if (product.id > maxId) maxId = product.id;
         });
         const newId = maxId + 1;
@@ -59,11 +59,11 @@ export default async function handler(request, response) {
         }
         
         // 5. Tambahkan produk ke kategori yang sesuai
-        if (productsJson[newProductData.category]) {
-            productsJson[newProductData.category].unshift(newProduct); 
+        if (settingsJson[newProductData.category]) {
+            settingsJson[newProductData.category].unshift(newProduct); 
         } else {
             // Jika kategori tidak ada, buat array baru
-            productsJson[newProductData.category] = [newProduct];
+            settingsJson[newProductData.category] = [newProduct];
         }
 
         // 6. Update file kembali ke repositori GitHub
@@ -72,7 +72,7 @@ export default async function handler(request, response) {
             repo: REPO_NAME,
             path: FILE_PATH,
             message: `feat: Menambahkan produk baru "${newProduct.nama}"`,
-            content: Buffer.from(JSON.stringify(productsJson, null, 4)).toString('base64'),
+            content: Buffer.from(JSON.stringify(settingsJson, null, 4)).toString('base64'),
             sha: fileData.sha, // SHA wajib ada untuk proses update
         });
 

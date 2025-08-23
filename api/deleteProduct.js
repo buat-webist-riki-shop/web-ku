@@ -14,11 +14,11 @@ export default async function handler(request, response) {
         const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
         const REPO_OWNER = process.env.REPO_OWNER;
         const REPO_NAME = process.env.REPO_NAME;
-        const FILE_PATH = 'products.json';
+        const FILE_PATH = 'settings.json';
 
         const octokit = new Octokit({ auth: GITHUB_TOKEN });
 
-        // Ambil file products.json dari GitHub
+        // Ambil file settings.json dari GitHub
         const { data: fileData } = await octokit.repos.getContent({
             owner: REPO_OWNER,
             repo: REPO_NAME,
@@ -26,20 +26,20 @@ export default async function handler(request, response) {
         });
 
         const content = Buffer.from(fileData.content, 'base64').toString('utf-8');
-        const productsJson = JSON.parse(content);
+        const settingsJson = JSON.parse(content);
 
-        if (!productsJson[category]) {
+        if (!settingsJson[category]) {
             return response.status(400).json({ message: 'Kategori tidak valid.' });
         }
 
         // Filter produk
-        const updatedProducts = productsJson[category].filter(prod => prod.id !== id);
+        const updatedsettings = settingsJson[category].filter(prod => prod.id !== id);
 
-        if (updatedProducts.length === productsJson[category].length) {
+        if (updatedsettings.length === settingsJson[category].length) {
             return response.status(404).json({ message: 'Produk tidak ditemukan.' });
         }
 
-        productsJson[category] = updatedProducts;
+        settingsJson[category] = updatedsettings;
 
         // Simpan ke GitHub
         await octokit.repos.createOrUpdateFileContents({
@@ -47,7 +47,7 @@ export default async function handler(request, response) {
             repo: REPO_NAME,
             path: FILE_PATH,
             message: `chore: Menghapus produk ID ${id}`,
-            content: Buffer.from(JSON.stringify(productsJson, null, 4)).toString('base64'),
+            content: Buffer.from(JSON.stringify(settingsJson, null, 4)).toString('base64'),
             sha: fileData.sha,
         });
 
