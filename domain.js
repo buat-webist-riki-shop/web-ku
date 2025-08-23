@@ -1,8 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- [PENTING] UBAH NOMOR INI ---
+    // Ganti dengan nomor WhatsApp Anda untuk penjualan API Key
+    const WA_ADMIN_APIKEY_NUMBER = "6285771555374"; 
+    // ---
+
     const apiKeyScreen = document.getElementById('api-key-screen');
     const createDomainScreen = document.getElementById('create-domain-screen');
     const apiKeyInput = document.getElementById('api-key-input');
     const verifyKeyBtn = document.getElementById('verify-key-btn');
+    const buyApiKeyBtn = document.getElementById('buy-api-key-btn');
     const toastContainer = document.getElementById('toast-container');
     const domainChoice = document.getElementById('domain-choice');
     const createDomainBtn = document.getElementById('create-domain-btn');
@@ -14,16 +20,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const API_BASE_URL = '/api';
     let currentApiKey = null;
+    let toastTimeout;
 
     function showToast(message, type = 'error', duration = 3000) {
+        if (toastContainer.firstChild) {
+            clearTimeout(toastTimeout);
+            toastContainer.innerHTML = '';
+        }
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         let iconClass = (type === 'success') ? 'fa-check-circle' : 'fa-exclamation-circle';
         toast.innerHTML = `<i class="fas ${iconClass}"></i> ${message}`;
-        toastContainer.innerHTML = ''; // Hapus toast lama
         toastContainer.appendChild(toast);
-        setTimeout(() => toast.remove(), duration);
+        toastTimeout = setTimeout(() => toast.remove(), duration);
     }
+
+    buyApiKeyBtn.addEventListener('click', () => {
+        const message = "Halo admin, saya ingin membeli API Key untuk membuat subdomain reseller.";
+        window.open(`https://wa.me/${WA_ADMIN_APIKEY_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
+    });
 
     async function loadAvailableDomains() {
         try {
@@ -98,10 +113,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!res.ok) throw new Error(data.message);
 
             resultContent.innerHTML = `
-                <p>Domain Anda:</p>
-                <code>${data.created_domain}</code>
-                <p>Node Domain Anda:</p>
-                <code>${data.created_node_domain}</code>
+                <p><b>Domain:</b> ${data.created_domain}</p>
+                <p><b>Node:</b> ${data.created_node_domain}</p>
             `;
             resultModal.classList.add('is-visible');
 

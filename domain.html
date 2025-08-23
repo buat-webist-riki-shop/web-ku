@@ -3,34 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Buat Subdomain - Rikishopreal</title>
+    <title>Buat Subdomain - Reseller Rikishop</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="admin.css"> <style>
-        .result-popup { padding: 20px; text-align: left; }
-        .result-popup code {
-            display: block;
-            background-color: var(--secondary-color);
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 5px;
-            word-break: break-all;
-        }
-        .result-popup p { text-align: left; }
-    </style>
+    <link rel="stylesheet" href="admin.css">
 </head>
 <body class="light-mode">
     <div id="toast-container"></div>
 
     <div class="main-container" style="padding-top: 40px;">
         <div id="api-key-screen" class="form-card">
-            <h2><i class="fas fa-lock"></i> Verifikasi API Key</h2>
+            <h2><i class="fas fa-lock"></i> Verifikasi API Key Reseller</h2>
             <p>Masukkan API Key Anda untuk mengakses fitur pembuatan subdomain.</p>
              <div class="password-input-container">
                 <input type="text" id="api-key-input" placeholder="Masukkan API Key Anda">
             </div>
             <button type="button" id="verify-key-btn">Verifikasi</button>
-             <p style="margin-top: 20px; font-size: 0.9em;">Belum punya API Key? Hubungi admin untuk mendapatkannya!</p>
+            <button type="button" id="buy-api-key-btn" class="confirm-cancel-btn" style="width:100%; margin-top: 15px;">
+                <i class="fab fa-whatsapp"></i> Belum Punya API Key? Beli Di Sini
+            </button>
         </div>
 
         <div id="create-domain-screen" class="form-card" style="display: none;">
@@ -53,10 +44,10 @@
     </div>
 
     <div id="resultModal" class="modal">
-        <div class="modal-content confirm-modal-content result-popup">
+        <div class="modal-content confirm-modal-content">
             <h3><i class="fas fa-check-circle" style="color: var(--success-color);"></i> Sukses!</h3>
-            <p>Subdomain Anda berhasil dibuat. Berikut adalah detailnya:</p>
-            <div id="result-content"></div>
+            <p style="text-align:left;">Subdomain Anda berhasil dibuat. Berikut adalah detailnya:</p>
+            <div id="result-content" style="text-align:left; background-color: var(--secondary-color); padding: 10px; border-radius: 8px; font-size: 0.9em;"></div>
             <div class="confirm-actions">
                 <button type="button" id="closeResultModal" class="confirm-ok-btn">Selesai</button>
             </div>
