@@ -41,7 +41,7 @@ const visitorCountSpan = visitorCountDisplay ? visitorCountDisplay.querySelector
 let currentBannerIndex = 0;
 let bannerInterval;
 
-// ADDED: Elemen Countdown Timer
+// Elemen Countdown Timer
 const countdownTimerDiv = document.getElementById('countdownTimer');
 let countdownInterval = null;
 
@@ -313,11 +313,21 @@ function loadServiceProducts(serviceType) {
                     isNew = true;
                 }
             }
-            
-            let priceDisplay = `<span class="product-price-list">${formatRupiah(product.harga)}</span>`;
-            if (product.hargaAsli && product.hargaAsli > product.harga) {
-                priceDisplay = `<span class="original-price"><del>${formatRupiah(product.hargaAsli)}</del></span> <span class="discounted-price">${formatRupiah(product.harga)}</span>`;
+
+            // --- CHANGED: Logika harga dipindahkan ke sini ---
+            let finalPrice = product.harga;
+            const originalPrice = product.hargaAsli;
+
+            // Cek apakah diskon sudah berakhir
+            if (product.discountEndDate && new Date(product.discountEndDate) < new Date()) {
+                finalPrice = originalPrice; // Kembalikan ke harga asli jika sudah berakhir
             }
+
+            let priceDisplay = `<span class="product-price-list">${formatRupiah(finalPrice)}</span>`;
+            if (originalPrice && originalPrice > finalPrice) {
+                priceDisplay = `<span class="original-price"><del>${formatRupiah(originalPrice)}</del></span> <span class="discounted-price">${formatRupiah(finalPrice)}</span>`;
+            }
+            // --- END CHANGED ---
             
             productItem.innerHTML = `
                 <div>
@@ -342,7 +352,6 @@ function loadServiceProducts(serviceType) {
     }
 }
 
-// CHANGED: Entire function updated for discount and countdown logic
 function showProductDetail(product, serviceType) {
     productListDiv.style.display = 'none';
     productDetailViewDiv.style.display = 'block';
@@ -351,11 +360,9 @@ function showProductDetail(product, serviceType) {
     let finalPrice = product.harga;
     let originalPrice = product.hargaAsli;
     
-    // Logic to handle expired discounts on the client-side
+    // Cek apakah diskon sudah berakhir
     if (product.discountEndDate && new Date(product.discountEndDate) < new Date()) {
-        finalPrice = originalPrice; // Revert to original price if discount is expired
-    } else {
-        finalPrice = product.harga;
+        finalPrice = originalPrice; 
     }
 
     const priceHtml = (originalPrice && originalPrice > finalPrice)
@@ -365,7 +372,7 @@ function showProductDetail(product, serviceType) {
     detailProductPrice.innerHTML = priceHtml;
     detailProductActions.innerHTML = '';
     
-    // Countdown Timer Logic
+    // Logika Countdown Timer
     if (countdownInterval) clearInterval(countdownInterval);
     if (product.discountEndDate && new Date(product.discountEndDate) > new Date()) {
         countdownTimerDiv.style.display = 'block';
@@ -425,7 +432,7 @@ function showProductDetail(product, serviceType) {
     Object.assign(addToCartBtn.dataset, {
         productId: product.id,
         productName: product.nama,
-        productPrice: finalPrice, // Use final price for cart
+        productPrice: finalPrice, // Gunakan harga final untuk keranjang
         serviceType: serviceType
     });
     addToCartBtn.addEventListener('click', addToCart);
