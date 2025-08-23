@@ -6,7 +6,7 @@ export default async function handler(request, response) {
     }
 
     try {
-        // CHANGED: Destructure all new price fields from the request
+        // Mengambil semua data baru dari body request, termasuk untuk diskon
         const { 
             id, category, newName, hargaAsli, harga, 
             discountPrice, discountEndDate, 
@@ -41,17 +41,23 @@ export default async function handler(request, response) {
         productsJson[category] = productsJson[category].map(product => {
             if (product.id === id) {
                 productFound = true;
-                // CHANGED: Update all product properties including new discount fields
+                
+                // Memperbarui semua properti produk
                 product.nama = newName;
                 product.hargaAsli = hargaAsli;
                 product.harga = harga;
                 product.discountPrice = discountPrice ? Number(discountPrice) : null;
                 product.discountEndDate = discountEndDate || null;
                 product.deskripsiPanjang = newDesc;
-                product.nomorWA = nomorWA;
+                product.nomorWA = nomorWA || ""; // Pastikan nomor WA adalah string
 
-                if (newImages !== null && typeof newImages !== 'undefined') product.images = newImages;
-                if (newMenuContent !== null && typeof newMenuContent !== 'undefined') product.menuContent = newMenuContent;
+                // Hanya update jika ada data baru
+                if (newImages !== null && typeof newImages !== 'undefined') {
+                    product.images = newImages;
+                }
+                if (newMenuContent !== null && typeof newMenuContent !== 'undefined') {
+                    product.menuContent = newMenuContent;
+                }
             }
             return product;
         });
@@ -72,7 +78,7 @@ export default async function handler(request, response) {
         response.status(200).json({ message: 'Produk berhasil diperbarui!' });
 
     } catch (error) {
-        console.error("Error updateProduct:", error);
+        console.error("Error di updateProduct.js:", error);
         response.status(500).json({ message: 'Terjadi kesalahan di server.', error: error.message });
     }
 }
