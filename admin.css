@@ -29,7 +29,7 @@
 /* ANIMASI                                      */
 /* ============================================== */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
+    from { opacity: 0; transform: translateY(-20px); } /* CHANGED: Animation from top */
     to { opacity: 1; transform: translateY(0); }
 }
 @keyframes fadeOut {
@@ -187,7 +187,7 @@ small {
     display: block;
     font-size: 0.8em;
     color: var(--light-text-color);
-    margin-top: 5px; /* Diperbaiki dari -10px menjadi 5px */
+    margin-top: 5px;
     margin-bottom: 10px;
 }
 h3 {
@@ -333,6 +333,7 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
 /* ============================================== */
 /* MODAL & TOAST                                */
 /* ============================================== */
+/* CHANGED: Positioned toast at the top */
 #toast-container {
     position: fixed;
     top: 20px;
@@ -469,6 +470,24 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
 }
 .edit-btn { background-color: var(--primary-color); }
 .delete-btn { background-color: var(--error-color); }
+/* ADDED: Styles for discount display */
+.original-price del {
+    color: var(--light-text-color);
+    font-weight: normal;
+}
+.discounted-price {
+    color: var(--error-color);
+    font-weight: bold;
+}
+.new-badge {
+    background-color: var(--success-color);
+    color: white;
+    font-size: 0.7em;
+    padding: 2px 6px;
+    border-radius: 5px;
+    font-weight: bold;
+    vertical-align: middle;
+}
 
 .add-photo-container { display: flex; gap: 10px; margin-top: 10px; }
 .add-photo-container input { flex-grow: 1; } 
@@ -496,6 +515,16 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
 .bulk-price-input-group { display: flex; gap: 10px; align-items: center; }
 .bulk-price-input-group input { flex-grow: 1; margin-top: 0; }
 .bulk-price-input-group button { width: auto; margin-top: 0; padding: 10px 15px; }
+
+/* ADDED: Style for reset price button */
+.secondary-button {
+    background-color: #ff9500; /* Apple Orange */
+    color: white;
+}
+.dark-mode .secondary-button {
+    background-color: #ff9f0a;
+}
+
 
 #category-whatsapp-numbers-container .category-wa-input {
     display: grid;

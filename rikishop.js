@@ -41,6 +41,10 @@ const visitorCountSpan = visitorCountDisplay ? visitorCountDisplay.querySelector
 let currentBannerIndex = 0;
 let bannerInterval;
 
+// ADDED: Elemen Countdown Timer
+const countdownTimerDiv = document.getElementById('countdownTimer');
+let countdownInterval = null;
+
 // --- Elemen untuk Fitur Stock Akun ---
 const stockImageSliderContainer = document.getElementById('stockImageSliderContainer');
 const stockImageSlider = document.getElementById('stockImageSlider');
@@ -338,16 +342,60 @@ function loadServiceProducts(serviceType) {
     }
 }
 
+// CHANGED: Entire function updated for discount and countdown logic
 function showProductDetail(product, serviceType) {
     productListDiv.style.display = 'none';
     productDetailViewDiv.style.display = 'block';
     detailProductName.textContent = product.nama;
     
-    const priceHtml = product.hargaAsli && product.hargaAsli > product.harga
-        ? `<span class="original-price"><del>${formatRupiah(product.hargaAsli)}</del></span> <span class="discounted-price">${formatRupiah(product.harga)}</span>`
-        : `${formatRupiah(product.harga)}`;
+    let finalPrice = product.harga;
+    let originalPrice = product.hargaAsli;
+    
+    // Logic to handle expired discounts on the client-side
+    if (product.discountEndDate && new Date(product.discountEndDate) < new Date()) {
+        finalPrice = originalPrice; // Revert to original price if discount is expired
+    } else {
+        finalPrice = product.harga;
+    }
+
+    const priceHtml = (originalPrice && originalPrice > finalPrice)
+        ? `<span class="original-price"><del>${formatRupiah(originalPrice)}</del></span> <span class="discounted-price">${formatRupiah(finalPrice)}</span>`
+        : `${formatRupiah(finalPrice)}`;
+
     detailProductPrice.innerHTML = priceHtml;
     detailProductActions.innerHTML = '';
+    
+    // Countdown Timer Logic
+    if (countdownInterval) clearInterval(countdownInterval);
+    if (product.discountEndDate && new Date(product.discountEndDate) > new Date()) {
+        countdownTimerDiv.style.display = 'block';
+        const endTime = new Date(product.discountEndDate).getTime();
+
+        const updateTimer = () => {
+            const now = new Date().getTime();
+            const distance = endTime - now;
+
+            if (distance < 0) {
+                clearInterval(countdownInterval);
+                countdownTimerDiv.innerHTML = '<div class="timer-title">Diskon Berakhir</div>';
+                detailProductPrice.innerHTML = `${formatRupiah(originalPrice)}`;
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('countdown-display').textContent = 
+                `${days}h ${hours}j ${minutes}m ${seconds}d`;
+        };
+
+        updateTimer();
+        countdownInterval = setInterval(updateTimer, 1000);
+    } else {
+        countdownTimerDiv.style.display = 'none';
+    }
 
     if ((serviceType === 'Stock Akun' || serviceType === 'Logo') && product.images && product.images.length > 0) {
         stockImageSliderContainer.style.display = 'block';
@@ -377,7 +425,7 @@ function showProductDetail(product, serviceType) {
     Object.assign(addToCartBtn.dataset, {
         productId: product.id,
         productName: product.nama,
-        productPrice: product.harga,
+        productPrice: finalPrice, // Use final price for cart
         serviceType: serviceType
     });
     addToCartBtn.addEventListener('click', addToCart);
@@ -391,11 +439,11 @@ function showProductDetail(product, serviceType) {
 
     let buyNowMessage = '';
     if (serviceType === 'Stock Akun' && product.images && product.images.length > 0) {
-        buyNowMessage = `Halo Kak, saya tertarik memesan Akun:\n\nProduk: *${product.nama}*\nHarga: *${formatRupiah(product.harga)}*\n\nReferensi gambar:\n${product.images[0]}\n\nMohon info ketersediaannya. Terima kasih! ðŸ™`;
+        buyNowMessage = `Halo Kak, saya tertarik memesan Akun:\n\nProduk: *${product.nama}*\nHarga: *${formatRupiah(finalPrice)}*\n\nReferensi gambar:\n${product.images[0]}\n\nMohon info ketersediaannya. Terima kasih! ðŸ™ `;
     } else if (serviceType === 'Logo' && product.images && product.images.length > 0) {
-        buyNowMessage = `Halo Kak, saya tertarik memesan Logo:\n\nNama Logo: *${product.nama}*\nHarga: *${formatRupiah(product.harga)}*\n\nReferensi gambar:\n${product.images[0]}\n\nMohon info ketersediaannya. Terima kasih! ðŸ™`;
+        buyNowMessage = `Halo Kak, saya tertarik memesan Logo:\n\nNama Logo: *${product.nama}*\nHarga: *${formatRupiah(finalPrice)}*\n\nReferensi gambar:\n${product.images[0]}\n\nMohon info ketersediaannya. Terima kasih! ðŸ™ `;
     } else {
-        buyNowMessage = `Halo Kak, saya tertarik memesan produk:\n\nProduk: *${product.nama}*\nHarga: *${formatRupiah(product.harga)}*\n\nMohon info selanjutnya. Terima kasih! ðŸ™`;
+        buyNowMessage = `Halo Kak, saya tertarik memesan produk:\n\nProduk: *${product.nama}*\nHarga: *${formatRupiah(finalPrice)}*\n\nMohon info selanjutnya. Terima kasih! ðŸ™ `;
     }
     
     buyNowLink.href = `https://wa.me/${targetPhoneNumber}?text=${encodeURIComponent(buyNowMessage)}`;
@@ -581,7 +629,7 @@ checkoutButton.addEventListener('click', () => {
         totalOrder += item.price * item.quantity;
     });
 
-    let message = `Halo Kak, saya ingin mengonfirmasi pesanan dari keranjang:\n\n--- PESANAN ---\n${itemsText}--------------------\n\n*Total: ${formatRupiah(totalOrder)}*\n\nMohon konfirmasinya. Terima kasih! ðŸ™`;
+    let message = `Halo Kak, saya ingin mengonfirmasi pesanan dari keranjang:\n\n--- PESANAN ---\n${itemsText}--------------------\n\n*Total: ${formatRupiah(totalOrder)}*\n\nMohon konfirmasinya. Terima kasih! ðŸ™ `;
     
     const checkoutNumber = siteSettings.globalPhoneNumber || WA_ADMIN_NUMBER;
     window.open(`https://wa.me/${checkoutNumber}?text=${encodeURIComponent(message)}`, '_blank');
