@@ -246,7 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
             button.classList.add('active');
             tabContents.forEach(content => content.classList.remove('active'));
             document.getElementById(button.dataset.tab).classList.add('active');
-            if (button.dataset.tab === 'managesettings') {
+            if (button.dataset.tab === 'manageProducts') {
                 const currentCategory = manageCategorySelect.value;
                 if (currentCategory) { 
                     manageCategorySelect.dispatchEvent(new Event('change'));
@@ -272,24 +272,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         try {
             const timestamp = new Date().getTime();
-            const res = await fetch(`/settings.json?v=${timestamp}`);
+            const res = await fetch(`/products.json?v=${timestamp}`);
             if (!res.ok) {
                 const errorText = await res.text(); 
                 throw new Error(`Gagal memuat produk: Status ${res.status}. Detail: ${errorText.substring(0, 100)}...`);
             }
             const data = await res.json(); 
-            const settingsInCat = data[category] || [];
-            if (settingsInCat.length === 0) {
+            const productsInCat = data[category] || [];
+            if (productsInCat.length === 0) {
                 manageProductList.innerHTML = '<p>Tidak ada produk di kategori ini.</p>';
                 saveOrderButton.style.display = 'none';
                 bulkPriceEditContainer.style.display = 'none';
                 return;
             }
-            renderManageList(settingsInCat, category);
+            renderManageList(productsInCat, category);
             saveOrderButton.style.display = 'block';
             bulkPriceEditContainer.style.display = 'flex'; 
         } catch (err) {
-            console.error("Error loading settings for management:", err); 
+            console.error("Error loading products for management:", err); 
             showToast(err.message || 'Gagal memuat produk. Periksa konsol browser untuk detail.', 'error');
             manageProductList.innerHTML = `<p>Gagal memuat produk. ${err.message || ''}</p>`;
             saveOrderButton.style.display = 'none';
@@ -297,9 +297,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    function renderManageList(settingsToRender, category) {
+    function renderManageList(productsToRender, category) {
         manageProductList.innerHTML = '';
-        settingsToRender.forEach(prod => {
+        productsToRender.forEach(prod => {
             const isNew = prod.createdAt && Date.now() - new Date(prod.createdAt).getTime() < 24 * 60 * 60 * 1000;
             const item = document.createElement('div');
             item.className = 'delete-item';
@@ -323,14 +323,14 @@ document.addEventListener('DOMContentLoaded', () => {
             manageProductList.appendChild(item);
         });
 
-        setupManageActions(category, settingsToRender);
+        setupManageActions(category, productsToRender);
     }
     
     function formatRupiah(number) {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
     }
 
-    function setupManageActions(category, settingsInCat) {
+    function setupManageActions(category, productsInCat) {
         manageProductList.querySelectorAll('.delete-btn').forEach(btn => {
             btn.addEventListener('click', async e => {
                 e.preventDefault(); 
@@ -386,7 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault(); 
                 const productId = parseInt(e.target.closest('.edit-btn').dataset.id); 
-                const product = settingsInCat.find(p => p.id === productId);
+                const product = productsInCat.find(p => p.id === productId);
                 if (!product) {
                     showToast('Produk tidak ditemukan.', 'error');
                     return;
@@ -545,7 +545,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast('Menyimpan urutan...', 'info', 5000);
             saveOrderButton.disabled = true;
             try {
-                const res = await fetch(`${API_BASE_URL}/reordersettings`, {
+                const res = await fetch(`${API_BASE_URL}/reorderProducts`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ category, order: newOrder })
@@ -588,7 +588,7 @@ document.addEventListener('DOMContentLoaded', () => {
             applyBulkPriceBtn.disabled = true;
 
             try {
-                const res = await fetch(`${API_BASE_URL}/updatesettingsInCategory`, { 
+                const res = await fetch(`${API_BASE_URL}/updateProductsInCategory`, { 
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ category, newPrice: newBulkPrice })

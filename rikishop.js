@@ -91,7 +91,7 @@ let toastTimeout;
 let customMusicMuted = false;
 
 // Variabel Global
-let settings = {};
+let products = {};
 let siteSettings = {}; // Menyimpan data dari settings.json
 let cart = JSON.parse(localStorage.getItem('rikishop_cart')) || [];
 let currentPage = 'home-page';
@@ -286,15 +286,15 @@ serviceItems.forEach(item => {
     item.addEventListener('click', (e) => {
         e.preventDefault();
         const serviceType = item.dataset.service;
-        loadServicesettings(serviceType);
+        loadServiceProducts(serviceType);
         showPage('service-detail-page');
     });
 });
-function loadServicesettings(serviceType) {
+function loadServiceProducts(serviceType) {
     serviceDetailPageTitle.textContent = serviceType;
     productListDiv.innerHTML = '';
     productDetailViewDiv.style.display = 'none';
-    let productData = settings[serviceType];
+    let productData = products[serviceType];
     
     if (productData && productData.length > 0) {
         productData.forEach(product => {
@@ -615,7 +615,7 @@ function getAiResponse(input) {
     if (lowerInput.includes('toko apa ini') || lowerInput.includes('rikishop itu apa')) return `<b>Rikishop</b> adalah platform penyedia layanan digital terlengkap. Kami fokus pada produk berkualitas seperti Panel Hosting, VPS, Script Bot, dan berbagai jasa digital lainnya dengan harga terjangkau.`;
     if (lowerInput.includes('aman') || lowerInput.includes('terpercaya') || lowerInput.includes('tipu')) return `Tentu! Keamanan dan kepercayaan pelanggan adalah prioritas utama kami. Semua transaksi dijamin aman dan produk yang kami jual memiliki kualitas terbaik. Anda bisa melihat testimoni dari pelanggan kami.`;
     if (lowerInput.includes('testi') || lowerInput.includes('testimoni')) return `Tentu, Anda bisa melihat semua testimoni pelanggan kami di halaman ini: <a href="${TESTIMONI_LINK}" target="_blank">${TESTIMONI_LINK}</a>`;
-    if (lowerInput.includes('jual apa') || lowerInput.includes('produk apa') || lowerInput.includes('layanan')) { const categories = Object.keys(settings).join(', '); return `Kami menyediakan berbagai layanan digital, antara lain: <b>${categories}</b>. Apakah ada kategori spesifik yang ingin Anda ketahui lebih lanjut?`; }
+    if (lowerInput.includes('jual apa') || lowerInput.includes('produk apa') || lowerInput.includes('layanan')) { const categories = Object.keys(products).join(', '); return `Kami menyediakan berbagai layanan digital, antara lain: <b>${categories}</b>. Apakah ada kategori spesifik yang ingin Anda ketahui lebih lanjut?`; }
     if (lowerInput.includes('panel')) return `Kami menyediakan Panel Hosting dengan berbagai pilihan RAM, mulai dari 1GB hingga UNLIMITED. Server kami private, berkualitas, dan bergaransi. Cocok untuk menjalankan berbagai jenis bot.`;
     if (lowerInput.includes('vps')) return `Tentu, untuk VPS kami punya banyak pilihan spesifikasi RAM dan CPU. Setiap pembelian VPS akan mendapatkan bonus menarik seperti gratis install panel. Sangat cocok untuk kebutuhan server Anda.`;
     if (lowerInput.includes('script')) return `Kami menjual berbagai script fungsional seperti script push kontak, cpanel untuk reseller, bot Telegram, dan banyak lagi. Semua script sudah teruji dan siap pakai.`;
@@ -703,13 +703,13 @@ async function initializeApp() {
     mainContainer.style.display = 'none';
     try {
         const timestamp = new Date().getTime();
-        const [settingsResponse, settingsResponse] = await Promise.all([
-            fetch(`settings.json?v=${timestamp}`),
+        const [productsResponse, settingsResponse] = await Promise.all([
+            fetch(`products.json?v=${timestamp}`),
             fetch(`settings.json?v=${timestamp}`)
         ]);
 
-        if (!settingsResponse.ok) throw new Error(`Gagal memuat produk: ${settingsResponse.status}`);
-        settings = await settingsResponse.json();
+        if (!productsResponse.ok) throw new Error(`Gagal memuat produk: ${productsResponse.status}`);
+        products = await productsResponse.json();
         
         if (settingsResponse.ok) {
             siteSettings = await settingsResponse.json();
