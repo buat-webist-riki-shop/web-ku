@@ -136,12 +136,17 @@
         {
             "id": 13,
             "nama": "VPS Ram:1GB Cpu:1",
-            "harga": 20000,
+            "harga": 3000,
             "hargaAsli": 20000,
             "deskripsiPanjang": "Bonus Buy Vps: Free Install Panel 1x ram 8/16 || Free Instal Wings/Node 1x ram 8/16 || Free Pasang Egg Bot/Mc || Free Install Thema Buy Ram 8/16 || Garansi 15 Hari Nego? = Nogar || Vps On 30 Hari || Garansi Hanya 1x Ambil",
             "nomorWA": "",
-            "discountPrice": null,
-            "discountEndDate": null
+            "discountPrice": 3000,
+            "discountEndDate": "2025-08-23T12:53:00.000Z",
+            "category": "VPS",
+            "newName": "VPS Ram:1GB Cpu:1",
+            "newDesc": "Bonus Buy Vps: Free Install Panel 1x ram 8/16 || Free Instal Wings/Node 1x ram 8/16 || Free Pasang Egg Bot/Mc || Free Install Thema Buy Ram 8/16 || Garansi 15 Hari Nego? = Nogar || Vps On 30 Hari || Garansi Hanya 1x Ambil",
+            "newImages": [],
+            "newMenuContent": ""
         },
         {
             "id": 14,
