@@ -41,7 +41,7 @@
         <nav class="admin-tabs">
             <button type="button" class="tab-button active" data-tab="addProduct">Tambah Produk</button>
             <button type="button" class="tab-button" data-tab="manageProducts">Kelola Produk</button>
-            <button type="button" class="tab-button" data-tab="manageDomains">Kelola Domain & API</button>
+            <button type="button" class="tab-button" data-tab="settings">Pengaturan</button>
         </nav>
         
         <div id="addProduct" class="admin-tab-content active">
@@ -67,11 +67,11 @@
                 <label for="product-price">Harga Produk (hanya angka):</label>
                 <input type="number" id="product-price" placeholder="Contoh: 3000">
 
-                <label for="product-whatsapp">Nomor WhatsApp (Opsional, cth: 62812xxxx):</label>
-                <input type="text" id="product-whatsapp" placeholder="Hanya angka, diawali kode negara">
-
                 <label for="product-description">Deskripsi Produk (Tekan Enter untuk baris baru):</label>
                 <textarea id="product-description" rows="5" placeholder="Tulis deskripsi di sini..."></textarea>
+                
+                <label for="product-whatsapp-number">Nomor WA Spesifik (Opsional):</label>
+                <input type="text" id="product-whatsapp-number" placeholder="Contoh: 628123456789. Kosongkan untuk pakai nomor kategori/global.">
 
                 <div id="scriptMenuSection" style="display: none;">
                     <label for="script-menu-content">Konten Menu Script:</label>
@@ -88,9 +88,9 @@
         </div>
         
         <div id="manageProducts" class="admin-tab-content">
-            <div class="admin-form">
+            <form class="admin-form">
                 <h2><i class="fas fa-cogs"></i> Kelola Produk</h2>
-                <label for="manage-category">Pilih Kategori untuk Dikelola:</label>
+                <label for="manage-category">Pilih Kategori:</label>
                 <select id="manage-category">
                     <option value="">-- Pilih Kategori --</option>
                     <option value="Panel">Panel</option>
@@ -106,74 +106,32 @@
                 <div id="manage-product-list"></div>
                 <button type="button" id="save-order-button" style="display:none;">Simpan Urutan</button>
 
-                <div id="bulk-edit-sections" style="display: none;">
-                    <hr style="margin: 25px 0; border: 1px solid var(--border-color);">
-                    <h3><i class="fas fa-edit"></i> Edit Massal per Kategori</h3>
-                    <p style="font-size: 0.9em;">Perubahan di bawah ini hanya berlaku untuk kategori "<b id="selected-category-name"></b>" yang sedang dipilih.</p>
-                    <div class="bulk-price-edit-container">
-                        <label for="bulk-price-input">Ubah Harga:</label>
-                        <div class="bulk-price-input-group">
-                            <input type="number" id="bulk-price-input" placeholder="Masukkan harga baru">
-                            <button type="button" id="apply-bulk-price-btn">Terapkan Harga</button>
-                        </div>
-                    </div>
-                    <div class="bulk-price-edit-container">
-                        <label for="bulk-whatsapp-input">Ubah No. WhatsApp:</label>
-                        <div class="bulk-price-input-group">
-                            <input type="text" id="bulk-whatsapp-input" placeholder="Masukkan No. WA baru">
-                            <button type="button" id="apply-bulk-whatsapp-btn">Terapkan No. WA</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="admin-form" style="margin-top:20px;">
-                <h3><i class="fas fa-globe-asia"></i> Edit Massal Global</h3>
-                <p style="font-size: 0.9em;">Perubahan di sini akan diterapkan pada **SEMUA PRODUK** di **SEMUA KATEGORI**.</p>
-                <div class="bulk-price-edit-container">
-                    <label for="global-bulk-whatsapp-input">Ubah No. WhatsApp untuk Semua Produk:</label>
+                <div id="bulk-price-edit-container" class="bulk-price-edit-container" style="display: none;">
+                    <label for="bulk-price-input">Ubah Harga Semua Produk di Kategori Ini:</label>
                     <div class="bulk-price-input-group">
-                        <input type="text" id="global-bulk-whatsapp-input" placeholder="cth: 62812xxxx (kosongkan untuk hapus)">
-                        <button type="button" id="apply-global-bulk-whatsapp-btn">Terapkan ke Semua</button>
+                        <input type="number" id="bulk-price-input" placeholder="Masukkan harga baru (contoh: 5000)">
+                        <button type="button" id="apply-bulk-price-btn">Terapkan Harga</button>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
 
-        <div id="manageDomains" class="admin-tab-content">
-             <div class="admin-form">
-                <h2><i class="fas fa-key"></i> Kelola API Key</h2>
-                <div class="api-key-form">
-                    <label for="api-user-identifier">Nama Pengguna / Identifier:</label>
-                    <input type="text" id="api-user-identifier" placeholder="Contoh: riki_reseller">
-                    <label for="api-duration">Masa Aktif (hari):</label>
-                    <input type="number" id="api-duration" placeholder="Contoh: 30">
-                    <button type="button" id="generate-api-key-btn">Buat API Key</button>
-                </div>
-                <h3>Daftar API Key Aktif</h3>
-                <div id="api-key-list">Memuat...</div>
-            </div>
+        <div id="settings" class="admin-tab-content">
+            <form class="admin-form" id="settingsForm">
+                <h2><i class="fas fa-globe"></i> Pengaturan Nomor WhatsApp</h2>
+                
+                <label for="global-whatsapp-number">Nomor WA Global (Default):</label>
+                <input type="text" id="global-whatsapp-number" placeholder="Contoh: 628123456789 (Wajib diisi)">
+                <small>Nomor ini akan digunakan jika nomor kategori/produk tidak diatur.</small>
 
-            <div class="admin-form" style="margin-top: 20px;">
-                <h2><i class="fas fa-globe"></i> Kelola Domain Induk</h2>
-                 <a href="/domain.html" target="_blank" style="display:block; text-align:center; margin-bottom: 15px; text-decoration: none; font-weight: 500;">
-                    <i class="fas fa-external-link-alt"></i> Buka Halaman Reseller
-                 </a>
-                 <p style="font-size: 0.8em; text-align: left;">Tambahkan domain yang akan tersedia untuk pembuatan subdomain oleh reseller. Dapatkan Zone ID dan API Token dari dashboard Cloudflare Anda.</p>
-                <div class="domain-manager-form">
-                    <label for="domain-name">Nama Domain:</label>
-                    <input type="text" id="domain-name" placeholder="contoh.com">
-                    <label for="domain-zone-id">Cloudflare Zone ID:</label>
-                    <input type="text" id="domain-zone-id" placeholder="ID Zona dari Cloudflare">
-                    <label for="domain-api-token">Cloudflare API Token:</label>
-                    <input type="text" id="domain-api-token" placeholder="Token API Cloudflare (dengan izin Edit DNS)">
-                    <button type="button" id="add-domain-btn">Tambah Domain</button>
-                </div>
-                <h3>Daftar Domain Tersedia</h3>
-                <div id="domain-list">Memuat...</div>
-                 <h3>Daftar Subdomain Dibuat</h3>
-                 <div id="subdomain-list">Memuat...</div>
-            </div>
+                <div id="category-whatsapp-numbers-container">
+                    <h3><i class="fas fa-list-alt"></i> Nomor WA per Kategori (Opsional)</h3>
+                    </div>
+                
+                <button type="button" id="save-settings-button">Simpan Pengaturan</button>
+            </form>
         </div>
+
     </div>
     
     <div id="editProductModal" class="modal">
@@ -190,12 +148,12 @@
                 
                 <label for="edit-price">Harga Produk:</label>
                 <input type="number" id="edit-price">
-
-                <label for="edit-whatsapp">Nomor WhatsApp (Opsional):</label>
-                <input type="text" id="edit-whatsapp" placeholder="Hanya angka, cth: 62812xxxx">
                 
                 <label for="edit-desc">Deskripsi Produk:</label>
                 <textarea id="edit-desc" rows="5"></textarea>
+
+                <label for="edit-whatsapp-number">Nomor WA Spesifik (Opsional):</label>
+                <input type="text" id="edit-whatsapp-number" placeholder="Contoh: 628123456789. Kosongkan untuk pakai nomor kategori/global.">
                 
                 <div id="edit-photo-section" style="display: none;">
                     <label>Kelola Foto:</label>
@@ -223,15 +181,6 @@
                 <button type="button" id="confirmCancelBtn" class="confirm-cancel-btn">Batal</button>
                 <button type="button" id="confirmOkBtn" class="confirm-ok-btn">Oke</button>
             </div>
-        </div>
-    </div>
-
-     <div id="apiKeyResultModal" class="modal">
-        <div class="modal-content confirm-modal-content">
-            <h3>API Key Berhasil Dibuat!</h3>
-            <p>Harap simpan API Key ini di tempat yang aman. Anda tidak dapat melihatnya lagi setelah menutup jendela ini.</p>
-            <div id="apiKeyResult" style="background-color: var(--secondary-color); padding: 15px; border-radius: 8px; margin: 15px 0; word-wrap: break-word; text-align: left;"></div>
-            <button type="button" id="closeApiKeyModal" class="confirm-ok-btn">Tutup</button>
         </div>
     </div>
     

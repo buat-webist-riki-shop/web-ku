@@ -50,13 +50,12 @@ body {
     min-height: 100vh;
 }
 
-/* Container admin - Pastikan selalu terpusat dan tidak melewati batas */
 .main-container {
     width: 100%;
     max-width: 1200px;
-    margin: 0 auto; /* Ini yang membuat konten utama terpusat */
-    padding: 15px; /* Padding agar tidak terlalu mepet ke samping */
-    box-sizing: border-box; /* Penting agar padding tidak menambah lebar */
+    margin: 0 auto;
+    padding: 15px;
+    box-sizing: border-box;
 }
 
 /* ============================================== */
@@ -74,8 +73,8 @@ body {
     text-align: center;
     width: 100%;
     max-width: 400px;
-    margin: 0 auto; /* Pastikan kartu login terpusat */
-    position: relative; /* Untuk memposisikan tombol tema */
+    margin: 0 auto;
+    position: relative;
 }
 .login-header {
     margin-bottom: 25px;
@@ -98,41 +97,28 @@ body {
     margin-bottom: 0;
 }
 
-/* Tombol Masuk - Dikembalikan ke bentuk persegi panjang */
 #login-button {
-    width: 100%; /* Lebar penuh */
+    width: 100%;
     padding: 14px;
     margin-top: 30px;
-    background-color: var(--primary-color);
-    color: var(--white-color);
-    border: none;
-    border-radius: 10px; /* Sudut membulat */
-    font-size: 1.05em;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: none; /* Hapus shadow tambahan jika ada */
+    border-radius: 10px;
 }
-#login-button:hover { filter: brightness(1.1); }
-#login-button:active { transform: scale(0.97); }
 #login-button:disabled { background-color: var(--light-text-color); cursor: not-allowed; }
 
-
-/* Perbaikan posisi ikon mata pada input password */
 .password-input-container {
-    position: relative; /* Kontainer menjadi relatif */
-    width: 100%; /* Pastikan mengambil lebar penuh */
-    margin-bottom: 15px; /* Tambahkan sedikit ruang di bawah input */
+    position: relative;
+    width: 100%;
+    margin-bottom: 15px;
 }
 .password-input-container input {
-    padding-right: 40px; /* Tambahkan padding agar ikon tidak menutupi teks */
+    padding-right: 40px;
     width: 100%;
 }
 .password-toggle {
-    position: absolute; /* Ikon menjadi absolut */
-    right: 15px; /* Posisikan di sebelah kanan */
-    top: 50%; /* Tengah vertikal */
-    transform: translateY(-50%); /* Penyesuaian tengah vertikal */
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
     cursor: pointer;
     color: var(--light-text-color);
     font-size: 1em;
@@ -141,12 +127,10 @@ body {
     color: var(--text-color);
 }
 
-/* Tombol Tema (theme-switch) - Dibuat bulat dan diposisikan */
-/* Untuk layar login */
 #login-screen .theme-switch {
-    position: absolute; /* Posisikan absolut di dalam login-card */
-    top: 15px; /* Jarak dari atas */
-    right: 15px; /* Jarak dari kanan */
+    position: absolute;
+    top: 15px;
+    right: 15px;
     width: 40px; 
     height: 40px;
     border-radius: 50%;
@@ -155,16 +139,10 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: background-color 0.2s ease;
-    flex-shrink: 0; 
     box-shadow: 0 2px 5px var(--shadow-color); 
 }
-#login-screen .theme-switch:hover { filter: brightness(0.95); }
-#login-screen .theme-switch i { font-size: 1.1em; transition: transform 0.2s ease; }
-
-/* Untuk panel admin (header) */
 .admin-header .theme-switch {
-    width: 38px; /* Sedikit lebih kecil agar pas di header */
+    width: 38px;
     height: 38px;
     border-radius: 50%;
     background-color: var(--secondary-color);
@@ -172,13 +150,8 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: background-color 0.2s ease;
-    flex-shrink: 0; 
-    box-shadow: 0 2px 5px var(--shadow-color); /* Tambahkan shadow */
+    box-shadow: 0 2px 5px var(--shadow-color);
 }
-.admin-header .theme-switch:hover { filter: brightness(0.95); }
-.admin-header .theme-switch i { font-size: 1.0em; transition: transform 0.2s ease; }
-
 
 /* ============================================== */
 /* FORM CARD & GENERAL ELEMENTS                 */
@@ -191,7 +164,6 @@ body {
     box-shadow: 0 10px 30px var(--shadow-color);
     border: 1px solid var(--border-color);
     animation: fadeIn 0.5s ease-out forwards;
-    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 h2 {
@@ -211,6 +183,25 @@ p {
     font-size: 0.95em;
     margin-bottom: 25px;
 }
+small {
+    display: block;
+    font-size: 0.8em;
+    color: var(--light-text-color);
+    margin-top: -10px;
+    margin-bottom: 10px;
+}
+h3 {
+    text-align: left;
+    margin-top: 25px;
+    font-size: 1.1em;
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 8px;
+}
+h3 i {
+    color: var(--primary-color);
+    margin-right: 8px;
+}
 
 label {
     display: block;
@@ -227,7 +218,7 @@ input, select, textarea {
     box-sizing: border-box;
     font-family: inherit;
     font-size: 1em;
-    background-color: transparent;
+    background-color: var(--secondary-color);
     color: var(--text-color);
     transition: box-shadow 0.2s, background-color 0.2s, border-color 0.2s;
 }
@@ -235,16 +226,16 @@ input:focus, select:focus, textarea:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
+    background-color: var(--white-color);
 }
 textarea { resize: vertical; min-height: 100px; }
 
-/* Tombol umum (selain login) */
 button {
     width: 100%;
     padding: 14px;
     margin-top: 30px;
     background-color: var(--primary-color);
-    color: var(--white-color);
+    color: #fff;
     border: none;
     border-radius: 10px;
     font-size: 1.05em;
@@ -278,20 +269,14 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
     flex-grow: 1; 
     text-align: center;
     padding: 0 10px; 
-    min-width: 0; 
-    white-space: nowrap; 
-    overflow: hidden; 
-    text-overflow: ellipsis; 
 }
 .admin-header .profile-pic {
     width: 38px; 
     height: 38px;
     border-radius: 50%;
     object-fit: cover;
-    flex-shrink: 0; 
 }
 
-/* Tabs - Perbaikan agar tidak "lewat ke pinggir" */
 .admin-tabs {
     width: 100%; 
     display: flex;
@@ -300,14 +285,12 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
     padding: 5px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     margin-top: 20px;
-    flex-wrap: wrap; 
     justify-content: center; 
     box-sizing: border-box; 
 }
 .tab-button {
     flex: 1; 
-    min-width: 120px; 
-    max-width: 50%; /* Batasi lebar maksimal tombol tab agar tidak terlalu besar */
+    min-width: 100px; 
     border: none;
     background-color: transparent;
     padding: 10px 15px;
@@ -316,31 +299,28 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
     cursor: pointer;
     color: var(--text-color);
     transition: background-color 0.2s ease, color 0.2s ease;
-    box-sizing: border-box; 
 }
 .tab-button.active {
     background-color: var(--primary-color);
-    color: var(--white-color);
+    color: #fff;
 }
 .admin-tab-content {
     display: none;
     width: 100%;
     margin-top: 20px;
     box-sizing: border-box; 
-    padding: 0 15px; /* Tambahkan padding ke konten tab agar tidak terlalu mepet */
+    padding: 0;
 }
 .admin-tab-content.active {
     display: block;
     animation: fadeIn 0.5s ease-out forwards;
 }
 
-/* Form admin - Pastikan selalu di tengah dan tidak lewat */
 .admin-form {
     display: flex;
     flex-direction: column;
-    gap: 15px;
     width: 100%;
-    max-width: 600px; 
+    max-width: 700px; 
     margin: 0 auto; 
     background: var(--white-color);
     padding: 25px;
@@ -354,24 +334,23 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
 /* ============================================== */
 #toast-container {
     position: fixed;
-    top: 30px;
+    top: 20px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
+    width: 90%;
+    max-width: 500px;
     pointer-events: none;
 }
 .toast {
+    width: 100%;
     display: flex;
     align-items: center;
     gap: 10px;
     background-color: rgba(255, 255, 255, 0.9);
     color: var(--text-color);
     padding: 12px 20px;
-    border-radius: 25px;
+    border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.15);
     font-size: 0.95em;
     font-weight: 500;
@@ -380,6 +359,8 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
     border: 1px solid rgba(0,0,0,0.05);
     animation: fadeIn 0.5s ease forwards;
     pointer-events: auto;
+    box-sizing: border-box;
+    margin-bottom: 10px;
 }
 .toast.success { background-color: rgba(52, 199, 89, 0.9); color: white; }
 .toast.error { background-color: rgba(255, 59, 48, 0.9); color: white; }
@@ -401,7 +382,7 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
     visibility: hidden;
     opacity: 0;
     transition: visibility 0s, opacity 0.3s ease;
-    box-sizing: border-box; /* Pastikan padding dihitung dalam width */
+    box-sizing: border-box;
 }
 .modal.is-visible { visibility: visible; opacity: 1; }
 .modal-content {
@@ -428,13 +409,11 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
     right: 15px;
     cursor: pointer;
 }
-.close-button:hover { color: var(--text-color); }
 
-/* Styling untuk Custom Confirmation Modal */
 .confirm-modal-content {
     text-align: center;
     padding: 20px;
-    max-width: 300px; /* Ukuran lebih kecil untuk konfirmasi */
+    max-width: 300px;
 }
 .confirm-message {
     font-size: 1.1em;
@@ -449,34 +428,16 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
 }
 .confirm-actions button {
     flex: 1;
-    margin-top: 0; /* Override margin-top default button */
+    margin-top: 0;
     padding: 10px 15px;
-    border-radius: 8px;
-    font-weight: 500;
-    font-size: 1em;
-    transition: all 0.2s ease;
 }
-.confirm-ok-btn {
-    background-color: var(--primary-color);
-    color: var(--white-color);
-}
-.confirm-ok-btn:hover {
-    filter: brightness(1.1);
-}
-.confirm-cancel-btn {
-    background-color: var(--secondary-color);
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
-}
-.confirm-cancel-btn:hover {
-    background-color: var(--border-color);
-}
+.confirm-ok-btn { background-color: var(--primary-color); }
+.confirm-cancel-btn { background-color: var(--secondary-color); color: var(--text-color); }
 
 
 /* ============================================== */
-/* KELOLA PRODUK (MANAGE)                       */
+/* KELOLA PRODUK & PENGATURAN                   */
 /* ============================================== */
-.delete-list { margin-top: 15px; }
 .delete-item {
     display: flex;
     flex-direction: column;
@@ -486,11 +447,8 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
     padding: 15px;
     border-radius: 10px;
     border: 1px solid var(--border-color);
-    box-shadow: 0 2px 5px var(--shadow-color);
     cursor: grab;
-    transition: background 0.2s, box-shadow 0.2s;
 }
-.delete-item:hover { background: var(--border-color); }
 .delete-item.dragging { opacity: 0.7; transform: scale(1.02); }
 .item-header {
     display: flex;
@@ -501,127 +459,29 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
     gap: 10px; 
 }
 .item-header span { font-weight: 500; }
-.item-header .new-badge {
-    background-color: var(--error-color);
-    color: var(--white-color);
-    padding: 2px 8px;
-    border-radius: 50px;
-    font-size: 0.7em;
-    font-weight: bold;
-    margin-left: 10px; 
-}
-.item-actions { 
-    display: flex; 
-    gap: 10px; 
-    margin-top: 10px; 
-    width: 100%; 
-    justify-content: stretch; 
-}
+.item-actions { display: flex; gap: 10px; }
 .edit-btn, .delete-btn {
     padding: 8px 12px;
     border-radius: 8px;
     font-size: 0.85em;
     margin-top: 0;
-    flex: 1; 
 }
 .edit-btn { background-color: var(--primary-color); }
 .delete-btn { background-color: var(--error-color); }
-.save-order-button { margin-top: 20px; }
-.price-display { 
-    display: flex; 
-    align-items: center; 
-    gap: 5px; 
-    flex-wrap: wrap; 
-}
-.original-price del { color: var(--light-text-color); font-size: 0.9em; }
-.discounted-price { font-weight: bold; }
-.add-photo-container { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
-.add-photo-container input { flex-grow: 1; min-width: 150px; } 
+
+.add-photo-container { display: flex; gap: 10px; margin-top: 10px; }
+.add-photo-container input { flex-grow: 1; } 
 .add-photo-container button { width: auto; margin-top: 0; } 
 
-.photo-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 10px;
-    justify-content: center; 
-}
-.photo-item { position: relative; width: 80px; height: 80px; flex-shrink: 0; } 
-.photo-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 8px;
-}
+.photo-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+.photo-item { position: relative; width: 80px; height: 80px; } 
+.photo-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
 .delete-photo-btn {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background-color: var(--error-color);
-    color: white;
-    font-size: 0.8em;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10;
+    position: absolute; top: -5px; right: -5px; width: 20px; height: 20px;
+    border-radius: 50%; background-color: var(--error-color); color: white;
+    border: none; cursor: pointer; display: flex; justify-content: center; align-items: center;
 }
 
-/* ============================================== */
-/* FORM TAMBAH & EDIT PRODUK                    */
-/* ============================================== */
-.admin-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    width: 100%;
-    max-width: 600px; 
-    margin: 0 auto; 
-    background: var(--white-color);
-    padding: 25px;
-    border-radius: 16px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    box-sizing: border-box; 
-}
-.admin-form h2 {
-    text-align: center;
-    margin-bottom: 10px;
-}
-.admin-form input,
-.admin-form textarea,
-.admin-form select {
-    width: 100%;
-    padding: 12px 15px;
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
-    font-size: 1em;
-    background: transparent;
-}
-.admin-form input:focus,
-.admin-form textarea:focus,
-.admin-form select:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(0,122,255,0.25);
-    outline: none;
-}
-.admin-form button {
-    background: var(--primary-color);
-    color: var(--white-color);
-    padding: 14px;
-    border: none;
-    border-radius: 10px;
-    font-size: 1.05em;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s ease;
-}
-.admin-form button:hover { background: #0056cc; }
-
-/* Styling untuk fitur edit harga massal */
 .bulk-price-edit-container {
     display: flex;
     flex-direction: column;
@@ -632,107 +492,37 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
     border-radius: 10px;
     background-color: var(--secondary-color);
 }
-.bulk-price-edit-container label {
-    margin-top: 0;
-    margin-bottom: 0;
-    font-weight: 600;
-}
-.bulk-price-input-group {
-    display: flex;
-    gap: 10px;
+.bulk-price-input-group { display: flex; gap: 10px; align-items: center; }
+.bulk-price-input-group input { flex-grow: 1; margin-top: 0; }
+.bulk-price-input-group button { width: auto; margin-top: 0; padding: 10px 15px; }
+
+#category-whatsapp-numbers-container .category-wa-input {
+    display: grid;
+    grid-template-columns: 100px 1fr;
     align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
 }
-.bulk-price-input-group input {
-    flex-grow: 1;
-    margin-top: 0;
+#category-whatsapp-numbers-container label {
+    margin: 0;
+    text-align: right;
+    font-weight: 400;
 }
-.bulk-price-input-group button {
-    width: auto;
-    margin-top: 0;
-    padding: 10px 15px;
-    font-size: 0.9em;
-    flex-shrink: 0;
+#category-whatsapp-numbers-container input {
+    margin: 0;
 }
 
-
-/* Media Queries untuk Responsivitas */
+/* Media Queries */
 @media (max-width: 768px) {
-    .admin-header h2 {
-        font-size: 1.2em;
+    .admin-header h2 { font-size: 1.2em; }
+    .tab-button { font-size: 0.9em; }
+    .item-header { flex-direction: column; align-items: flex-start; }
+    .item-actions { width: 100%; margin-top: 10px; }
+    #category-whatsapp-numbers-container .category-wa-input {
+        grid-template-columns: 1fr;
     }
-    .admin-tabs {
-        flex-direction: column; 
-        padding: 5px 0; 
-    }
-    .tab-button {
-        margin: 5px auto; /* Pusatkan tombol tab saat dalam mode kolom */
-        padding: 12px 10px;
-        font-size: 0.9em;
-        max-width: 90%; /* Batasi lebar agar tidak melewati */
-    }
-    .admin-tab-content {
-        padding: 0 10px; /* Kurangi padding horizontal di layar kecil */
-    }
-    .item-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .item-actions {
-        flex-direction: row; 
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 5px;
-    }
-    .edit-btn, .delete-btn {
-        width: calc(50% - 5px); 
-        flex: none; 
-    }
-    .add-photo-container {
-        flex-direction: column;
-    }
-    .add-photo-container input {
-        width: 100%;
-    }
-    .add-photo-container button {
-        width: 100%;
-    }
-    .bulk-price-input-group {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .bulk-price-input-group button {
-        width: 100%;
-    }
-}
-
-@media (max-width: 480px) {
-    .main-container {
-        padding: 10px;
-    }
-    .form-card, .admin-form {
-        padding: 20px 15px;
-    }
-    .login-header h2 {
-        font-size: 1.5em;
-    }
-    h2 {
-        font-size: 1.3em;
-    }
-    input, select, textarea, button {
-        padding: 10px;
-        font-size: 0.9em;
-    }
-    .toast {
-        padding: 10px 15px;
-        font-size: 0.85em;
-    }
-    .modal-content {
-        padding: 15px; 
-    }
-    .item-actions {
-        flex-direction: column; 
-    }
-    .edit-btn, .delete-btn {
-        width: 100%; 
+    #category-whatsapp-numbers-container label {
+        text-align: left;
+        margin-bottom: 5px;
     }
 }

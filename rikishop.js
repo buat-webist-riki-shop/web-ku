@@ -5,7 +5,7 @@ function onYouTubeIframeAPIReady() { isYouTubeApiReady = true; }
 (function() { const tag = document.createElement('script'); tag.src = "https://www.youtube.com/iframe_api"; const firstScriptTag = document.getElementsByTagName('script')[0]; firstScriptTag.parentNode.insertBefore(tag, firstScriptTag); })();
 
 // --- Konfigurasi ---
-const WA_ADMIN_NUMBER = "6285771555374";
+const WA_ADMIN_NUMBER = "6285771555374"; // Fallback jika settings.json gagal dimuat
 const WA_SELLER_NUMBER = "6285771555374";
 const CREATOR_USERNAME = "Riki Shop Real";
 const SOSMED_LINK = "https://rikishopreal.vercel.app";
@@ -38,7 +38,7 @@ const cartEmptyMessage = document.getElementById('cartEmptyMessage');
 const bannerCarousel = document.getElementById('bannerCarousel');
 const bannerPagination = document.getElementById('bannerPagination');
 const visitorCountDisplay = document.getElementById('visitorCountDisplay');
-const visitorCountSpan = visitorCountDisplay.querySelector('.count');
+const visitorCountSpan = visitorCountDisplay ? visitorCountDisplay.querySelector('.count') : null;
 let currentBannerIndex = 0;
 let bannerInterval;
 
@@ -89,17 +89,17 @@ const mediaPlayerContainer = document.getElementById('mediaPlayerContainer');
 const backgroundAudio = document.getElementById('background-audio');
 let toastTimeout;
 let customMusicMuted = false;
-let currentEmbedUrl = '';
-let currentVideoId = '';
 
 // Variabel Global
 let products = {};
+let siteSettings = {}; // Menyimpan data dari settings.json
 let cart = JSON.parse(localStorage.getItem('rikishop_cart')) || [];
 let currentPage = 'home-page';
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-rikishop';
 
 // --- Logika Firebase untuk Pengunjung & Hitungan Masuk ---
 async function setupFirebaseVisitorCounter() {
+    if (!visitorCountSpan) return;
     visitorCountSpan.textContent = '-';
     if (!window.firebaseServices) {
         console.warn("Layanan Firebase tidak tersedia.");
@@ -132,7 +132,6 @@ async function setupFirebaseVisitorCounter() {
             }
         });
         
-        // Menambah hitungan setiap kali halaman dimuat
         await runTransaction(db, async (transaction) => {
             const visitorDoc = await transaction.get(visitorDocRef);
             let currentCount = 0;
@@ -206,6 +205,19 @@ function updateDateTime() {
 }
 function formatRupiah(number) {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+}
+function getPhoneNumberForProduct(product, serviceType) {
+    // Hierarki: Produk -> Kategori -> Global -> Default
+    if (product && product.nomorWA) {
+        return product.nomorWA;
+    }
+    if (siteSettings.categoryPhoneNumbers && siteSettings.categoryPhoneNumbers[serviceType] && siteSettings.categoryPhoneNumbers[serviceType] !== "") {
+        return siteSettings.categoryPhoneNumbers[serviceType];
+    }
+    if (siteSettings.globalPhoneNumber) {
+        return siteSettings.globalPhoneNumber;
+    }
+    return WA_ADMIN_NUMBER; // Fallback ke nomor default
 }
 
 // --- Logika Carousel ---
@@ -285,12 +297,10 @@ function loadServiceProducts(serviceType) {
     let productData = products[serviceType];
     
     if (productData && productData.length > 0) {
-        // Produk seharusnya sudah terurut dari products.json yang diupdate oleh admin panel
         productData.forEach(product => {
             const productItem = document.createElement('div');
             productItem.classList.add('product-item');
 
-            // Cek apakah produk masih dalam 24 jam terakhir
             let isNew = false;
             if (product.createdAt) {
                 const createdTime = new Date(product.createdAt).getTime();
@@ -369,7 +379,7 @@ function showProductDetail(product, serviceType) {
         productId: product.id,
         productName: product.nama,
         productPrice: product.harga,
-        serviceType: serviceType // Menyimpan tipe layanan untuk logika keranjang
+        serviceType: serviceType
     });
     addToCartBtn.addEventListener('click', addToCart);
     detailProductActions.appendChild(addToCartBtn);
@@ -378,16 +388,18 @@ function showProductDetail(product, serviceType) {
     buyNowLink.className = 'buy-now';
     buyNowLink.textContent = 'Beli Sekarang';
 
+    const targetPhoneNumber = getPhoneNumberForProduct(product, serviceType);
+
     let buyNowMessage = '';
     if (serviceType === 'Stock Akun' && product.images && product.images.length > 0) {
-        buyNowMessage = `Halo Kak Admin Rikishopreal ✨\n\nSaya tertarik untuk memesan Akun ini:\n\nProduk: *${product.nama}*\nHarga: *${formatRupiah(product.harga)}*\n\nSebagai referensi, ini link gambarnya:\n${product.images[0]}\n\nMohon info ketersediaan dan panduan pembayarannya ya. Terima kasih! 🙏`;
+        buyNowMessage = `Halo Kak, saya tertarik memesan Akun:\n\nProduk: *${product.nama}*\nHarga: *${formatRupiah(product.harga)}*\n\nReferensi gambar:\n${product.images[0]}\n\nMohon info ketersediaannya. Terima kasih! 🙏`;
     } else if (serviceType === 'Logo' && product.images && product.images.length > 0) {
-        buyNowMessage = `Halo Kak Admin Rikishopreal ✨\n\nSaya tertarik untuk memesan Logo ini:\n\nNama Logo: *${product.nama}*\nHarga: *${formatRupiah(product.harga)}*\n\nBerikut link gambar logonya:\n${product.images[0]}\n\nMohon info ketersediaan dan panduan pembayarannya ya. Terima kasih! 🙏`;
+        buyNowMessage = `Halo Kak, saya tertarik memesan Logo:\n\nNama Logo: *${product.nama}*\nHarga: *${formatRupiah(product.harga)}*\n\nReferensi gambar:\n${product.images[0]}\n\nMohon info ketersediaannya. Terima kasih! 🙏`;
     } else {
-        buyNowMessage = `Halo Kak Admin Rikishopreal ✨\n\nSaya tertarik untuk memesan produk ini:\n\nProduk: *${product.nama}*\nHarga: *${formatRupiah(product.harga)}*\n\nMohon info selanjutnya untuk proses pembayaran ya. Terima kasih! 🙏`;
+        buyNowMessage = `Halo Kak, saya tertarik memesan produk:\n\nProduk: *${product.nama}*\nHarga: *${formatRupiah(product.harga)}*\n\nMohon info selanjutnya. Terima kasih! 🙏`;
     }
     
-    buyNowLink.href = `https://wa.me/${WA_ADMIN_NUMBER}?text=${encodeURIComponent(buyNowMessage)}`;
+    buyNowLink.href = `https://wa.me/${targetPhoneNumber}?text=${encodeURIComponent(buyNowMessage)}`;
     buyNowLink.target = "_blank";
     detailProductActions.appendChild(buyNowLink);
 
@@ -397,7 +409,6 @@ function showProductDetail(product, serviceType) {
         cekMenuBtn.textContent = 'Cek Menu';
         cekMenuBtn.addEventListener('click', () => {
             genericScriptMenuTitle.textContent = `Menu ${product.nama}`;
-            // Memformat menuContent dengan benar dari string ke tampilan
             genericScriptMenuContent.innerHTML = product.menuContent.replace(/\n/g, '<br>');
             genericScriptMenuModal.style.display = 'flex';
         });
@@ -407,7 +418,7 @@ function showProductDetail(product, serviceType) {
 
 // --- Logika untuk Slider & Lightbox ---
 function updateSliderPosition() {
-    stockImageSlider.style.transform = `translateX(-${currentStockImageIndex * 100}%)`;
+    if(stockImageSlider) stockImageSlider.style.transform = `translateX(-${currentStockImageIndex * 100}%)`;
 }
 function showNextImage() {
     currentStockImageIndex = (currentStockImageIndex + 1) % totalStockImages;
@@ -571,9 +582,10 @@ checkoutButton.addEventListener('click', () => {
         totalOrder += item.price * item.quantity;
     });
 
-    let message = `Halo Kak Admin Rikishopreal ✨\n\nSaya ingin mengonfirmasi pesanan dari keranjang belanja saya:\n\n--- DETAIL PESANAN ---\n${itemsText}--------------------\n\n*Total Estimasi: ${formatRupiah(totalOrder)}*\n\nMohon konfirmasi ketersediaan semua item dan totalnya, beserta panduan pembayarannya ya, Kak. Terima kasih! 🙏`;
+    let message = `Halo Kak, saya ingin mengonfirmasi pesanan dari keranjang:\n\n--- PESANAN ---\n${itemsText}--------------------\n\n*Total: ${formatRupiah(totalOrder)}*\n\nMohon konfirmasinya. Terima kasih! 🙏`;
     
-    window.open(`https://wa.me/${WA_ADMIN_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
+    const checkoutNumber = siteSettings.globalPhoneNumber || WA_ADMIN_NUMBER;
+    window.open(`https://wa.me/${checkoutNumber}?text=${encodeURIComponent(message)}`, '_blank');
 });
 
 // --- Logika AI Lokal ---
@@ -640,7 +652,6 @@ loadMediaBtn.addEventListener('click', () => {
         youtubePlayer = null;
     }
     mediaPlayerContainer.innerHTML = '';
-    currentVideoId = '';
     customMusicMuted = false;
 
     try {
@@ -651,8 +662,7 @@ loadMediaBtn.addEventListener('click', () => {
         }
 
         if (videoId) {
-            currentVideoId = videoId;
-            createYouTubePlayer(currentVideoId);
+            createYouTubePlayer(videoId);
             showToastNotification("Memuat video...", "fa-play-circle");
             muteAudioBtn.querySelector('i').className = 'fas fa-volume-up';
         } else {
@@ -692,14 +702,24 @@ function playBackgroundMusic() {
 async function initializeApp() {
     mainContainer.style.display = 'none';
     try {
-        // Tambahkan timestamp untuk mencegah cache saat memuat products.json
         const timestamp = new Date().getTime();
-        const response = await fetch(`products.json?v=${timestamp}`);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        products = await response.json();
+        const [productsResponse, settingsResponse] = await Promise.all([
+            fetch(`products.json?v=${timestamp}`),
+            fetch(`settings.json?v=${timestamp}`)
+        ]);
+
+        if (!productsResponse.ok) throw new Error(`Gagal memuat produk: ${productsResponse.status}`);
+        products = await productsResponse.json();
+        
+        if (settingsResponse.ok) {
+            siteSettings = await settingsResponse.json();
+        } else {
+            console.warn("Gagal memuat settings.json, menggunakan nomor fallback.");
+        }
+
     } catch (error) {
-        console.error("Gagal memuat data produk:", error);
-        document.querySelector('.main-content').innerHTML = `<p style="text-align:center; color:red;">Gagal memuat data produk.</p>`;
+        console.error("Gagal memuat data awal:", error);
+        document.querySelector('.main-content').innerHTML = `<p style="text-align:center; color:red;">Gagal memuat data. Coba muat ulang halaman.</p>`;
     }
     updateDateTime();
     setInterval(updateDateTime, 1000);
@@ -735,5 +755,5 @@ document.addEventListener('firebaseReady', () => {
 document.addEventListener('firebaseFailed', () => {
     console.log("Firebase failed to load, initializing app without visitor counter.");
     initializeApp();
-    visitorCountDisplay.querySelector('.count').textContent = 'R/S';
+    if(visitorCountDisplay) visitorCountDisplay.querySelector('.count').textContent = 'R/S';
 });

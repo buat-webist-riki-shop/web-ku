@@ -85,69 +85,31 @@ body.dark-mode {
     box-shadow: 0 4px 10px var(--shadow-color);
     display: flex;
     justify-content: space-between;
-    align-items: center; /* Mengatur alignment vertikal */
+    align-items: center;
     position: relative; z-index: 2;
     border: 1px solid var(--border-color); animation: fadeInUp 0.5s ease-out forwards;
 }
 .info-bar .date-time {
     display: flex;
-    flex-direction: column; /* Mengatur teks tanggal dan waktu menjadi vertikal */
+    flex-direction: column;
     align-items: flex-start;
     font-size: 1em; font-weight: 500; color: var(--text-color);
     line-height: 1.2;
 }
-.info-bar .date-time .date {
-    font-size: 0.9em;
-    color: var(--light-text-color);
-}
-.info-bar .date-time .time {
-    font-size: 1.1em;
-    font-weight: 700;
-    color: var(--text-color);
-}
-.info-bar .visitor-count {
-    display: flex;
-    align-items: center;
-    font-size: 0.9em; font-weight: 500; color: var(--text-color);
-}
-.info-bar .visitor-count .visitor-pic-wrapper {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    overflow: hidden;
-    margin-right: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.info-bar .visitor-count .visitor-pic-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.info-bar .visitor-count .count {
-    font-weight: 700;
-    color: var(--primary-color);
-    margin-left: 5px;
-}
+.info-bar .date-time .date { font-size: 0.9em; color: var(--light-text-color); }
+.info-bar .date-time .time { font-size: 1.1em; font-weight: 700; color: var(--text-color); }
+.info-bar .visitor-count { display: flex; align-items: center; font-size: 0.9em; font-weight: 500; color: var(--text-color); }
+.info-bar .visitor-count .visitor-pic-wrapper { width: 30px; height: 30px; border-radius: 50%; overflow: hidden; margin-right: 8px; }
+.info-bar .visitor-count .visitor-pic-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+.info-bar .visitor-count .count { font-weight: 700; color: var(--primary-color); margin-left: 5px; }
+.visitor-count.updated .count { transform: scale(1.2); color: #4caf50; transition: all 0.2s ease-in-out; }
 
 
 /* Konten Halaman Beranda */
 .main-content { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; padding-bottom: 20px; }
 .banner-carousel-container { width: 100%; max-width: 1200px; margin: 0 auto 20px; overflow: hidden; border-radius: 15px; position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.15); animation: fadeInUp 0.5s ease-out 0.2s forwards; opacity: 0; }
 .banner-carousel { display: flex; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
-
-.banner-item {
-    min-width: 100%;
-    aspect-ratio: 16 / 10;
-    background-size: cover;
-    background-position: center;
-    border-radius: 15px;
-}
-@media (min-width: 768px) { .banner-item { aspect-ratio: 2 / 1; } }
-@media (min-width: 1024px) { .banner-item { aspect-ratio: 16 / 7; } }
-
+.banner-item { min-width: 100%; aspect-ratio: 16 / 10; background-size: cover; background-position: center; border-radius: 15px; }
 .banner-pagination { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; }
 .banner-pagination span { width: 10px; height: 10px; background: rgba(255,255,255,0.6); border-radius: 50%; cursor: pointer; transition: all 0.3s ease; }
 .banner-pagination span.active { background: white; width: 20px; border-radius: 10px; }
@@ -198,17 +160,8 @@ h3 { font-size: 1.2em; color: var(--primary-color); margin-bottom: 15px; border-
 .fab-option:hover::after { opacity: 1; }
 
 /* Gaya Modal */
-.modal {
-    position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%;
-    background-color: rgba(0,0,0,0.6); display: none; align-items: center;
-    justify-content: center; padding: 15px; animation: fadeInModal 0.3s;
-}
-.modal-content {
-    background-color: var(--white-color); border-radius: 12px; width: 100%;
-    max-width: 500px; box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-    animation: slideInTop 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex; flex-direction: column; position: relative;
-}
+.modal { position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; padding: 15px; animation: fadeInModal 0.3s; }
+.modal-content { background-color: var(--white-color); border-radius: 12px; width: 100%; max-width: 500px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); animation: slideInTop 0.4s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; position: relative; }
 .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
 .modal-header h3 { margin: 0; padding: 0; border: none; font-size: 1.2em; color: var(--primary-color); }
 .close-button { font-size: 24px; font-weight: bold; cursor: pointer; color: var(--light-text-color); transition: color 0.2s ease; }
@@ -232,7 +185,6 @@ h3 { font-size: 1.2em; color: var(--primary-color); margin-bottom: 15px; border-
 .chat-input-area textarea:focus { border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2); outline: none; }
 .chat-input-area button { background-color: var(--primary-color); color: white; border: none; padding: 0; border-radius: 50%; cursor: pointer; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background-color 0.2s ease, transform 0.2s ease; }
 .chat-input-area button:hover { background-color: #005bb5; }
-.chat-input-area button svg { fill: white; }
 
 /* Modal Musik */
 .music-player-modal { position: fixed; top: 50%; left: 50%; width: 90%; max-width: 450px; background-color: var(--white-color); border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.2); z-index: 2001; border: 1px solid var(--border-color); overflow: hidden; opacity: 0; transform: translate(-50%, -40%); pointer-events: none; transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -242,15 +194,9 @@ h3 { font-size: 1.2em; color: var(--primary-color); margin-bottom: 15px; border-
 .music-player-header i { cursor: pointer; color: var(--light-text-color); font-size: 1.2em; }
 .music-player-body { padding: 18px; display: flex; flex-direction: column; gap: 12px; }
 .music-player-body p { font-size: 0.9em; color: var(--light-text-color); margin-bottom: 0; }
-.music-player-body .popup-instruction { font-size: 0.8em; text-align: center; margin-top: 10px; }
 .music-player-body input { width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.95em; background-color: var(--secondary-color); color: var(--text-color); }
-.music-player-body button { padding: 12px; background-color: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background-color 0.2s ease, transform 0.1s ease; }
+.music-player-body button { padding: 12px; background-color: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
 .media-player-container { margin-top: 10px; width: 100%; position: relative; }
-.media-player-container .iframe-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; cursor: pointer; }
-.media-player-container iframe { border-radius: 12px; width: 100%; border: none; }
-.media-player-container.spotify-track iframe { height: 80px; }
-.media-player-container.spotify-playlist iframe { height: 352px; }
-.media-player-container.youtube iframe { height: 180px; }
 
 /* Produk & Keranjang */
 .product-list { padding: 0 15px; background-color: var(--white-color); border-radius: 12px; box-shadow: 0 2px 8px var(--shadow-color); border: 1px solid var(--border-color); }
@@ -266,11 +212,11 @@ h3 { font-size: 1.2em; color: var(--primary-color); margin-bottom: 15px; border-
 #detailProductDescriptionContent { font-size: 1em; margin-bottom: 15px; color: var(--light-text-color); line-height: 1.6; }
 .product-detail .price { font-size: 1.5em; font-weight: 600; color: var(--success-color); margin-bottom: 20px; }
 .product-detail .actions { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
-.product-detail .actions button, .product-detail .actions a.buy-now { flex: 1; padding: 14px 18px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.95em; font-weight: 600; transition: all 0.3s ease; text-decoration: none; text-align: center; white-space: nowrap; }
+.product-detail .actions button, .product-detail .actions a.buy-now { flex: 1; padding: 14px 18px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.95em; font-weight: 600; text-decoration: none; text-align: center; }
 .actions .cek-menu { background-color: #6c757d; color: white; }
 .actions .add-to-cart { background-color: var(--warning-color); color: white; }
 .actions .buy-now { background-color: var(--success-color); color: white; }
-#cartItems { display: flex; flex-direction: column; gap: 15px; padding: 0; margin: 0; }
+#cartItems { display: flex; flex-direction: column; gap: 15px; }
 .cart-item-card { background-color: var(--white-color); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 12px var(--shadow-color); border: 1px solid var(--border-color); }
 .cart-item-card .item-image { width: 60px; height: 60px; border-radius: 8px; background-color: var(--secondary-color); display: flex; align-items: center; justify-content: center; color: var(--light-text-color); font-size: 1.5em; flex-shrink: 0; }
 .cart-item-card .item-details { flex-grow: 1; }
@@ -278,91 +224,65 @@ h3 { font-size: 1.2em; color: var(--primary-color); margin-bottom: 15px; border-
 .cart-item-card .item-price { font-size: 0.9em; color: var(--light-text-color); }
 .cart-item-card .item-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
 .cart-item-card .quantity-controls { display: flex; align-items: center; gap: 8px; background-color: var(--secondary-color); border-radius: 15px; padding: 4px; }
-.cart-item-card .quantity-btn { background-color: var(--white-color); border: 1px solid var(--border-color); color: var(--primary-color); width: 28px; height: 28px; border-radius: 50%; font-size: 1.1em; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s, color 0.2s; }
+.cart-item-card .quantity-btn { background-color: var(--white-color); border: 1px solid var(--border-color); color: var(--primary-color); width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .cart-item-card .item-quantity { font-weight: 600; min-width: 20px; text-align: center; }
 .cart-item-card .remove-item-btn { background: none; border: none; color: var(--error-color); cursor: pointer; font-size: 0.9em; font-weight: 500; display: flex; align-items: center; gap: 4px; padding: 5px; }
-/* Gaya Info Stok di Keranjang */
-.cart-item-card .stock-info {
-    font-size: 0.9em;
-    color: var(--primary-color);
-    font-weight: 500;
-    text-align: right;
-    margin-bottom: 8px;
-    background-color: var(--secondary-color);
-    padding: 4px 8px;
-    border-radius: 8px;
-}
+.cart-item-card .stock-info { font-size: 0.9em; color: var(--primary-color); font-weight: 500; background-color: var(--secondary-color); padding: 4px 8px; border-radius: 8px; }
 .cart-summary { margin-top: 20px; padding: 18px 15px; font-size: 1.2em; font-weight: 600; display: flex; justify-content: space-between; align-items: center; background-color: var(--white-color); border-radius: 12px; box-shadow: 0 -2px 8px var(--shadow-color); border: 1px solid var(--border-color); }
-.checkout-button { display: block; width: 100%; margin: 25px auto 0; padding: 14px; background-color: var(--success-color); color: white; border: none; border-radius: 8px; font-size: 1.2em; font-weight: 600; cursor: pointer; transition: background-color 0.3s ease, transform 0.2s ease; box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+.checkout-button { display: block; width: 100%; margin: 25px auto 0; padding: 14px; background-color: var(--success-color); color: white; border: none; border-radius: 8px; font-size: 1.2em; font-weight: 600; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
 
 /* Notifikasi Toast */
-#toast-notification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); z-index: 9999; background-color: rgba(28, 28, 30, 0.85); color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 0.9em; font-weight: 500; box-shadow: 0 4px 15px rgba(0,0,0,0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); opacity: 0; transition: transform 0.5s cubic-bezier(0.215, 0.610, 0.355, 1), opacity 0.5s ease; display: flex; align-items: center; gap: 8px; pointer-events: none; }
-#toast-notification.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+#toast-notification {
+    position: fixed;
+    bottom: 20px;
+    top: auto;
+    left: 50%;
+    transform: translateX(-50%) translateY(150%);
+    z-index: 9999;
+    background-color: rgba(28, 28, 30, 0.85);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 0.9em;
+    font-weight: 500;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    opacity: 0;
+    transition: transform 0.5s cubic-bezier(0.215, 0.610, 0.355, 1), opacity 0.5s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none;
+    width: 90%;
+    max-width: 400px;
+    justify-content: center;
+    box-sizing: border-box;
+}
+#toast-notification.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
 
 /* Modal Menu Script */
-.script-menu-display { white-space: pre-wrap; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; font-size: 0.85em; background-color: var(--secondary-color); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); max-height: 50vh; overflow-y: auto; line-height: 1.4; color: var(--text-color); }
+.script-menu-display { white-space: pre-wrap; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; font-size: 0.85em; background-color: var(--secondary-color); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); max-height: 50vh; overflow-y: auto; }
 
 /* Gaya untuk Slider Gambar (Stock Akun) */
 .image-slider-container { position: relative; width: 100%; margin-bottom: 20px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px var(--shadow-color); border: 1px solid var(--border-color); }
 .image-slider-wrapper { overflow: hidden; }
 .image-slider { display: flex; transition: transform 0.5s ease-in-out; }
 .image-slide { min-width: 100%; aspect-ratio: 16 / 10; background-size: cover; background-position: center; cursor: zoom-in; }
-@media (orientation: landscape) { .image-slide { aspect-ratio: 16 / 8; } }
-.slider-nav { position: absolute; top: 50%; transform: translateY(-50%); background-color: rgba(0, 0, 0, 0.4); color: white; border: none; padding: 10px 15px; cursor: pointer; font-size: 1.5em; z-index: 10; transition: background-color 0.2s ease; }
-.slider-nav:hover { background-color: rgba(0, 0, 0, 0.7); }
+.slider-nav { position: absolute; top: 50%; transform: translateY(-50%); background-color: rgba(0, 0, 0, 0.4); color: white; border: none; padding: 10px 15px; cursor: pointer; font-size: 1.5em; z-index: 10; }
 .slider-nav.prev { left: 0; border-radius: 0 8px 8px 0; }
 .slider-nav.next { right: 0; border-radius: 8px 0 0 8px; }
 
 /* Gaya untuk Lightbox (Zoom Gambar) */
 .lightbox { position: fixed; z-index: 9998; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); display: none; justify-content: center; align-items: center; animation: fadeInModal 0.3s; }
 .lightbox-content { display: block; max-width: 90%; max-height: 85%; animation: scaleUp 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-.lightbox-close { position: absolute; top: 20px; right: 35px; color: #f1f1f1; font-size: 40px; font-weight: bold; transition: 0.3s; cursor: pointer; }
-.lightbox-close:hover, .lightbox-close:focus { color: #bbb; text-decoration: none; }
+.lightbox-close { position: absolute; top: 20px; right: 35px; color: #f1f1f1; font-size: 40px; font-weight: bold; cursor: pointer; }
 
-/* Responsif */
-@media (max-width: 480px) {
-    .info-bar { margin-left: 10px; margin-right: 10px; padding: 12px; }
-    .service-grid { grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 10px; }
-    .service-item { padding: 15px 8px; min-height: 110px; }
-    .service-item img { width: 40px; height: 40px; }
-    .service-item span { font-size: 0.85em; }
-    .product-detail .actions button, .product-detail .actions a.buy-now { padding: 12px; font-size: 0.9em; }
-}
-
-.visitor-count.updated .count {
-    transform: scale(1.2);
-    color: #4caf50; 
-    transition: all 0.2s ease-in-out;
-}
-
-.new-badge {
-  background: var(--success-color);
-  color: white;
-  font-size: 10px;
-  padding: 2px 6px;
-  border-radius: 8px;
-  margin-left: 5px;
-  font-weight: bold;
-  animation: scaleUp 0.3s ease-out;
-}
-
-/* Gaya Khusus untuk Ukuran Logo 1:1 */
-.service-item[data-service="Logo"] i {
-    width: 45px;
-    height: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.5em; /* Menyesuaikan ukuran ikon */
-}
-
-.original-price {
-    font-size: 0.8em;
-    color: var(--light-text-color);
-    margin-right: 5px;
-}
-.discounted-price {
-    font-size: 1em;
-    font-weight: 600;
-    color: var(--error-color);
-}
+/* Badge & Harga Diskon */
+.new-badge { background: var(--success-color); color: white; font-size: 10px; padding: 2px 6px; border-radius: 8px; margin-left: 5px; font-weight: bold; }
+.original-price { font-size: 0.8em; color: var(--light-text-color); margin-right: 5px; }
+.discounted-price { font-size: 1em; font-weight: 600; color: var(--error-color); }

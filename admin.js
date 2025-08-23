@@ -1,65 +1,90 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // ELEMEN DASAR
     const loginScreen = document.getElementById('login-screen');
     const productFormScreen = document.getElementById('product-form-screen');
     const toastContainer = document.getElementById('toast-container');
+
     const passwordInput = document.getElementById('password');
     const loginButton = document.getElementById('login-button');
     const passwordToggle = document.getElementById('passwordToggle');
+
     const themeSwitchBtnLogin = document.getElementById('themeSwitchBtnLogin');
     const themeSwitchBtnPanel = document.getElementById('themeSwitchBtnPanel');
     const body = document.body;
 
-    // ELEMEN TAB TAMBAH PRODUK
     const categorySelect = document.getElementById('category');
     const nameInput = document.getElementById('product-name');
     const priceInput = document.getElementById('product-price');
-    const whatsappInput = document.getElementById('product-whatsapp');
     const descriptionInput = document.getElementById('product-description');
+    const productWhatsappNumberInput = document.getElementById('product-whatsapp-number');
     const scriptMenuSection = document.getElementById('scriptMenuSection');
     const scriptMenuContentInput = document.getElementById('script-menu-content');
     const stockPhotoSection = document.getElementById('stock-photo-section');
     const photosInput = document.getElementById('product-photos');
     const addButton = document.getElementById('add-product-button');
-    
-    // ELEMEN TAB KELOLA PRODUK
+
     const manageCategorySelect = document.getElementById('manage-category');
     const manageProductList = document.getElementById('manage-product-list');
     const saveOrderButton = document.getElementById('save-order-button');
-    const bulkEditSections = document.getElementById('bulk-edit-sections');
+
+    const bulkPriceEditContainer = document.getElementById('bulk-price-edit-container');
     const bulkPriceInput = document.getElementById('bulk-price-input');
     const applyBulkPriceBtn = document.getElementById('apply-bulk-price-btn');
-    const bulkWhatsappInput = document.getElementById('bulk-whatsapp-input');
-    const applyBulkWhatsappBtn = document.getElementById('apply-bulk-whatsapp-btn');
-    const selectedCategoryName = document.getElementById('selected-category-name');
-    const applyGlobalBulkWhatsappBtn = document.getElementById('apply-global-bulk-whatsapp-btn');
 
-    // ELEMEN MODAL
     const customConfirmModal = document.getElementById('customConfirmModal');
     const confirmMessage = document.getElementById('confirmMessage');
     const confirmOkBtn = document.getElementById('confirmOkBtn');
     const confirmCancelBtn = document.getElementById('confirmCancelBtn');
     let resolveConfirmPromise;
-    const editModal = document.getElementById('editProductModal');
 
-    // ELEMEN TAB KELOLA DOMAIN & API
-    const generateApiKeyBtn = document.getElementById('generate-api-key-btn');
-    const apiKeyList = document.getElementById('api-key-list');
-    const addDomainBtn = document.getElementById('add-domain-btn');
-    const domainList = document.getElementById('domain-list');
-    const subdomainList = document.getElementById('subdomain-list');
-    const apiKeyResultModal = document.getElementById('apiKeyResultModal');
-    const closeApiKeyModal = document.getElementById('closeApiKeyModal');
-    const apiKeyResultDiv = document.getElementById('apiKeyResult');
+    // Elemen Pengaturan Baru
+    const saveSettingsButton = document.getElementById('save-settings-button');
+    const globalWhatsappNumberInput = document.getElementById('global-whatsapp-number');
+    const categoryWhatsappNumbersContainer = document.getElementById('category-whatsapp-numbers-container');
 
-    // KONFIGURASI
+    // Elemen Modal Edit Baru
+    const editWhatsappNumberInput = document.getElementById('edit-whatsapp-number');
+
     const API_BASE_URL = '/api';
     let activeToastTimeout = null;
+    let siteSettings = {}; // Untuk menyimpan data dari settings.json
 
-    // --- FUNGSI-FUNGSI PEMBANTU ---
+    const savedTheme = localStorage.getItem('admin-theme') || 'light-mode';
+    body.className = savedTheme;
+    function updateThemeButton() {
+        const iconClass = body.classList.contains('dark-mode') ? 'fa-sun' : 'fa-moon';
+        themeSwitchBtnLogin.querySelector('i').className = `fas ${iconClass}`;
+        if (themeSwitchBtnPanel) {
+            themeSwitchBtnPanel.querySelector('i').className = `fas ${iconClass}`;
+        }
+    }
+    updateThemeButton();
+
+    function toggleTheme() {
+        if (body.classList.contains('light-mode')) {
+            body.classList.replace('light-mode', 'dark-mode');
+            localStorage.setItem('admin-theme', 'dark-mode');
+        } else {
+            body.classList.replace('dark-mode', 'light-mode');
+            localStorage.setItem('admin-theme', 'light-mode');
+        }
+        updateThemeButton();
+    }
+    themeSwitchBtnLogin.addEventListener('click', toggleTheme);
+    if (themeSwitchBtnPanel) {
+        themeSwitchBtnPanel.addEventListener('click', toggleTheme);
+    }
+    
+    passwordToggle.addEventListener('click', () => {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        passwordToggle.querySelector('i').className = `fas ${type === 'password' ? 'fa-eye-slash' : 'fa-eye'}`;
+    });
+
     function showToast(message, type = 'info', duration = 3000) {
-        if (activeToastTimeout) clearTimeout(activeToastTimeout);
-        toastContainer.innerHTML = '';
+        if (toastContainer.firstChild) {
+            clearTimeout(activeToastTimeout);
+            toastContainer.innerHTML = '';
+        }
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         let iconClass = 'fas fa-info-circle';
@@ -83,56 +108,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
     confirmOkBtn.addEventListener('click', () => {
         customConfirmModal.classList.remove('is-visible');
-        if (resolveConfirmPromise) resolveConfirmPromise(true);
+        if (resolveConfirmPromise) {
+            resolveConfirmPromise(true);
+            resolveConfirmPromise = null;
+        }
     });
 
     confirmCancelBtn.addEventListener('click', () => {
         customConfirmModal.classList.remove('is-visible');
-        if (resolveConfirmPromise) resolveConfirmPromise(false);
+        if (resolveConfirmPromise) {
+            resolveConfirmPromise(false);
+            resolveConfirmPromise = null;
+        }
     });
 
-    function formatRupiah(number) {
-        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
-    }
-
-    async function apiRequest(endpoint, method = 'GET', body = null) {
-        const options = { method, headers: { 'Content-Type': 'application/json' } };
-        if (body) options.body = JSON.stringify(body);
-        const res = await fetch(`${API_BASE_URL}/admin${endpoint}`, options);
-        const result = await res.json();
-        if (!res.ok) throw new Error(result.message);
-        return result;
-    }
-
-    // --- LOGIKA UTAMA ---
-
-    // Tema & Login
-    const savedTheme = localStorage.getItem('admin-theme') || 'light-mode';
-    body.className = savedTheme;
-    function updateThemeButton() {
-        const iconClass = body.classList.contains('dark-mode') ? 'fa-sun' : 'fa-moon';
-        if(themeSwitchBtnLogin) themeSwitchBtnLogin.querySelector('i').className = `fas ${iconClass}`;
-        if (themeSwitchBtnPanel) themeSwitchBtnPanel.querySelector('i').className = `fas ${iconClass}`;
-    }
-    updateThemeButton();
-    function toggleTheme() {
-        body.classList.toggle('dark-mode');
-        body.classList.toggle('light-mode');
-        localStorage.setItem('admin-theme', body.classList.contains('dark-mode') ? 'dark-mode' : 'light-mode');
-        updateThemeButton();
-    }
-    if(themeSwitchBtnLogin) themeSwitchBtnLogin.addEventListener('click', toggleTheme);
-    if (themeSwitchBtnPanel) themeSwitchBtnPanel.addEventListener('click', toggleTheme);
-    
-    passwordToggle.addEventListener('click', () => {
-        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput.setAttribute('type', type);
-        passwordToggle.querySelector('i').className = `fas ${type === 'password' ? 'fa-eye-slash' : 'fa-eye'}`;
+    customConfirmModal.addEventListener('click', (e) => {
+        if (e.target === customConfirmModal) {
+            customConfirmModal.classList.remove('is-visible');
+            if (resolveConfirmPromise) {
+                resolveConfirmPromise(false);
+                resolveConfirmPromise = null;
+            }
+        }
     });
+
+    function validatePhoneNumber(number) {
+        if (!number) return true;
+        const phoneRegex = /^\d+$/;
+        return phoneRegex.test(number);
+    }
 
     const handleLogin = async () => {
         const password = passwordInput.value;
-        if (!password) return showToast('Password tidak boleh kosong.', 'error');
+        if (!password) {
+            showToast('Password tidak boleh kosong.', 'error');
+            return;
+        }
         loginButton.textContent = 'Memverifikasi...';
         loginButton.disabled = true;
         try {
@@ -142,12 +153,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ password })
             });
             const result = await res.json();
-            if (!res.ok) throw new Error(result.message);
+            if (!res.ok) {
+                throw new Error(result.message);
+            }
             sessionStorage.setItem('isAdminAuthenticated', 'true');
             loginScreen.style.display = 'none';
             productFormScreen.style.display = 'block';
             showToast('Login berhasil!', 'success');
+            await loadSettings();
+            document.querySelector('.tab-button[data-tab="addProduct"]').click();
         } catch (e) {
+            console.error('Login error:', e);
             showToast(e.message || 'Password salah.', 'error');
         } finally {
             loginButton.textContent = 'Masuk';
@@ -156,57 +172,42 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     loginButton.addEventListener('click', handleLogin);
     passwordInput.addEventListener('keypress', e => {
-        if (e.key === 'Enter') handleLogin();
+        if (e.key === 'Enter') {
+            e.preventDefault(); 
+            handleLogin();
+        }
     });
 
-    // Navigasi Tab
-    const tabButtons = document.querySelectorAll('.tab-button');
-    const tabContents = document.querySelectorAll('.admin-tab-content');
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            tabContents.forEach(content => content.classList.remove('active'));
-            document.getElementById(button.dataset.tab).classList.add('active');
-            
-            if (button.dataset.tab === 'manageProducts' && manageCategorySelect.value) {
-                manageCategorySelect.dispatchEvent(new Event('change'));
-            } else if (button.dataset.tab === 'manageDomains') {
-                loadApiKeys();
-                loadDomains();
-                loadSubdomains();
-            }
-        });
-    });
-
-    // Logika Tab Tambah Produk
     categorySelect.addEventListener('change', () => {
         const category = categorySelect.value;
         stockPhotoSection.style.display = (category === 'Stock Akun' || category === 'Logo') ? 'block' : 'none';
         scriptMenuSection.style.display = category === 'Script' ? 'block' : 'none';
     });
 
-    addButton.addEventListener('click', async () => {
-        const whatsappNumber = whatsappInput.value.trim();
-        if (whatsappNumber && !/^\d+$/.test(whatsappNumber)) {
-            return showToast('Format nomor WhatsApp salah. Harus berupa angka saja.', 'error');
+
+    addButton.addEventListener('click', async (e) => { 
+        e.preventDefault(); 
+        const waNumber = productWhatsappNumberInput.value.trim();
+        if (waNumber && !validatePhoneNumber(waNumber)) {
+            return showToast('Format Nomor WA salah. Gunakan angka saja (contoh: 628123...).', 'error');
         }
 
         const productData = {
             category: categorySelect.value,
             nama: nameInput.value.trim(),
             harga: parseInt(priceInput.value, 10),
-            nomorWA: whatsappNumber,
             deskripsiPanjang: descriptionInput.value.trim(),
             images: photosInput.value.split(',').map(l => l.trim()).filter(Boolean),
             createdAt: new Date().toISOString(),
-            menuContent: scriptMenuContentInput.value.trim()
+            nomorWA: waNumber,
         };
-
-        if (!productData.nama || isNaN(productData.harga) || !productData.deskripsiPanjang) {
-            return showToast('Nama, Harga, dan Deskripsi wajib diisi.', 'error');
+        if (productData.category === 'Script') {
+            productData.menuContent = scriptMenuContentInput.value.trim();
         }
-        
+
+        if (!productData.nama || isNaN(productData.harga) || productData.harga < 0 || !productData.deskripsiPanjang) {
+            return showToast('Semua kolom wajib diisi dan harga harus angka positif.', 'error');
+        }
         addButton.textContent = 'Memproses...';
         addButton.disabled = true;
         try {
@@ -216,11 +217,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(productData)
             });
             const result = await res.json();
-            if (!res.ok) throw new Error(result.message);
+            if (!res.ok) {
+                throw new Error(result.message);
+            }
             showToast(`Produk "${productData.nama}" berhasil ditambahkan.`, 'success');
-            document.getElementById('addProductForm').reset();
-            categorySelect.dispatchEvent(new Event('change'));
+            nameInput.value = '';
+            priceInput.value = '';
+            descriptionInput.value = '';
+            photosInput.value = '';
+            scriptMenuContentInput.value = '';
+            productWhatsappNumberInput.value = '';
+            categorySelect.value = 'Panel'; 
+            categorySelect.dispatchEvent(new Event('change')); 
         } catch (err) {
+            console.error('Error adding product:', err);
             showToast(err.message || 'Gagal menambahkan produk.', 'error');
         } finally {
             addButton.textContent = 'Tambah Produk';
@@ -228,287 +238,475 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Logika Tab Kelola Produk
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.admin-tab-content');
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            tabContents.forEach(content => content.classList.remove('active'));
+            document.getElementById(button.dataset.tab).classList.add('active');
+            if (button.dataset.tab === 'manageProducts') {
+                const currentCategory = manageCategorySelect.value;
+                if (currentCategory) { 
+                    manageCategorySelect.dispatchEvent(new Event('change'));
+                } else {
+                    manageProductList.innerHTML = '<p>Pilih kategori untuk mengelola produk.</p>';
+                    saveOrderButton.style.display = 'none';
+                    bulkPriceEditContainer.style.display = 'none'; 
+                }
+            } else {
+                bulkPriceEditContainer.style.display = 'none'; 
+            }
+        });
+    });
+
     manageCategorySelect.addEventListener('change', async () => {
         manageProductList.innerHTML = 'Memuat...';
         const category = manageCategorySelect.value;
-        selectedCategoryName.textContent = category;
         if (!category) {
             manageProductList.innerHTML = '<p>Pilih kategori untuk mengelola produk.</p>';
             saveOrderButton.style.display = 'none';
-            bulkEditSections.style.display = 'none';
+            bulkPriceEditContainer.style.display = 'none';
             return;
         }
         try {
-            const res = await fetch(`/products.json?v=${new Date().getTime()}`);
-            if (!res.ok) throw new Error(`Gagal memuat produk`);
-            const data = await res.json();
+            const timestamp = new Date().getTime();
+            const res = await fetch(`/products.json?v=${timestamp}`);
+            if (!res.ok) {
+                const errorText = await res.text(); 
+                throw new Error(`Gagal memuat produk: Status ${res.status}. Detail: ${errorText.substring(0, 100)}...`);
+            }
+            const data = await res.json(); 
             const productsInCat = data[category] || [];
             if (productsInCat.length === 0) {
                 manageProductList.innerHTML = '<p>Tidak ada produk di kategori ini.</p>';
                 saveOrderButton.style.display = 'none';
-                bulkEditSections.style.display = 'none';
+                bulkPriceEditContainer.style.display = 'none';
                 return;
             }
             renderManageList(productsInCat, category);
             saveOrderButton.style.display = 'block';
-            bulkEditSections.style.display = 'block';
+            bulkPriceEditContainer.style.display = 'flex'; 
         } catch (err) {
-            showToast(err.message, 'error');
-            manageProductList.innerHTML = `<p>Gagal memuat produk.</p>`;
+            console.error("Error loading products for management:", err); 
+            showToast(err.message || 'Gagal memuat produk. Periksa konsol browser untuk detail.', 'error');
+            manageProductList.innerHTML = `<p>Gagal memuat produk. ${err.message || ''}</p>`;
+            saveOrderButton.style.display = 'none';
+            bulkPriceEditContainer.style.display = 'none';
         }
     });
 
     function renderManageList(productsToRender, category) {
         manageProductList.innerHTML = '';
         productsToRender.forEach(prod => {
+            const isNew = prod.createdAt && Date.now() - new Date(prod.createdAt).getTime() < 24 * 60 * 60 * 1000;
             const item = document.createElement('div');
             item.className = 'delete-item';
             item.setAttribute('draggable', 'true');
             item.dataset.id = prod.id;
             
-            const priceDisplay = `<span>${formatRupiah(prod.harga)}</span>`;
-            const waDisplay = prod.nomorWA ? `<span style="font-size:0.8em; color:green; margin-left:8px;"><i class="fab fa-whatsapp"></i> ${prod.nomorWA}</span>` : '';
-
+            let priceDisplay = `<span>${formatRupiah(prod.harga)}</span>`;
+            if (prod.hargaAsli && prod.hargaAsli > prod.harga) {
+                priceDisplay = `<span class="original-price"><del>${formatRupiah(prod.hargaAsli)}</del></span> <span class="discounted-price">${formatRupiah(prod.harga)}</span>`;
+            }
+            
             item.innerHTML = `
                 <div class="item-header">
-                    <span>${prod.nama} - ${priceDisplay}${waDisplay}</span>
+                    <span>${prod.nama} - ${priceDisplay} ${isNew ? '<span class="new-badge">NEW</span>' : ''}</span>
                     <div class="item-actions">
                         <button type="button" class="edit-btn" data-id="${prod.id}"><i class="fas fa-edit"></i> Edit</button>
-                        <button type="button" class="delete-btn" data-id="${prod.id}"><i class="fas fa-trash-alt"></i> Hapus</button>
+                        <button type="button" class="delete-btn"><i class="fas fa-trash-alt"></i> Hapus</button>
                     </div>
-                </div>`;
+                </div>
+            `;
             manageProductList.appendChild(item);
         });
+
         setupManageActions(category, productsToRender);
     }
     
+    function formatRupiah(number) {
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+    }
+
     function setupManageActions(category, productsInCat) {
-        manageProductList.querySelectorAll('.edit-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const product = productsInCat.find(p => p.id === parseInt(btn.dataset.id));
-                if (!product) return;
+        manageProductList.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', async e => {
+                e.preventDefault(); 
+                const parent = e.target.closest('.delete-item');
+                const id = parseInt(parent.dataset.id);
                 
-                document.getElementById('edit-product-id').value = product.id;
-                document.getElementById('edit-product-category').value = category;
-                document.getElementById('editModalTitle').textContent = `Edit: ${product.nama}`;
-                document.getElementById('edit-name').value = product.nama;
-                document.getElementById('edit-price').value = product.harga;
-                document.getElementById('edit-whatsapp').value = product.nomorWA || '';
-                document.getElementById('edit-desc').value = product.deskripsiPanjang ? product.deskripsiPanjang.replace(/ \|\| /g, '\n') : '';
+                const confirmMessageHtml = `Apakah Anda yakin ingin menghapus produk <b>${parent.querySelector('.item-header span').textContent.split(' - ')[0]}</b>?`;
+                const userConfirmed = await showCustomConfirm(confirmMessageHtml);
+
+                if (!userConfirmed) {
+                    showToast('Penghapusan dibatalkan.', 'info');
+                    return;
+                }
+
+                showToast('Menghapus produk...', 'info', 5000); 
+                try {
+                    const res = await fetch(`${API_BASE_URL}/deleteProduct`, {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id, category: category })
+                    });
+                    const result = await res.json();
+                    if (!res.ok) {
+                        throw new Error(result.message);
+                    }
+                    parent.remove(); 
+                    showToast(result.message, 'success');
+                } catch (err) {
+                    console.error('Error deleting product:', err);
+                    showToast(err.message || 'Gagal menghapus produk.', 'error');
+                }
+            });
+        });
+
+        const editModal = document.getElementById('editProductModal');
+        const closeEditModalBtn = document.getElementById('closeEditModal');
+        const editModalTitle = document.getElementById('editModalTitle');
+        const saveEditBtn = document.getElementById('save-edit-btn');
+        
+        const editProductId = document.getElementById('edit-product-id');
+        const editProductCategory = document.getElementById('edit-product-category');
+        const editNameInput = document.getElementById('edit-name');
+        const editPriceInput = document.getElementById('edit-price');
+        const editDescInput = document.getElementById('edit-desc');
+        const editPhotoSection = document.getElementById('edit-photo-section');
+        const editPhotoGrid = document.getElementById('edit-photo-grid');
+        const addPhotoInput = document.getElementById('add-photo-input');
+        const addPhotoBtn = document.getElementById('add-photo-btn');
+        const editScriptMenuSection = document.getElementById('edit-script-menu-section');
+        const editScriptMenuContent = document.getElementById('edit-script-menu-content');
+        
+        manageProductList.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault(); 
+                const productId = parseInt(e.target.closest('.edit-btn').dataset.id); 
+                const product = productsInCat.find(p => p.id === productId);
+                if (!product) {
+                    showToast('Produk tidak ditemukan.', 'error');
+                    return;
+                }
+                
+                editProductId.value = product.id;
+                editProductCategory.value = category;
+                editModalTitle.innerHTML = `<i class="fas fa-edit"></i> Edit Produk: ${product.nama}`;
+                editNameInput.value = product.nama;
+                editPriceInput.value = product.harga;
+                editDescInput.value = product.deskripsiPanjang ? product.deskripsiPanjang.replace(/ \|\| /g, '\n') : '';
+                editWhatsappNumberInput.value = product.nomorWA || '';
+                
+                if (category === 'Stock Akun' || category === 'Logo') {
+                    editPhotoSection.style.display = 'block';
+                    editPhotoGrid.innerHTML = '';
+                    (product.images || []).forEach(img => {
+                        const photoItem = document.createElement('div');
+                        photoItem.className = 'photo-item';
+                        photoItem.innerHTML = `<img src="${img}" alt="Product Photo"><button type="button" class="delete-photo-btn"><i class="fas fa-times"></i></button>`;
+                        editPhotoGrid.appendChild(photoItem);
+                        photoItem.querySelector('.delete-photo-btn').addEventListener('click', (e_photo) => {
+                            e_photo.stopPropagation(); 
+                            e_photo.target.closest('.photo-item').remove();
+                        });
+                    });
+                } else {
+                    editPhotoSection.style.display = 'none';
+                }
+                
+                if (category === 'Script') {
+                    editScriptMenuSection.style.display = 'block';
+                    editScriptMenuContent.value = product.menuContent || '';
+                } else {
+                    editScriptMenuSection.style.display = 'none';
+                }
+                
                 editModal.classList.add('is-visible');
             });
         });
 
-        document.getElementById('save-edit-btn').onclick = async () => {
-            const newWhatsapp = document.getElementById('edit-whatsapp').value.trim();
-             if (newWhatsapp && !/^\d+$/.test(newWhatsapp)) {
-                return showToast('Format nomor WhatsApp salah.', 'error');
+        closeEditModalBtn.addEventListener('click', () => editModal.classList.remove('is-visible'));
+        window.addEventListener('click', (e) => {
+            if (e.target === editModal) {
+                editModal.classList.remove('is-visible');
+            }
+        });
+        
+        addPhotoBtn.addEventListener('click', (e) => {
+            e.preventDefault(); 
+            const newPhotoUrl = addPhotoInput.value.trim();
+            if (newPhotoUrl) {
+                const newPhotoItem = document.createElement('div');
+                newPhotoItem.className = 'photo-item';
+                newPhotoItem.innerHTML = `<img src="${newPhotoUrl}" alt="Product Photo"><button type="button" class="delete-photo-btn"><i class="fas fa-times"></i></button>`;
+                editPhotoGrid.appendChild(newPhotoItem);
+                newPhotoItem.querySelector('.delete-photo-btn').addEventListener('click', (e_photo) => {
+                    e_photo.stopPropagation(); 
+                    e_photo.target.closest('.photo-item').remove();
+                });
+                addPhotoInput.value = '';
+            } else {
+                showToast('URL foto tidak boleh kosong.', 'error');
+            }
+        });
+
+        saveEditBtn.addEventListener('click', async (e) => {
+            e.preventDefault(); 
+            const newWaNumber = editWhatsappNumberInput.value.trim();
+            if (newWaNumber && !validatePhoneNumber(newWaNumber)) {
+                return showToast('Format Nomor WA salah. Gunakan angka saja.', 'error');
             }
 
-            const updatedData = {
-                id: parseInt(document.getElementById('edit-product-id').value),
-                category: document.getElementById('edit-product-category').value,
-                newName: document.getElementById('edit-name').value.trim(),
-                newPrice: parseInt(document.getElementById('edit-price').value, 10),
-                newWhatsapp: newWhatsapp,
-                newDesc: document.getElementById('edit-desc').value.trim().replace(/\n/g, ' || '),
-            };
+            const id = parseInt(editProductId.value);
+            const categoryToUpdate = editProductCategory.value;
+            const newName = editNameInput.value.trim();
+            const newPrice = parseInt(editPriceInput.value, 10);
+            const newDesc = editDescInput.value.trim().replace(/\n/g, ' || ');
+            
+            let newImages = null;
+            if (categoryToUpdate === 'Stock Akun' || categoryToUpdate === 'Logo') {
+                newImages = [...editPhotoGrid.querySelectorAll('.photo-item img')].map(img => img.src);
+            }
+            
+            let newMenuContent = null;
+            if (categoryToUpdate === 'Script') {
+                newMenuContent = editScriptMenuContent.value.trim();
+            }
 
-            const saveBtn = document.getElementById('save-edit-btn');
-            saveBtn.textContent = 'Menyimpan...';
-            saveBtn.disabled = true;
+            if (isNaN(newPrice) || newPrice < 0 || !newName || !newDesc) {
+                return showToast('Data tidak valid (Nama, Harga, Deskripsi harus diisi dan harga harus angka positif).', 'error');
+            }
+            
+            saveEditBtn.textContent = 'Menyimpan...';
+            saveEditBtn.disabled = true;
 
             try {
                 const res = await fetch(`${API_BASE_URL}/updateProduct`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(updatedData)
+                    body: JSON.stringify({ id, category: categoryToUpdate, newName, newPrice, newDesc, newImages, newMenuContent, nomorWA: newWaNumber })
                 });
                 const result = await res.json();
-                if (!res.ok) throw new Error(result.message);
+
+                if (!res.ok) {
+                    throw new Error(result.message);
+                }
                 showToast('Produk berhasil diperbarui.', 'success');
-                editModal.classList.remove('is-visible');
+                editModal.classList.remove('is-visible'); 
                 manageCategorySelect.dispatchEvent(new Event('change'));
             } catch (err) {
-                showToast(err.message, 'error');
+                console.error('Error updating product:', err);
+                showToast(err.message || 'Gagal memperbarui produk.', 'error');
             } finally {
-                saveBtn.textContent = 'Simpan Perubahan';
-                saveBtn.disabled = false;
+                saveEditBtn.textContent = 'Simpan Perubahan';
+                saveEditBtn.disabled = false;
             }
-        };
-
-        applyBulkWhatsappBtn.onclick = async () => {
-            const newWhatsapp = bulkWhatsappInput.value.trim();
-            if (newWhatsapp && !/^\d+$/.test(newWhatsapp)) {
-                return showToast('Format nomor WhatsApp salah.', 'error');
+        });
+        
+        let draggingItem = null;
+        manageProductList.addEventListener('dragstart', (e) => {
+            draggingItem = e.target.closest('.delete-item');
+            if (draggingItem) {
+                setTimeout(() => draggingItem.classList.add('dragging'), 0);
             }
-            if (!await showCustomConfirm(`Yakin ubah No. WA semua produk di kategori "<b>${category}</b>"?`)) return;
+        });
 
-            applyBulkWhatsappBtn.disabled = true;
+        manageProductList.addEventListener('dragend', () => {
+            if (draggingItem) {
+                draggingItem.classList.remove('dragging');
+                draggingItem = null;
+            }
+        });
+        
+        manageProductList.addEventListener('dragover', (e) => {
+            e.preventDefault(); 
+            const afterElement = getDragAfterElement(manageProductList, e.clientY);
+            const draggable = document.querySelector('.dragging');
+            if (draggable) {
+                 if (afterElement == null) {
+                    manageProductList.appendChild(draggable);
+                } else {
+                    manageProductList.insertBefore(draggable, afterElement);
+                }
+            }
+        });
+
+        saveOrderButton.addEventListener('click', async (e) => {
+            e.preventDefault(); 
+            const newOrder = [...manageProductList.children].map(item => parseInt(item.dataset.id));
+            const category = manageCategorySelect.value;
+            if (!category || newOrder.length === 0) {
+                return showToast('Pilih kategori dan pastikan ada produk untuk diurutkan.', 'error');
+            }
+
+            showToast('Menyimpan urutan...', 'info', 5000);
+            saveOrderButton.disabled = true;
             try {
-                 const res = await fetch(`${API_BASE_URL}/updateBulkWhatsapp`, {
+                const res = await fetch(`${API_BASE_URL}/reorderProducts`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ category, newWhatsapp: newWhatsapp || null })
+                    body: JSON.stringify({ category, order: newOrder })
                 });
                 const result = await res.json();
-                if (!res.ok) throw new Error(result.message);
-                showToast(result.message, 'success');
-                bulkWhatsappInput.value = '';
+                if (!res.ok) {
+                    throw new Error(result.message);
+                }
+                showToast('Urutan berhasil disimpan.', 'success');
                 manageCategorySelect.dispatchEvent(new Event('change'));
             } catch (err) {
-                showToast(err.message, 'error');
+                console.error('Error saving order:', err);
+                showToast(err.message || 'Gagal menyimpan urutan.', 'error');
             } finally {
-                applyBulkWhatsappBtn.disabled = false;
+                saveOrderButton.disabled = false;
             }
-        };
+        });
+
+        applyBulkPriceBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const category = manageCategorySelect.value;
+            const newBulkPrice = parseInt(bulkPriceInput.value, 10);
+
+            if (!category) {
+                return showToast('Pilih kategori terlebih dahulu.', 'error');
+            }
+            if (isNaN(newBulkPrice) || newBulkPrice < 0) {
+                return showToast('Harga massal tidak valid.', 'error');
+            }
+
+            const confirmMessageHtml = `Yakin ingin mengubah harga SEMUA produk di "<b>${category}</b>" menjadi <b>${formatRupiah(newBulkPrice)}</b>?`;
+            const userConfirmed = await showCustomConfirm(confirmMessageHtml);
+            
+            if (!userConfirmed) {
+                showToast('Pembaruan dibatalkan.', 'info');
+                return; 
+            }
+
+            showToast(`Menerapkan harga massal...`, 'info', 5000);
+            applyBulkPriceBtn.disabled = true;
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/updateProductsInCategory`, { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ category, newPrice: newBulkPrice })
+                });
+                const result = await res.json();
+                if (!res.ok) {
+                    throw new Error(result.message || await res.text());
+                }
+                showToast(result.message, 'success');
+                bulkPriceInput.value = ''; 
+                manageCategorySelect.dispatchEvent(new Event('change')); 
+            } catch (err) {
+                console.error('Error applying bulk price:', err);
+                showToast(`Gagal: ${err.message}`, 'error');
+            } finally {
+                applyBulkPriceBtn.disabled = false;
+            }
+        });
+    }
+    
+    function getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll('.delete-item:not(.dragging)')];
+
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element; 
     }
 
-    applyGlobalBulkWhatsappBtn.addEventListener('click', async () => {
-        const newWhatsapp = document.getElementById('global-bulk-whatsapp-input').value.trim();
-        if (newWhatsapp && !/^\d+$/.test(newWhatsapp)) {
-            return showToast('Format nomor WhatsApp salah.', 'error');
-        }
-        const confirmMsg = `Anda YAKIN ingin mengubah No. WA untuk **SEMUA PRODUK** menjadi "${newWhatsapp || '(dihapus)'}"? Tindakan ini tidak dapat diurungkan.`;
-        if (!await showCustomConfirm(confirmMsg)) return showToast('Tindakan dibatalkan.', 'info');
-
-        showToast('Memproses perubahan global...', 'info');
-        applyGlobalBulkWhatsappBtn.disabled = true;
+    async function loadSettings() {
         try {
-            const res = await fetch(`${API_BASE_URL}/updateAllProductsWhatsapp`, {
+            const res = await fetch(`${API_BASE_URL}/getSettings`);
+            if (!res.ok) {
+                throw new Error('Gagal memuat pengaturan. Pastikan file settings.json ada.');
+            }
+            siteSettings = await res.json();
+            
+            globalWhatsappNumberInput.value = siteSettings.globalPhoneNumber || '';
+
+            categoryWhatsappNumbersContainer.innerHTML = '<h3><i class="fas fa-list-alt"></i> Nomor WA per Kategori (Opsional)</h3>';
+            const categoriesInSettings = siteSettings.categoryPhoneNumbers || {};
+            
+            // Ambil semua opsi kategori dari dropdown untuk memastikan semua ada
+            const allCategories = [...manageCategorySelect.options].filter(opt => opt.value).map(opt => opt.value);
+            
+            allCategories.forEach(cat => {
+                const div = document.createElement('div');
+                div.className = 'category-wa-input'; // class for styling if needed
+                div.innerHTML = `
+                    <label for="wa-${cat}">${cat}:</label>
+                    <input type="text" id="wa-${cat}" data-category="${cat}" value="${categoriesInSettings[cat] || ''}" placeholder="Kosongkan untuk pakai nomor global">
+                `;
+                categoryWhatsappNumbersContainer.appendChild(div);
+            });
+
+        } catch (err) {
+            showToast(err.message, 'error', 5000);
+            console.error('Error loading settings:', err);
+        }
+    }
+
+    saveSettingsButton.addEventListener('click', async () => {
+        const globalNumber = globalWhatsappNumberInput.value.trim();
+        if (!validatePhoneNumber(globalNumber)) {
+            return showToast('Format Nomor WA Global salah. Gunakan angka saja.', 'error');
+        }
+        if (!globalNumber) {
+            return showToast('Nomor WA Global wajib diisi.', 'error');
+        }
+
+        const categoryNumbers = {};
+        let isCategoryValid = true;
+        categoryWhatsappNumbersContainer.querySelectorAll('input[data-category]').forEach(input => {
+            const cat = input.dataset.category;
+            const num = input.value.trim();
+            if (num && !validatePhoneNumber(num)) {
+                showToast(`Format Nomor WA untuk kategori ${cat} salah.`, 'error');
+                isCategoryValid = false;
+            }
+            categoryNumbers[cat] = num;
+        });
+
+        if (!isCategoryValid) return;
+
+        saveSettingsButton.textContent = 'Menyimpan...';
+        saveSettingsButton.disabled = true;
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/updateSettings`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ newWhatsapp: newWhatsapp || null })
+                body: JSON.stringify({
+                    globalPhoneNumber: globalNumber,
+                    categoryPhoneNumbers: categoryNumbers
+                })
             });
             const result = await res.json();
             if (!res.ok) throw new Error(result.message);
-            showToast(result.message, 'success');
-            document.getElementById('global-bulk-whatsapp-input').value = '';
-            if (manageCategorySelect.value) {
-                manageCategorySelect.dispatchEvent(new Event('change'));
-            }
+            
+            showToast('Pengaturan berhasil disimpan!', 'success');
+            await loadSettings();
         } catch (err) {
-            showToast(`Gagal: ${err.message}`, 'error');
+            showToast(err.message || 'Gagal menyimpan pengaturan.', 'error');
         } finally {
-            applyGlobalBulkWhatsappBtn.disabled = false;
+            saveSettingsButton.textContent = 'Simpan Pengaturan';
+            saveSettingsButton.disabled = false;
         }
     });
 
-    // Logika Tab Kelola Domain & API
-    async function loadApiKeys() {
-        apiKeyList.innerHTML = 'Memuat...';
-        try {
-            const { keys } = await apiRequest('/apiKeys');
-            apiKeyList.innerHTML = keys.length ? keys.map(key => `
-                <div class="api-key-item">
-                    <span><b>${key.identifier}</b>: <code>${key.key}</code></span>
-                    <small>Expires: ${new Date(key.expiresAt).toLocaleString('id-ID')}</small>
-                    <button class="delete-api-key-btn" data-key="${key.key}">&times;</button>
-                </div>`).join('') : '<p>Belum ada API Key.</p>';
-        } catch (error) {
-            apiKeyList.innerHTML = `<p class="error">${error.message}</p>`;
-        }
-    }
-
-    async function loadDomains() {
-        domainList.innerHTML = 'Memuat...';
-        try {
-            const { domains } = await apiRequest('/domains');
-            const domainNames = Object.keys(domains);
-            domainList.innerHTML = domainNames.length ? domainNames.map(d => `
-                <div class="domain-item">
-                    <span>${d}</span>
-                    <button class="delete-domain-btn" data-domain="${d}">&times;</button>
-                </div>`).join('') : '<p>Belum ada domain ditambahkan.</p>';
-        } catch (error) {
-            domainList.innerHTML = `<p class="error">${error.message}</p>`;
-        }
-    }
-    
-    async function loadSubdomains() {
-        subdomainList.innerHTML = 'Memuat...';
-        try {
-            const { subdomains } = await apiRequest('/subdomains');
-            subdomainList.innerHTML = subdomains.length ? subdomains.map(s => `
-                <div class="subdomain-item">
-                    <span><b>${s.full_domain}</b> -> ${s.ip}</span>
-                    <small>Dibuat pada: ${new Date(s.createdAt).toLocaleString('id-ID')}</small>
-                </div>`).join('') : '<p>Belum ada subdomain yang dibuat.</p>';
-        } catch(e) {
-             subdomainList.innerHTML = `<p class="error">${e.message}</p>`;
-        }
-    }
-
-    generateApiKeyBtn.addEventListener('click', async () => {
-        const identifier = document.getElementById('api-user-identifier').value.trim();
-        const duration = parseInt(document.getElementById('api-duration').value, 10);
-        if (!identifier || isNaN(duration) || duration <= 0) {
-            return showToast('Identifier dan masa aktif (hari) harus diisi.', 'error');
-        }
-        try {
-            const result = await apiRequest('/apiKeys', 'POST', { identifier, duration });
-            apiKeyResultDiv.innerHTML = `
-                <p><strong>Identifier:</strong> ${result.identifier}</p>
-                <p><strong>API Key:</strong> <code>${result.key}</code></p>
-                <p><strong>Berlaku sampai:</strong> ${new Date(result.expiresAt).toLocaleString('id-ID')}</p>`;
-            apiKeyResultModal.classList.add('is-visible');
-            loadApiKeys();
-        } catch (error) {
-            showToast(error.message, 'error');
-        }
-    });
-
-    closeApiKeyModal.addEventListener('click', () => apiKeyResultModal.classList.remove('is-visible'));
-    
-    addDomainBtn.addEventListener('click', async () => {
-        const domain = document.getElementById('domain-name').value.trim();
-        const zoneId = document.getElementById('domain-zone-id').value.trim();
-        const apiToken = document.getElementById('domain-api-token').value.trim();
-        if (!domain || !zoneId || !apiToken) return showToast('Semua field domain wajib diisi.', 'error');
-        try {
-            await apiRequest('/domains', 'POST', { domain, zoneId, apiToken });
-            showToast('Domain berhasil ditambahkan.', 'success');
-            loadDomains();
-            document.getElementById('domain-manager-form').reset();
-        } catch (error) {
-            showToast(error.message, 'error');
-        }
-    });
-
-    apiKeyList.addEventListener('click', async (e) => {
-        if (e.target.classList.contains('delete-api-key-btn')) {
-            const key = e.target.dataset.key;
-            if (await showCustomConfirm('Yakin ingin menghapus API Key ini?')) {
-                try {
-                    await apiRequest('/apiKeys', 'DELETE', { key });
-                    showToast('API Key berhasil dihapus.', 'success');
-                    loadApiKeys();
-                } catch (error) {
-                    showToast(error.message, 'error');
-                }
-            }
-        }
-    });
-    
-    domainList.addEventListener('click', async (e) => {
-        if (e.target.classList.contains('delete-domain-btn')) {
-            const domain = e.target.dataset.domain;
-            if (await showCustomConfirm(`Yakin ingin menghapus domain <b>${domain}</b>?`)) {
-                try {
-                    await apiRequest('/domains', 'DELETE', { domain });
-                    showToast('Domain berhasil dihapus.', 'success');
-                    loadDomains();
-                } catch (error) {
-                    showToast(error.message, 'error');
-                }
-            }
-        }
-    });
-
-    // Inisialisasi
     if (sessionStorage.getItem('isAdminAuthenticated')) {
         loginScreen.style.display = 'none';
         productFormScreen.style.display = 'block';
+        loadSettings();
+        document.querySelector('.tab-button[data-tab="addProduct"]').click();
     }
 });
