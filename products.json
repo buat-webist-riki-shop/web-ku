@@ -406,6 +406,16 @@
             "discountEndDate": null
         },
         {
+            "id": 39,
+            "nama": "Jasa pembuatan script",
+            "harga": 50000,
+            "hargaAsli": 50000,
+            "deskripsiPanjang": "jasa pembuatan ini tergantung fitur ya, harga mulai dari 20k - 50k dan seterusnya, semua sudah free raname dan request",
+            "nomorWA": "",
+            "discountPrice": null,
+            "discountEndDate": null
+        },
+        {
             "id": 34,
             "nama": "Jasa install tema",
             "harga": 10000,
@@ -451,16 +461,6 @@
             "harga": 15000,
             "hargaAsli": 15000,
             "deskripsiPanjang": "untuk tampil website nya silahkan salin link di bawah ini. https://rikishopreal.vercel.app",
-            "nomorWA": "",
-            "discountPrice": null,
-            "discountEndDate": null
-        },
-        {
-            "id": 39,
-            "nama": "Jasa pembuatan script",
-            "harga": 50000,
-            "hargaAsli": 50000,
-            "deskripsiPanjang": "jasa pembuatan ini tergantung fitur ya, harga mulai dari 20k - 50k dan seterusnya, semua sudah free raname dan request",
             "nomorWA": "",
             "discountPrice": null,
             "discountEndDate": null
