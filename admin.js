@@ -607,7 +607,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 // NOTE: Endpoint 'updateProductsInCategory' now only sets the current price 'harga'.
                 // It does not change 'hargaAsli'.
-                const res = await fetch(`${API_BASE_URL}/updateProductsInCategory`, { 
+                const res = await fetch(`${API_BASE_URL}/updateProduct`, { 
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ category, newPrice: newBulkPrice })
