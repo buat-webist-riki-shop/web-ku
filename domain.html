@@ -3,102 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Domain Panel - Rikishopreal</title>
+    <title>Buat Subdomain - Rikishopreal</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="domain.css">
+    <link rel="stylesheet" href="admin.css"> <style>
+        .result-popup { padding: 20px; text-align: left; }
+        .result-popup code {
+            display: block;
+            background-color: var(--secondary-color);
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 5px;
+            word-break: break-all;
+        }
+        .result-popup p { text-align: left; }
+    </style>
 </head>
 <body class="light-mode">
     <div id="toast-container"></div>
 
-    <!-- API Key Input Screen -->
-    <div id="apikey-screen" class="main-container">
-        <div class="form-card login-card">
-            <div class="login-header">
-                <img src="logo.jpg" alt="Rikishopreal" class="profile-pic">
-                <h2>Panel Domain</h2>
-                <p>Masukkan API Key Anda untuk mengakses.</p>
-            </div>
-            <div class="password-input-container">
+    <div class="main-container" style="padding-top: 40px;">
+        <div id="api-key-screen" class="form-card">
+            <h2><i class="fas fa-lock"></i> Verifikasi API Key</h2>
+            <p>Masukkan API Key Anda untuk mengakses fitur pembuatan subdomain.</p>
+             <div class="password-input-container">
                 <input type="text" id="api-key-input" placeholder="Masukkan API Key Anda">
             </div>
-            <button type="button" id="verify-api-key-button">Verifikasi API Key</button>
-            <div class="theme-switch" id="themeSwitchBtnLogin">
-                <i class="fas fa-moon"></i>
-            </div>
+            <button type="button" id="verify-key-btn">Verifikasi</button>
+             <p style="margin-top: 20px; font-size: 0.9em;">Belum punya API Key? Hubungi admin untuk mendapatkannya!</p>
+        </div>
+
+        <div id="create-domain-screen" class="form-card" style="display: none;">
+            <h2><i class="fas fa-globe-asia"></i> Buat Subdomain</h2>
+            <p>Hai <b id="user-identifier"></b>! Silakan isi formulir di bawah ini.</p>
+            
+            <label for="subdomain-name">Nama Subdomain (hanya huruf, angka, dan strip):</label>
+            <input type="text" id="subdomain-name" placeholder="Contoh: riki-shop">
+
+            <label for="domain-choice">Pilih Domain:</label>
+            <select id="domain-choice">
+                <option value="">Memuat domain...</option>
+            </select>
+
+            <label for="vps-ip">IP VPS Anda:</label>
+            <input type="text" id="vps-ip" placeholder="Contoh: 1.2.3.4">
+
+            <button type="button" id="create-domain-btn">Buat Domain</button>
         </div>
     </div>
 
-    <!-- Domain Management Screen -->
-    <div id="domain-management-screen" class="main-container" style="display: none;">
-        <header class="domain-header">
-            <img src="logo.jpg" alt="Rikishopreal" class="profile-pic">
-            <h2>Domain Panel</h2>
-            <div class="theme-switch" id="themeSwitchBtnPanel">
-                <i class="fas fa-moon"></i>
-            </div>
-        </header>
-
-        <nav class="domain-tabs">
-            <button type="button" class="tab-button active" data-tab="createDomain">Buat Domain</button>
-            <button type="button" class="tab-button" data-tab="listDomains">Daftar Domain Dibuat</button>
-        </nav>
-
-        <!-- Buat Domain -->
-        <div id="createDomain" class="domain-tab-content active">
-            <form class="domain-form" id="createDomainForm">
-                <h2><i class="fas fa-plus-circle"></i> Buat Subdomain</h2>
-                <label for="host-input">Nama Domain/Host:</label>
-                <input type="text" id="host-input" placeholder="Contoh: toko atau myapp">
-
-                <label for="domain-category-select">Pilih Kategori Domain:</label>
-                <select id="domain-category-select">
-                    <option value="">-- Muat Kategori --</option>
-                </select>
-
-                <label for="ip-input">Alamat IP VPS:</label>
-                <input type="text" id="ip-input" placeholder="Contoh: 1.1.1.1">
-
-                <button type="submit" id="create-subdomain-btn">Buat Domain</button>
-            </form>
-        </div>
-
-        <!-- Daftar Domain Dibuat -->
-        <div id="listDomains" class="domain-tab-content">
-            <div class="domain-form">
-                <h2><i class="fas fa-list-alt"></i> Daftar Domain Dibuat</h2>
-                <div id="created-domain-list" class="domain-list">
-                    <p>Domain yang Anda buat akan muncul di sini.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Custom Confirmation Modal (Pengganti window.confirm) -->
-    <div id="customConfirmModal" class="modal">
-        <div class="modal-content confirm-modal-content">
-            <div class="confirm-message" id="confirmMessage"></div>
+    <div id="resultModal" class="modal">
+        <div class="modal-content confirm-modal-content result-popup">
+            <h3><i class="fas fa-check-circle" style="color: var(--success-color);"></i> Sukses!</h3>
+            <p>Subdomain Anda berhasil dibuat. Berikut adalah detailnya:</p>
+            <div id="result-content"></div>
             <div class="confirm-actions">
-                <button type="button" id="confirmCancelBtn" class="confirm-cancel-btn">Batal</button>
-                <button type="button" id="confirmOkBtn" class="confirm-ok-btn">Oke</button>
+                <button type="button" id="closeResultModal" class="confirm-ok-btn">Selesai</button>
             </div>
         </div>
     </div>
-
-    <!-- Domain Created Success Modal -->
-    <div id="domainSuccessModal" class="modal">
-        <div class="modal-content domain-success-modal-content">
-            <span class="close-button" id="closeDomainSuccessModal">&times;</span>
-            <h2><i class="fas fa-check-circle success-icon"></i> Domain Berhasil Dibuat!</h2>
-            <div class="success-details">
-                <p><b>Domain:</b> <span id="displayDomainName"></span></p>
-                <p><b>Node:</b> <span id="displayNodeName"></span></p>
-            </div>
-            <button type="button" class="copy-button" data-target="displayDomainName"><i class="fas fa-copy"></i> Salin Domain</button>
-            <button type="button" class="copy-button" data-target="displayNodeName" style="margin-top: 10px;"><i class="fas fa-copy"></i> Salin Node</button>
-        </div>
-    </div>
-
+    
     <script src="domain.js"></script>
 </body>
 </html>

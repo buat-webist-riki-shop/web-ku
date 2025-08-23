@@ -1,117 +1,38 @@
-// index.js - Server Backend Node.js dengan Express.js
+// =================================================================
+// SERVER BACKEND RIKISHOPREAL DENGAN EXPRESS.JS
+// =================================================================
 
-// Impor modul yang diperlukan
+// --- Impor Modul ---
 import express from 'express';
-import cors from 'cors'; // Untuk mengatasi masalah CORS jika di-deploy ke domain yang berbeda (saat development biasanya tidak perlu jika static diserve dari sini)
-import path from 'path'; // Modul Path untuk menangani jalur file
-import { fileURLToPath } from 'url'; // Untuk mendapatkan __dirname di ES Modules
-import fs from 'fs/promises'; // Untuk membaca/menulis file JSON
-import axios from 'axios'; // Untuk interaksi dengan Cloudflare API
-import { v4 as uuidv4 } from 'uuid'; // Untuk menghasilkan UUID unik
+import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs/promises';
+import crypto from 'crypto';
+import { Octokit } from "@octokit/rest";
+import fetch from 'node-fetch'; // Diperlukan untuk API Cloudflare
 
-// Dapatkan __dirname untuk ES Modules
+// --- Konfigurasi Awal ---
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3000; // Server akan berjalan di port 3000 secara default
+const PORT = process.env.PORT || 3000;
 
-// Middleware untuk mengizinkan Express mengurai body permintaan dalam format JSON
-app.use(express.json());
+// --- File Paths untuk Data Lokal (API Key & Domain) ---
+const keysFilePath = path.join(process.cwd(), 'apikeys.json');
+const domainsFilePath = path.join(process.cwd(), 'domains.json');
+const subdomainsFilePath = path.join(process.cwd(), 'subdomains.json');
 
-// Middleware untuk mengizinkan permintaan lintas asal (Cross-Origin Resource Sharing)
-app.use(cors());
+// --- Middleware ---
+app.use(express.json()); // Mengurai body JSON
+app.use(cors()); // Mengizinkan Cross-Origin
+app.use(express.static(__dirname)); // Menyajikan file statis (HTML, CSS, JS frontend)
 
-// --- KONFIGURASI DOMAIN CLOUDFLARE (Emulasi .env) ---
-// CATATAN PENTING: Dalam produksi, ini harus dimuat dari variabel lingkungan (.env)
-// Contoh: process.env.CLOUDFLARE_API_TOKEN_RIKISHOP
-// Menggunakan data JSON kategori domain yang baru diberikan oleh user.
-// Perhatian: Ada duplikasi kunci dalam JSON yang diberikan user. Entri terakhir akan menimpa yang sebelumnya.
-const CLOUDFLARE_CONFIG = {
-  "mypanelstore.web.id": {
-    "zone": "c61c442d70392500611499c5af816532",
-    "apitoken": "ImdyjF7XVU7ObDbdCr7LwSUZ4eDQJ-QozAbUIWoF" // Mengambil apitoken terakhir dari duplikasi
-  },
-  "privatserver.my.id": {
-    "zone": "699bb9eb65046a886399c91daacb1968",
-    "apitoken": "fnl7ixlJ-Y-7zxJ7EUGEXitfmfLiPGW985iXobdu" // Mengambil apitoken terakhir dari duplikasi
-  },
-  "serverku.biz.id": {
-    "zone": "4e4feaba70b41ed78295d2dcc090dd3a",
-    "apitoken": "d6kmqwlvi0qwCyMxoGuc3EBAYRYvbulhjhR9T0I7" // Mengambil apitoken terakhir dari duplikasi
-  },
-  "panelwebsite.biz.id": {
-    "zone": "2d6aab40136299392d66eed44a7b1122",
-    "apitoken": "ImdyjF7XVU7ObDbdCr7LwSUZ4eDQJ-QozAbUIWoF"
-  },
-  "pteroserver.us.kg": {
-    "zone": "f693559a94aebc553a68c27a3ffe3b55",
-    "apitoken": "ImdyjF7XVU7ObDbdCr7LwSUZ4eDQJ-QozAbUIWoF"
-  },
-  "digitalserver.us.kg": {
-    "zone": "df13e6e4faa4de9edaeb8e1f05cf1a36",
-    "apitoken": "ImdyjF7XVU7ObDbdCr7LwSUZ4eDQJ-QozAbUIWoF"
-  },
-  "shopserver.us.kg": {
-    "zone": "54ca38e266bfdf2dcdb7f51fd79c2db5",
-    "apitoken": "ImdyjF7XVU7ObDbdCr7LwSUZ4eDQJ-QozAbUIWoF"
-  },
-  "bisnis-panel.web.id": {
-    "zone": "5002eff0a93516bcf233c7034c5979b5",
-    "apitoken": "ssPZ-LGjJZWeL3HCmrSWDCGXBOCipolE7ZrteJxR"
-  },
-  "bokep-jepang.biz.id": {
-    "zone": "d22b5af4b6c21d6cebcf654a09766372",
-    "apitoken": "_AVB1AVabMVndz9XuAv0eU37_TIi8nWZLEbqP2_z"
-  },
-  "developer-bot.biz.id": {
-    "zone": "b460d437d312ec9a2df11c9bfa41067e",
-    "apitoken": "7IZuQOewlLUxmcj2NxC0QsIGbXPpVnEv9TKybt7j"
-  },
-  "developerbot.my.id": {
-    "zone": "4120b6b00845ad031e6b7b6501f07cbd",
-    "apitoken": "iknDRCKF9-leVYc82xqvVZ_HK6tIMoirPxr9_xJC"
-  },
-  "doa-ibu.my.id": {
-    "zone": "a78a6b0cffab54d527403b59ac61efed",
-    "apitoken": "kDsR7IXP91Coo5rFmIdQ8H-lVly1WKEGHdlJm_AK"
-  },
-  "doo-ayah.biz.id": {
-    "zone": "2145588922844e662f65a935a02faedf",
-    "apitoken": "n3_BCQoa2_AsWpKJAlnqL1d1BQCSjGW9bkwuy7yg"
-  },
-  "fenscaitlin.web.id": {
-    "zone": "a32c5f8cf43d10f18f57fe0607753ec7",
-    "apitoken": "nqdsa1bzi7z1UR0bKjaWWC3uSMs8J1gB_rj8DGA1"
-  },
-  "ff-freefirecom.my.id": {
-    "zone": "56cb5b16d237366d90b379f2b74fd1ec",
-    "apitoken": "To8b0WOT7qbtj_jOf4stbTN1IyfSFG7qlwWrkKso"
-  },
-  "hostindonesia.biz.id": {
-    "zone": "39b842cf9f16e205198d4d2890c5f26f",
-    "apitoken": "23On8cgpqwtr83ujSbCeRJmDAZyyiNMpF7okgwco"
-  },
-  "kangbot.biz.id": {
-    "zone": "8c21a2699fc88ab81a323fcdd0d43a29",
-    "apitoken": "O0kWzDmDdV_Zub6TF1VPE6RzG7gEeUJNLLlycW-O"
-  },
-  "kangpanel.biz.id": {
-    "zone": "90ab3a017b7b29dd9ee92fdbb5831b0a",
-    "apitoken": "MbuO3DVbNX9aTG2Sj5OLZ67lcZyM0MILLdnzXt8w-O"
-  }
-};
-
-
-const API_KEYS_FILE = path.join(__dirname, 'apikeys.json');
-const DOMAIN_CATEGORIES_FILE = path.join(__dirname, 'domainCategories.json');
-const PRODUCTS_FILE = path.join(__dirname, 'products.json'); // Path ke products.json
-const CREATED_DOMAINS_FILE = path.join(__dirname, 'domains.json'); // NEW: Path untuk menyimpan domain yang dibuat
-
-// Fungsi pembantu untuk membaca/menulis file JSON
-async function readJsonFile(filePath, defaultValue = {}) {
+// --- Helper Functions ---
+const readJsonFile = async (filePath, defaultValue) => {
     try {
-        const data = await fs.readFile(filePath, 'utf-8');
+        const data = await fs.readFile(filePath, 'utf8');
         return JSON.parse(data);
     } catch (error) {
         if (error.code === 'ENOENT') {
@@ -120,525 +41,304 @@ async function readJsonFile(filePath, defaultValue = {}) {
         }
         throw error;
     }
-}
+};
 
-async function writeJsonFile(filePath, data) {
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
-}
+const writeJsonFile = async (filePath, data) => {
+    await fs.writeFile(filePath, JSON.stringify(data, null, 2));
+};
 
-// --- MENYAJIKAN FILE STATIS ---
-// Ini akan membuat file seperti admin.html, admin.js, admin.css dapat diakses
-// dari URL root server (misalnya http://localhost:3000/admin.html)
-app.use(express.static(__dirname));
+// =================================================================
+// RUTE API (ENDPOINT)
+// =================================================================
 
-// --- RUTE API UNTUK LOGIN ---
+// --- API Login Admin ---
 app.post('/api/login', (req, res) => {
-    const { password } = req.body; // Mengambil password dari body permintaan
+    const { password } = req.body;
+    // PENTING: Gunakan Environment Variable di hosting Anda!
+    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'ganti-dengan-password-aman';
 
-    // Logika verifikasi password Anda
-    // GANTI 'password-rahasia-anda-kuat' dengan password yang benar untuk admin
-    if (password === 'password-rahasia-anda-kuat') {
-        // Jika password benar, kirim respons sukses (JSON)
-        res.status(200).json({ message: 'Login berhasil!' });
+    if (password && password === ADMIN_PASSWORD) {
+        res.status(200).json({ message: 'Login berhasil' });
     } else {
-        // Jika password salah, kirim respons error (JSON)
-        // Pastikan pesan error juga dalam format JSON
-        res.status(401).json({ message: 'Password salah.' });
+        res.status(401).json({ message: 'Password yang Anda masukkan salah.' });
     }
 });
 
-// --- RUTE API UNTUK MENAMBAH PRODUK ---
+
+// --- API Produk (Integrasi dengan GitHub) ---
+// Inisialisasi Octokit (untuk interaksi dengan GitHub)
+const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+const REPO_OWNER = process.env.REPO_OWNER;
+const REPO_NAME = process.env.REPO_NAME;
+const FILE_PATH = 'products.json';
+
+// Fungsi helper untuk mengambil file dari GitHub
+const getProductsFile = async () => {
+    const { data } = await octokit.repos.getContent({
+        owner: REPO_OWNER,
+        repo: REPO_NAME,
+        path: FILE_PATH,
+    });
+    return {
+        sha: data.sha,
+        json: JSON.parse(Buffer.from(data.content, 'base64').toString('utf-8'))
+    };
+};
+
+// Fungsi helper untuk update file di GitHub
+const updateProductsFile = async (sha, json, message) => {
+    await octokit.repos.createOrUpdateFileContents({
+        owner: REPO_OWNER,
+        repo: REPO_NAME,
+        path: FILE_PATH,
+        message,
+        content: Buffer.from(JSON.stringify(json, null, 4)).toString('base64'),
+        sha,
+    });
+};
+
+
 app.post('/api/addProduct', async (req, res) => {
-    const productData = req.body; // Mengambil data produk dari body permintaan
-
     try {
-        const products = await readJsonFile(PRODUCTS_FILE);
-        if (!products[productData.category]) {
-            products[productData.category] = [];
-        }
-        productData.id = Date.now(); // ID unik untuk setiap produk baru
-        products[productData.category].push(productData);
-        await writeJsonFile(PRODUCTS_FILE, products);
-        res.status(200).json({ message: `Produk "${productData.nama}" berhasil ditambahkan.`, product: productData });
-    } catch (error) {
-        console.error('Error adding product:', error);
-        res.status(500).json({ message: 'Gagal menambahkan produk.' });
-    }
-});
-
-// --- RUTE API UNTUK MENGHAPUS PRODUK ---
-app.delete('/api/deleteProduct', async (req, res) => {
-    const { id, category } = req.body;
-    try {
-        const products = await readJsonFile(PRODUCTS_FILE);
-        if (products[category]) {
-            const initialLength = products[category].length;
-            products[category] = products[category].filter(p => p.id !== id);
-            if (products[category].length < initialLength) {
-                await writeJsonFile(PRODUCTS_FILE, products);
-                res.status(200).json({ message: 'Produk berhasil dihapus.' });
-            } else {
-                res.status(404).json({ message: 'Produk tidak ditemukan.' });
-            }
-        } else {
-            res.status(404).json({ message: 'Kategori tidak ditemukan.' });
-        }
-    } catch (error) {
-        console.error('Error deleting product:', error);
-        res.status(500).json({ message: 'Gagal menghapus produk.' });
-    }
-});
-
-// --- RUTE API UNTUK MEMPERBARUI PRODUK ---
-app.post('/api/updateProduct', async (req, res) => {
-    const { id, category, newName, newPrice, newDesc, newImages, newMenuContent, newContactNumber } = req.body;
-    try {
-        const products = await readJsonFile(PRODUCTS_FILE);
-        if (products[category]) {
-            const productIndex = products[category].findIndex(p => p.id === id);
-            if (productIndex !== -1) {
-                products[category][productIndex].nama = newName;
-                products[category][productIndex].harga = newPrice;
-                products[category][productIndex].deskripsiPanjang = newDesc;
-                
-                // Hanya update jika properti ada
-                if (newImages !== undefined) {
-                    products[category][productIndex].images = newImages;
-                }
-                if (newMenuContent !== undefined) {
-                    products[category][productIndex].menuContent = newMenuContent;
-                }
-                // Update contactNumber, jika kosong akan dihapus
-                if (newContactNumber) {
-                    products[category][productIndex].contactNumber = newContactNumber;
-                } else {
-                    delete products[category][productIndex].contactNumber;
-                }
-
-                await writeJsonFile(PRODUCTS_FILE, products);
-                res.status(200).json({ message: 'Produk berhasil diperbarui.', product: products[category][productIndex] });
-            } else {
-                res.status(404).json({ message: 'Produk tidak ditemukan.' });
-            }
-        } else {
-            res.status(404).json({ message: 'Kategori tidak ditemukan.' });
-        }
-    } catch (error) {
-        console.error('Error updating product:', error);
-        res.status(500).json({ message: 'Gagal memperbarui produk.' });
-    }
-});
-
-// --- RUTE API UNTUK MENGUBAH URUTAN PRODUK ---
-app.post('/api/reorderProducts', async (req, res) => {
-    const { category, order } = req.body; // `order` adalah array ID produk dalam urutan baru
-    try {
-        const productsData = await readJsonFile(PRODUCTS_FILE);
-        if (productsData[category]) {
-            const reorderedProducts = order.map(id => productsData[category].find(p => p.id === id)).filter(Boolean);
-            // Memastikan semua produk ada di daftar baru
-            if (reorderedProducts.length !== productsData[category].length) {
-                console.warn('Peringatan: Tidak semua produk ditemukan saat mengurutkan ulang.');
-            }
-            productsData[category] = reorderedProducts;
-            await writeJsonFile(PRODUCTS_FILE, productsData);
-            res.status(200).json({ message: 'Urutan produk berhasil disimpan.' });
-        } else {
-            res.status(404).json({ message: 'Kategori tidak ditemukan.' });
-        }
-    } catch (error) {
-        console.error('Error reordering products:', error);
-        res.status(500).json({ message: 'Gagal menyimpan urutan produk.' });
-    }
-});
-
-// --- RUTE API UNTUK MENGUBAH HARGA SEMUA PRODUK DALAM KATEGORI (BULK PRICE) ---
-app.post('/api/updateProductsInCategory', async (req, res) => {
-    const { category, newPrice } = req.body;
-    try {
-        const productsData = await readJsonFile(PRODUCTS_FILE);
-        if (productsData[category]) {
-            productsData[category] = productsData[category].map(p => {
-                // Simpan harga asli sebelum diubah jika belum ada
-                const hargaAsli = p.hargaAsli !== undefined ? p.hargaAsli : p.harga;
-                return { ...p, harga: newPrice, hargaAsli: hargaAsli };
-            });
-            await writeJsonFile(PRODUCTS_FILE, productsData);
-            res.status(200).json({ message: `Harga semua produk di kategori "${category}" berhasil diubah menjadi ${newPrice}.` });
-        } else {
-            res.status(404).json({ message: 'Kategori tidak ditemukan.' });
-        }
-    } catch (error) {
-        console.error('Error updating bulk price:', error);
-        res.status(500).json({ message: 'Gagal menerapkan harga massal.' });
-    }
-});
-
-// --- RUTE API UNTUK MENGEMBALIKAN HARGA ASLI SEMUA PRODUK DALAM KATEGORI ---
-app.post('/api/resetBulkPriceInCategory', async (req, res) => {
-    const { category } = req.body;
-    try {
-        const productsData = await readJsonFile(PRODUCTS_FILE);
-        if (productsData[category]) {
-            productsData[category] = productsData[category].map(p => {
-                // Jika ada hargaAsli, kembalikan harga ke hargaAsli dan hapus hargaAsli
-                if (p.hargaAsli !== undefined) {
-                    const { hargaAsli, ...rest } = p; // Hapus hargaAsli dari objek
-                    return { ...rest, harga: hargaAsli };
-                }
-                return p;
-            });
-            await writeJsonFile(PRODUCTS_FILE, productsData);
-            res.status(200).json({ message: `Harga produk di kategori "${category}" berhasil dikembalikan ke harga awal.` });
-        } else {
-            res.status(404).json({ message: 'Kategori tidak ditemukan.' });
-        }
-    } catch (error) {
-        console.error('Error resetting bulk price:', error);
-        res.status(500).json({ message: 'Gagal mengembalikan harga awal.' });
-    }
-});
-
-// --- RUTE API UNTUK MENGUBAH NOMOR KONTAK SEMUA PRODUK DALAM KATEGORI (BULK CONTACT NUMBER) ---
-app.post('/api/updateContactNumbersInCategory', async (req, res) => {
-    const { category, newContactNumber } = req.body;
-    try {
-        const productsData = await readJsonFile(PRODUCTS_FILE);
-        if (productsData[category]) {
-            productsData[category] = productsData[category].map(p => {
-                // Jika newContactNumber kosong, hapus properti contactNumber
-                if (newContactNumber) {
-                    return { ...p, contactNumber: newContactNumber };
-                } else {
-                    const { contactNumber, ...rest } = p; // Hapus contactNumber dari objek
-                    return rest;
-                }
-            });
-            await writeJsonFile(PRODUCTS_FILE, productsData);
-            res.status(200).json({ message: `Nomor kontak semua produk di kategori "${category}" berhasil diubah menjadi ${newContactNumber || 'kosong'}.` });
-        } else {
-            res.status(404).json({ message: 'Kategori tidak ditemukan.' });
-        }
-    } catch (error) {
-        console.error('Error updating bulk contact number:', error);
-        res.status(500).json({ message: 'Gagal menerapkan nomor kontak massal.' });
-    }
-});
-
-
-// --- RUTE API UNTUK MENGELOLA API KEYS ---
-
-// GET: Mendapatkan semua API Keys
-app.get('/api/apikeys', async (req, res) => {
-    try {
-        const apiKeys = await readJsonFile(API_KEYS_FILE, []);
-        res.status(200).json(apiKeys);
-    } catch (error) {
-        console.error('Error fetching API keys:', error);
-        res.status(500).json({ message: 'Gagal mengambil API keys.' });
-    }
-});
-
-// POST: Membuat API Key baru
-app.post('/api/createApiKey', async (req, res) => {
-    const { name, duration } = req.body; // duration: 'day', 'week', 'month', 'year', 'permanent'
-    if (!name || !duration) {
-        return res.status(400).json({ message: 'Nama dan durasi API Key wajib diisi.' });
-    }
-
-    try {
-        const apiKeys = await readJsonFile(API_KEYS_FILE, []);
-        const newKey = `rkshp-${uuidv4()}`; // Menggunakan UUID untuk kunci yang lebih unik
-        
-        let expiryDate = null;
-        if (duration !== 'permanent') {
-            const now = new Date();
-            if (duration === 'day') now.setDate(now.getDate() + 1);
-            else if (duration === 'week') now.setDate(now.getDate() + 7);
-            else if (duration === 'month') now.setMonth(now.getMonth() + 1);
-            else if (duration === 'year') now.setFullYear(now.getFullYear() + 1);
-            expiryDate = now.toISOString();
+        const newProductData = req.body;
+        if (newProductData.nomorWA && !/^\d+$/.test(newProductData.nomorWA)) {
+            return res.status(400).json({ message: 'Format nomor WhatsApp salah. Harus berupa angka saja.' });
         }
 
-        apiKeys.push({ key: newKey, name, duration, expiryDate, createdAt: new Date().toISOString() });
-        await writeJsonFile(API_KEYS_FILE, apiKeys);
-        res.status(200).json({ message: 'API Key berhasil dibuat.', apiKey: newKey, name, duration, expiryDate });
-    } catch (error) {
-        console.error('Error creating API key:', error);
-        res.status(500).json({ message: 'Gagal membuat API Key.' });
-    }
-});
+        const { sha, json: productsJson } = await getProductsFile();
 
-// DELETE: Menghapus API Key
-app.delete('/api/deleteApiKey', async (req, res) => {
-    const { key } = req.body;
-    try {
-        let apiKeys = await readJsonFile(API_KEYS_FILE, []);
-        const initialLength = apiKeys.length;
-        apiKeys = apiKeys.filter(k => k.key !== key);
-        if (apiKeys.length < initialLength) {
-            await writeJsonFile(API_KEYS_FILE, apiKeys);
-            res.status(200).json({ message: 'API Key berhasil dihapus.' });
-        } else {
-            res.status(404).json({ message: 'API Key tidak ditemukan.' });
-        }
-    } catch (error) {
-        console.error('Error deleting API key:', error);
-        res.status(500).json({ message: 'Gagal menghapus API Key.' });
-    }
-});
-
-
-// --- RUTE API UNTUK MENGELOLA KATEGORI DOMAIN ---
-
-// GET: Mendapatkan semua kategori domain
-app.get('/api/domainCategories', async (req, res) => {
-    try {
-        const domainCategories = await readJsonFile(DOMAIN_CATEGORIES_FILE, []);
-        // Gabungkan dengan CLOUDFLARE_CONFIG jika ada
-        const combinedCategories = [...domainCategories];
-        for (const key in CLOUDFLARE_CONFIG) {
-            if (!combinedCategories.some(cat => cat.name === key)) {
-                combinedCategories.push({ name: key, ...CLOUDFLARE_CONFIG[key], preloaded: true });
-            }
-        }
-        res.status(200).json(combinedCategories);
-    } catch (error) {
-        console.error('Error fetching domain categories:', error);
-        res.status(500).json({ message: 'Gagal mengambil kategori domain.' });
-    }
-});
-
-// POST: Menambahkan kategori domain baru
-app.post('/api/addDomainCategory', async (req, res) => {
-    const { name, zone, apitoken } = req.body;
-    if (!name || !zone || !apitoken) {
-        return res.status(400).json({ message: 'Nama, Zone, dan API Token wajib diisi.' });
-    }
-
-    try {
-        const domainCategories = await readJsonFile(DOMAIN_CATEGORIES_FILE, []);
-        // Cek juga di CLOUDFLARE_CONFIG
-        if (domainCategories.some(cat => cat.name === name) || CLOUDFLARE_CONFIG[name]) {
-            return res.status(409).json({ message: 'Kategori domain dengan nama tersebut sudah ada.' });
-        }
-        domainCategories.push({ name, zone, apitoken, createdAt: new Date().toISOString() });
-        await writeJsonFile(DOMAIN_CATEGORIES_FILE, domainCategories);
-        res.status(200).json({ message: 'Kategori domain berhasil ditambahkan.', category: { name, zone, apitoken } });
-    } catch (error) {
-        console.error('Error adding domain category:', error);
-        res.status(500).json({ message: 'Gagal menambahkan kategori domain.' });
-    }
-});
-
-// DELETE: Menghapus kategori domain
-app.delete('/api/deleteDomainCategory', async (req, res) => {
-    const { name } = req.body;
-    // Mencegah penghapusan kategori domain yang sudah ada di CLOUDFLARE_CONFIG
-    if (CLOUDFLARE_CONFIG[name]) {
-        return res.status(403).json({ message: 'Tidak dapat menghapus kategori domain bawaan.' });
-    }
-    try {
-        let domainCategories = await readJsonFile(DOMAIN_CATEGORIES_FILE, []);
-        const initialLength = domainCategories.length;
-        domainCategories = domainCategories.filter(cat => cat.name !== name);
-        if (domainCategories.length < initialLength) {
-            await writeJsonFile(DOMAIN_CATEGORIES_FILE, domainCategories);
-            res.status(200).json({ message: 'Kategori domain berhasil dihapus.' });
-        } else {
-            res.status(404).json({ message: 'Kategori domain tidak ditemukan.' });
-        }
-    } catch (error) {
-        console.error('Error deleting domain category:', error);
-        res.status(500).json({ message: 'Gagal menghapus kategori domain.' });
-    }
-});
-
-// --- RUTE API UNTUK MEMBUAT SUBDOMAIN (CLOUDFLARE) ---
-app.post('/api/createSubdomain', async (req, res) => {
-    const { apiKey, host, domainCategory, ip } = req.body;
-
-    if (!apiKey || !host || !domainCategory || !ip) {
-        return res.status(400).json({ message: 'API Key, Nama Host, Kategori Domain, dan IP VPS wajib diisi.' });
-    }
-
-    try {
-        // 1. Verifikasi API Key
-        const apiKeys = await readJsonFile(API_KEYS_FILE, []);
-        const validApiKey = apiKeys.find(k => k.key === apiKey);
-
-        if (!validApiKey) {
-            return res.status(403).json({ message: 'API Key tidak valid.' });
-        }
-
-        if (validApiKey.expiryDate && new Date(validApiKey.expiryDate) < new Date()) {
-            return res.status(403).json({ message: 'API Key sudah kadaluarsa.' });
-        }
-
-        // 2. Dapatkan konfigurasi domain dari kategori yang dipilih
-        const domainCategories = await readJsonFile(DOMAIN_CATEGORIES_FILE, []);
-        let selectedDomain = domainCategories.find(cat => cat.name === domainCategory);
-
-        // Jika tidak ditemukan di domainCategories.json, coba cari di CLOUDFLARE_CONFIG langsung
-        if (!selectedDomain && CLOUDFLARE_CONFIG[domainCategory]) {
-            selectedDomain = { 
-                name: domainCategory, 
-                zone: CLOUDFLARE_CONFIG[domainCategory].zone, 
-                apitoken: CLOUDFLARE_CONFIG[domainCategory].apitoken 
-            };
-        }
-
-        if (!selectedDomain) {
-            return res.status(404).json({ message: 'Kategori domain tidak ditemukan.' });
-        }
-        
-        const { zone, apitoken } = selectedDomain;
-
-        // Fungsi internal untuk membuat record DNS
-        const createDnsRecord = async (recordHost, recordIp, domainCategoryName) => { // Menerima domainCategoryName
-            try {
-                const response = await axios.post(
-                    `https://api.cloudflare.com/client/v4/zones/${zone}/dns_records`,
-                    {
-                        type: "A",
-                        name: recordHost.replace(/[^a-z0-9.-]/gi, "") + "." + domainCategoryName, // Gunakan domainCategoryName
-                        content: recordIp.replace(/[^0-9.]/gi, ""), // Sanitasi IP
-                        ttl: 3600,
-                        priority: 10,
-                        proxied: false
-                    },
-                    {
-                        headers: {
-                            Authorization: `Bearer ${apitoken}`,
-                            "Content-Type": "application/json",
-                        },
-                    }
-                );
-                return { success: true, result: response.data.result };
-            } catch (e) {
-                const errorDetail = e.response?.data?.errors?.[0]?.message || e.message;
-                return { success: false, error: errorDetail };
-            }
+        let maxId = Object.values(productsJson).flat().reduce((max, p) => p.id > max ? p.id : max, 0);
+        const newProduct = {
+            id: maxId + 1,
+            nama: newProductData.nama,
+            harga: newProductData.harga,
+            deskripsiPanjang: newProductData.deskripsiPanjang.replace(/\n/g, ' || '),
+            createdAt: new Date().toISOString(),
+            ...(newProductData.nomorWA && { nomorWA: newProductData.nomorWA }),
+            ...((newProductData.category === 'Stock Akun' || newProductData.category === 'Logo') && { images: newProductData.images }),
+            ...(newProductData.category === 'Script' && { menuContent: newProductData.menuContent }),
         };
 
-        const cleanedHost = host.toLowerCase().replace(/[^a-z0-9]/gi, ''); // Bersihkan host untuk subdomain
-        const fullDomain = `${cleanedHost}.${domainCategory}`;
-        const randomString = Math.random().toString(36).substring(2, 8); // Random string untuk node
-        const nodeDomainHost = `node-${cleanedHost}${randomString}`; // Hanya host bagian depan untuk node
-        const fullNodeDomain = `${nodeDomainHost}.${domainCategory}`;
-
-
-        let results = [];
-        let successCount = 0;
-
-        // Buat record untuk domain utama
-        const domainResult = await createDnsRecord(cleanedHost, ip, domainCategory); // Kirim domainCategory
-        if (domainResult.success) {
-            results.push({ name: domainResult.result.name, status: 'success' });
-            successCount++;
-        } else {
-            results.push({ name: fullDomain, status: 'failed', error: domainResult.error });
+        if (!productsJson[newProductData.category]) {
+            productsJson[newProductData.category] = [];
         }
+        productsJson[newProductData.category].unshift(newProduct);
 
-        // Buat record untuk node domain
-        const nodeResult = await createDnsRecord(nodeDomainHost, ip, domainCategory); // Kirim domainCategory
-        if (nodeResult.success) {
-            results.push({ name: nodeResult.result.name, status: 'success' });
-            successCount++;
-        } else {
-            results.push({ name: fullNodeDomain, status: 'failed', error: nodeResult.error });
-        }
-
-        if (successCount > 0) {
-            // NEW: Simpan domain yang dibuat ke domains.json
-            const createdDomains = await readJsonFile(CREATED_DOMAINS_FILE, []);
-            createdDomains.push({
-                id: uuidv4(), // ID unik untuk domain yang dibuat
-                apiKeyUsed: apiKey,
-                host: host,
-                domainCategory: domainCategory,
-                ip: ip,
-                fullDomain: fullDomain,
-                fullNode: fullNodeDomain,
-                createdAt: new Date().toISOString()
-            });
-            await writeJsonFile(CREATED_DOMAINS_FILE, createdDomains);
-
-            res.status(200).json({ 
-                message: 'Subdomain berhasil dibuat.', 
-                domain: fullDomain, 
-                node: fullNodeDomain, 
-                results 
-            });
-        } else {
-            res.status(500).json({ message: 'Gagal membuat subdomain.', results });
-        }
+        await updateProductsFile(sha, productsJson, `feat: Menambahkan produk baru "${newProduct.nama}"`);
+        res.status(200).json({ message: 'Produk berhasil ditambahkan!', newProduct });
 
     } catch (error) {
-        console.error('Error creating subdomain:', error);
-        res.status(500).json({ message: 'Terjadi kesalahan server saat membuat subdomain.' });
+        console.error("Error addProduct:", error);
+        res.status(500).json({ message: 'Terjadi kesalahan di server.', error: error.message });
     }
 });
 
-// NEW: RUTE API UNTUK MENDAPATKAN SEMUA DOMAIN YANG DIBUAT
-app.get('/api/createdDomains', async (req, res) => {
+app.post('/api/updateProduct', async (req, res) => {
     try {
-        const domains = await readJsonFile(CREATED_DOMAINS_FILE, []);
-        res.status(200).json(domains);
-    } catch (error) {
-        console.error('Error fetching created domains:', error);
-        res.status(500).json({ message: 'Gagal mengambil daftar domain yang dibuat.' });
-    }
-});
-
-// NEW: RUTE API UNTUK MENGHAPUS DOMAIN YANG DIBUAT
-app.delete('/api/deleteCreatedDomain', async (req, res) => {
-    const { id } = req.body; // Menggunakan ID unik domain yang dibuat
-    try {
-        let domains = await readJsonFile(CREATED_DOMAINS_FILE, []);
-        const initialLength = domains.length;
-        domains = domains.filter(d => d.id !== id);
-        if (domains.length < initialLength) {
-            await writeJsonFile(CREATED_DOMAINS_FILE, domains);
-            res.status(200).json({ message: 'Domain berhasil dihapus dari daftar.' });
-        } else {
-            res.status(404).json({ message: 'Domain tidak ditemukan di daftar.' });
+        const { id, category, newName, newPrice, newDesc, newImages, newMenuContent, newWhatsapp } = req.body;
+         if (newWhatsapp && !/^\d+$/.test(newWhatsapp)) {
+            return res.status(400).json({ message: 'Format nomor WhatsApp salah.' });
         }
+        
+        const { sha, json: productsJson } = await getProductsFile();
+        let productFound = false;
+
+        productsJson[category] = productsJson[category].map(p => {
+            if (p.id === id) {
+                productFound = true;
+                const updated = { ...p, nama: newName, harga: newPrice, deskripsiPanjang: newDesc };
+                if (newWhatsapp) updated.nomorWA = newWhatsapp; else delete updated.nomorWA;
+                if (newImages !== null) updated.images = newImages;
+                if (newMenuContent !== null) updated.menuContent = newMenuContent;
+                return updated;
+            }
+            return p;
+        });
+
+        if (!productFound) return res.status(404).json({ message: 'Produk tidak ditemukan.' });
+
+        await updateProductsFile(sha, productsJson, `chore: Memperbarui produk ID ${id}`);
+        res.status(200).json({ message: 'Produk berhasil diperbarui.' });
+
     } catch (error) {
-        console.error('Error deleting created domain:', error);
-        res.status(500).json({ message: 'Gagal menghapus domain dari daftar.' });
+        res.status(500).json({ message: 'Gagal memperbarui produk.', error: error.message });
+    }
+});
+
+app.post('/api/updateBulkWhatsapp', async (req, res) => {
+    try {
+        const { category, newWhatsapp } = req.body;
+        if (newWhatsapp && !/^\d+$/.test(newWhatsapp)) {
+            return res.status(400).json({ message: 'Format nomor WhatsApp salah.' });
+        }
+        
+        const { sha, json: productsJson } = await getProductsFile();
+        if (!productsJson[category]) return res.status(404).json({ message: 'Kategori tidak ditemukan.' });
+
+        productsJson[category] = productsJson[category].map(p => {
+            const updated = { ...p };
+            if (newWhatsapp) updated.nomorWA = newWhatsapp; else delete updated.nomorWA;
+            return updated;
+        });
+        
+        await updateProductsFile(sha, productsJson, `chore: Update No.WA massal kategori ${category}`);
+        res.status(200).json({ message: `No. WhatsApp kategori "${category}" berhasil diperbarui.` });
+
+    } catch (error) {
+         res.status(500).json({ message: 'Gagal update No.WA massal.', error: error.message });
+    }
+});
+
+// Anda bisa menambahkan rute lain seperti deleteProduct, reorderProducts, dll. dengan pola yang sama.
+
+
+// --- API Manajemen Admin (Domain & API Keys) ---
+const adminApiRouter = express.Router();
+
+// Middleware sederhana untuk proteksi (nantinya bisa diganti dengan session/token)
+adminApiRouter.use((req, res, next) => {
+    // Di sini Anda bisa menambahkan verifikasi apakah user adalah admin
+    // Untuk saat ini, kita biarkan lolos
+    next();
+});
+
+adminApiRouter.route('/apiKeys')
+    .get(async (req, res) => {
+        const keys = await readJsonFile(keysFilePath, []);
+        const activeKeys = keys.filter(k => new Date(k.expiresAt) > new Date());
+        await writeJsonFile(keysFilePath, activeKeys);
+        res.status(200).json({ keys: activeKeys });
+    })
+    .post(async (req, res) => {
+        const { identifier, duration } = req.body;
+        const keys = await readJsonFile(keysFilePath, []);
+        const newKey = `RKS_${crypto.randomBytes(16).toString('hex')}`;
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + parseInt(duration));
+        
+        const keyData = { identifier, key: newKey, createdAt: new Date().toISOString(), expiresAt: expiresAt.toISOString() };
+        keys.push(keyData);
+        await writeJsonFile(keysFilePath, keys);
+        res.status(201).json(keyData);
+    })
+    .delete(async (req, res) => {
+        const { key } = req.body;
+        let keys = await readJsonFile(keysFilePath, []);
+        keys = keys.filter(k => k.key !== key);
+        await writeJsonFile(keysFilePath, keys);
+        res.status(200).json({ message: 'API Key berhasil dihapus.' });
+    });
+
+adminApiRouter.route('/domains')
+    .get(async (req, res) => {
+        const domains = await readJsonFile(domainsFilePath, {});
+        res.status(200).json({ domains });
+    })
+    .post(async (req, res) => {
+        const { domain, zoneId, apiToken } = req.body;
+        const domains = await readJsonFile(domainsFilePath, {});
+        domains[domain] = { zone: zoneId, apitoken: apiToken };
+        await writeJsonFile(domainsFilePath, domains);
+        res.status(201).json({ message: 'Domain berhasil ditambahkan.' });
+    })
+    .delete(async (req, res) => {
+        const { domain } = req.body;
+        const domains = await readJsonFile(domainsFilePath, {});
+        delete domains[domain];
+        await writeJsonFile(domainsFilePath, domains);
+        res.status(200).json({ message: 'Domain berhasil dihapus.' });
+    });
+
+adminApiRouter.get('/subdomains', async (req, res) => {
+    const subdomains = await readJsonFile(subdomainsFilePath, []);
+    res.status(200).json({ subdomains });
+});
+
+app.use('/api/admin', adminApiRouter);
+
+
+// --- API Publik (Reseller) ---
+app.get('/api/getAvailableDomains', async (req, res) => {
+    const domains = await readJsonFile(domainsFilePath, {});
+    res.status(200).json({ domains: Object.keys(domains) });
+});
+
+app.post('/api/validateApiKey', async (req, res) => {
+    const { key } = req.body;
+    const apiKeys = await readJsonFile(keysFilePath, []);
+    const validKey = apiKeys.find(k => k.key === key);
+    if (!validKey) return res.status(401).json({ message: 'API Key tidak valid.' });
+    if (new Date(validKey.expiresAt) < new Date()) return res.status(403).json({ message: 'API Key telah kedaluwarsa.' });
+    res.status(200).json({ message: 'API Key valid.', identifier: validKey.identifier });
+});
+
+app.post('/api/createSubdomain', async (req, res) => {
+    try {
+        const { subdomain, domain, ip, apiKey } = req.body;
+        
+        // Validasi API Key
+        const apiKeys = await readJsonFile(keysFilePath, []);
+        const validKey = apiKeys.find(k => k.key === apiKey && new Date(k.expiresAt) > new Date());
+        if (!validKey) return res.status(403).json({ message: 'API Key tidak valid atau kedaluwarsa.' });
+
+        // Dapatkan Konfigurasi Domain
+        const domainsConfig = await readJsonFile(domainsFilePath, {});
+        const config = domainsConfig[domain];
+        if (!config) return res.status(400).json({ message: 'Domain tidak valid.' });
+
+        const createDnsRecord = async (name) => {
+            const response = await fetch(`https://api.cloudflare.com/client/v4/zones/${config.zone}/dns_records`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${config.apitoken}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'A', name, content: ip, ttl: 1, proxied: false })
+            });
+            const data = await response.json();
+            if (!data.success) throw new Error(`Cloudflare: ${data.errors.map(e => e.message).join(', ')}`);
+        };
+
+        const fullDomain = `${subdomain}.${domain}`;
+        const nodeDomain = `node16.${subdomain}.${domain}`;
+
+        await createDnsRecord(fullDomain);
+        await createDnsRecord(nodeDomain);
+
+        const subdomainsLog = await readJsonFile(subdomainsFilePath, []);
+        subdomainsLog.unshift({ full_domain: fullDomain, ip: ip, user: validKey.identifier, createdAt: new Date().toISOString() });
+        await writeJsonFile(subdomainsFilePath, subdomainsLog);
+
+        res.status(200).json({
+            message: 'Subdomain berhasil dibuat!',
+            created_domain: fullDomain,
+            created_node_domain: nodeDomain
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 });
 
 
-// --- RUTE DEFAULT ---
-// Jika ada yang mengakses root URL (misalnya http://localhost:3000/)
-// kita bisa mengarahkan mereka ke admin.html
+// =================================================================
+// PENYAJIAN HALAMAN & SERVER START
+// =================================================================
+
+// Rute default mengarah ke index.html (toko) atau admin.html
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// --- Penanganan rute ke halaman domain ---
-app.get('/domain.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'domain.html'));
-});
-
-
-// --- Penanganan rute yang tidak ditemukan (404) ---
-// Ini penting agar server mengirimkan respons JSON yang benar jika ada rute yang tidak dikenal
-app.use((req, res, next) => {
-    // Jika permintaan adalah API, kirimkan JSON error 404
+// Penanganan 404
+app.use((req, res) => {
     if (req.originalUrl.startsWith('/api/')) {
-        return res.status(404).json({ message: 'API Endpoint tidak ditemukan.' });
+        return res.status(404).json({ message: 'Endpoint tidak ditemukan.' });
     }
-    // Untuk rute non-API lainnya, biarkan Express menangani serving static files atau 404 standar
-    res.status(404).send('File atau halaman tidak ditemukan.');
+    res.status(404).send('Halaman tidak ditemukan.');
 });
 
-// --- Mulai Server ---
+// Mulai server
 app.listen(PORT, () => {
-    console.log(`Server backend berjalan di http://localhost:${PORT}`);
-    console.log(`Akses Admin Panel di: http://localhost:${PORT}/admin.html atau http://localhost:${PORT}/`);
-    console.log(`Akses Domain Panel di: http://localhost:${PORT}/domain.html`);
-    console.log(`(Ganti 'password-rahasia-anda-kuat' di index.js dengan password yang Anda inginkan)`);
+    console.log(`Server Rikishopreal berjalan di http://localhost:${PORT}`);
+    console.log(`Akses Toko: http://localhost:${PORT}/`);
+    console.log(`Akses Panel Admin: http://localhost:${PORT}/admin.html`);
+    console.log(`Akses Halaman Domain: http://localhost:${PORT}/domain.html`);
 });

@@ -1,409 +1,119 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const apikeyScreen = document.getElementById('apikey-screen');
-    const domainManagementScreen = document.getElementById('domain-management-screen');
+    const apiKeyScreen = document.getElementById('api-key-screen');
+    const createDomainScreen = document.getElementById('create-domain-screen');
     const apiKeyInput = document.getElementById('api-key-input');
-    const verifyApiKeyButton = document.getElementById('verify-api-key-button');
-
+    const verifyKeyBtn = document.getElementById('verify-key-btn');
     const toastContainer = document.getElementById('toast-container');
-    let activeToastTimeout = null;
-
-    const themeSwitchBtnLogin = document.getElementById('themeSwitchBtnLogin');
-    const themeSwitchBtnPanel = document.getElementById('themeSwitchBtnPanel');
-    const body = document.body;
-
-    // Elemen untuk Custom Confirmation Modal
-    const customConfirmModal = document.getElementById('customConfirmModal');
-    const confirmMessage = document.getElementById('confirmMessage');
-    const confirmOkBtn = document.getElementById('confirmOkBtn');
-    const confirmCancelBtn = document.getElementById('confirmCancelBtn');
-    let resolveConfirmPromise;
-
-    // Elemen untuk Domain Success Modal
-    const domainSuccessModal = document.getElementById('domainSuccessModal');
-    const closeDomainSuccessModalBtn = document.getElementById('closeDomainSuccessModal');
-    const displayDomainName = document.getElementById('displayDomainName');
-    const displayNodeName = document.getElementById('displayNodeName');
-    const copyButtons = document.querySelectorAll('.domain-success-modal-content .copy-button');
-
-
-    // Domain Management Elements
-    const domainCategorySelect = document.getElementById('domain-category-select');
-    const hostInput = document.getElementById('host-input');
-    const ipInput = document.getElementById('ip-input');
-    const createDomainForm = document.getElementById('createDomainForm');
-    const createSubdomainBtn = document.getElementById('create-subdomain-btn');
-    const createdDomainList = document.getElementById('created-domain-list');
+    const domainChoice = document.getElementById('domain-choice');
+    const createDomainBtn = document.getElementById('create-domain-btn');
+    const userIdentifier = document.getElementById('user-identifier');
+    
+    const resultModal = document.getElementById('resultModal');
+    const resultContent = document.getElementById('result-content');
+    const closeResultModal = document.getElementById('closeResultModal');
 
     const API_BASE_URL = '/api';
+    let currentApiKey = null;
 
-    // Menyimpan API Key di sessionStorage setelah diverifikasi
-    let userApiKey = sessionStorage.getItem('userApiKey') || null;
-
-    // --- Theme Toggling ---
-    const savedTheme = localStorage.getItem('domain-theme') || 'light-mode';
-    body.className = savedTheme;
-
-    function updateThemeButton() {
-        const iconClass = body.classList.contains('dark-mode') ? 'fa-sun' : 'fa-moon';
-        themeSwitchBtnLogin.querySelector('i').className = `fas ${iconClass}`;
-        if (themeSwitchBtnPanel) {
-            themeSwitchBtnPanel.querySelector('i').className = `fas ${iconClass}`;
-        }
-    }
-    updateThemeButton();
-
-    function toggleTheme() {
-        if (body.classList.contains('light-mode')) {
-            body.classList.replace('light-mode', 'dark-mode');
-            localStorage.setItem('domain-theme', 'dark-mode');
-        } else {
-            body.classList.replace('dark-mode', 'light-mode');
-            localStorage.setItem('domain-theme', 'light-mode');
-        }
-        updateThemeButton();
-    }
-    themeSwitchBtnLogin.addEventListener('click', toggleTheme);
-    if (themeSwitchBtnPanel) {
-        themeSwitchBtnPanel.addEventListener('click', toggleTheme);
-    }
-
-    // --- Toast Notifications ---
-    function showToast(message, type = 'info', duration = 3000) {
-        if (toastContainer.firstChild) {
-            clearTimeout(activeToastTimeout);
-            toastContainer.innerHTML = '';
-        }
+    function showToast(message, type = 'error', duration = 3000) {
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
-        let iconClass = 'fas fa-info-circle';
-        if (type === 'success') iconClass = 'fas fa-check-circle';
-        if (type === 'error') iconClass = 'fas fa-exclamation-circle';
-        toast.innerHTML = `<i class="${iconClass}"></i> ${message}`;
+        let iconClass = (type === 'success') ? 'fa-check-circle' : 'fa-exclamation-circle';
+        toast.innerHTML = `<i class="fas ${iconClass}"></i> ${message}`;
+        toastContainer.innerHTML = ''; // Hapus toast lama
         toastContainer.appendChild(toast);
-        activeToastTimeout = setTimeout(() => {
-            toast.classList.add('fade-out');
-            toast.addEventListener('animationend', () => toast.remove());
-        }, duration);
+        setTimeout(() => toast.remove(), duration);
     }
 
-    // --- Custom Confirmation Modal ---
-    function showCustomConfirm(message) {
-        confirmMessage.innerHTML = message;
-        customConfirmModal.classList.add('is-visible');
-        return new Promise((resolve) => {
-            resolveConfirmPromise = resolve;
-        });
-    }
-
-    confirmOkBtn.addEventListener('click', () => {
-        customConfirmModal.classList.remove('is-visible');
-        if (resolveConfirmPromise) {
-            resolveConfirmPromise(true);
-            resolveConfirmPromise = null;
-        }
-    });
-
-    confirmCancelBtn.addEventListener('click', () => {
-        customConfirmModal.classList.remove('is-visible');
-        if (resolveConfirmPromise) {
-            resolveConfirmPromise(false);
-            resolveConfirmPromise = null;
-        }
-    });
-
-    customConfirmModal.addEventListener('click', (e) => {
-        if (e.target === customConfirmModal) {
-            customConfirmModal.classList.remove('is-visible');
-            if (resolveConfirmPromise) {
-                resolveConfirmPromise(false);
-                resolveConfirmPromise = null;
-            }
-        }
-    });
-
-    // --- Domain Success Modal ---
-    closeDomainSuccessModalBtn.addEventListener('click', () => {
-        domainSuccessModal.classList.remove('is-visible');
-    });
-
-    window.addEventListener('click', (e) => {
-        if (e.target === domainSuccessModal) {
-            domainSuccessModal.classList.remove('is-visible');
-        }
-    });
-
-    copyButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            const targetId = e.currentTarget.dataset.target;
-            const elementToCopy = document.getElementById(targetId);
-            if (elementToCopy) {
-                const textToCopy = elementToCopy.textContent;
-                navigator.clipboard.writeText(textToCopy).then(() => {
-                    showToast(`${targetId === 'displayDomainName' ? 'Domain' : 'Node'} berhasil disalin!`, 'success');
-                }).catch(err => {
-                    console.error('Gagal menyalin:', err);
-                    showToast('Gagal menyalin.', 'error');
-                });
-            }
-        });
-    });
-
-    // --- API Key Verification ---
-    verifyApiKeyButton.addEventListener('click', async () => {
-        const key = apiKeyInput.value.trim();
-        if (!key) {
-            showToast('API Key tidak boleh kosong.', 'error');
-            return;
-        }
-        verifyApiKeyButton.textContent = 'Memverifikasi...';
-        verifyApiKeyButton.disabled = true;
-
+    async function loadAvailableDomains() {
         try {
-            const res = await fetch(`${API_BASE_URL}/apikeys`);
-            if (!res.ok) {
-                const errorText = await res.text();
-                throw new Error(`Gagal memuat API Keys untuk verifikasi: Status ${res.status}. Detail: ${errorText.substring(0, 100)}...`);
-            }
-            const apiKeys = await res.json();
-            const validKey = apiKeys.find(k => k.key === key);
-
-            if (validKey) {
-                if (validKey.expiryDate && new Date(validKey.expiryDate) < new Date()) {
-                    throw new Error('API Key sudah kadaluarsa.');
-                }
-                userApiKey = key;
-                sessionStorage.setItem('userApiKey', key);
-                apikeyScreen.style.display = 'none';
-                domainManagementScreen.style.display = 'block';
-                showToast('Verifikasi API Key berhasil!', 'success');
-                loadDomainCategoriesForSelect();
-                document.querySelector('.tab-button[data-tab="createDomain"]').click();
-            } else {
-                throw new Error('API Key tidak valid.');
-            }
-        } catch (e) {
-            console.error('API Key verification error:', e);
-            showToast(e.message || 'Verifikasi API Key gagal.', 'error');
-        } finally {
-            verifyApiKeyButton.textContent = 'Verifikasi API Key';
-            verifyApiKeyButton.disabled = false;
-        }
-    });
-
-    // --- Domain Management Tabs ---
-    const tabButtons = document.querySelectorAll('.domain-tabs .tab-button');
-    const tabContents = document.querySelectorAll('.domain-tab-content');
-
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            tabContents.forEach(content => content.classList.remove('active'));
-            document.getElementById(button.dataset.tab).classList.add('active');
-
-            if (button.dataset.tab === 'listDomains') {
-                loadCreatedDomains(); // Mengganti renderCreatedDomains() dengan loadCreatedDomains()
-            }
-        });
-    });
-
-    // --- Load Domain Categories for Select ---
-    async function loadDomainCategoriesForSelect() {
-        domainCategorySelect.innerHTML = '<option value="">-- Memuat Kategori --</option>';
-        try {
-            const res = await fetch(`${API_BASE_URL}/domainCategories`);
-            if (!res.ok) {
-                const errorText = await res.text();
-                throw new Error(`Gagal memuat kategori domain: Status ${res.status}. Detail: ${errorText.substring(0, 100)}...`);
-            }
-            const categories = await res.json();
-            
-            if (categories.length === 0) {
-                domainCategorySelect.innerHTML = '<option value="">-- Tidak ada kategori --</option>';
-                return;
-            }
-
-            domainCategorySelect.innerHTML = '<option value="">-- Pilih Kategori --</option>';
-            categories.forEach(cat => {
-                const option = document.createElement('option');
-                option.value = cat.name;
-                option.textContent = cat.name;
-                domainCategorySelect.appendChild(option);
+            const res = await fetch(`${API_BASE_URL}/getAvailableDomains`);
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message);
+            domainChoice.innerHTML = '<option value="">-- Pilih Domain --</option>';
+            data.domains.forEach(domain => {
+                const option = new Option(domain, domain);
+                domainChoice.appendChild(option);
             });
         } catch (error) {
-            console.error('Error loading domain categories for select:', error);
-            showToast(error.message || 'Gagal memuat kategori domain.', 'error');
-            domainCategorySelect.innerHTML = '<option value="">-- Gagal memuat kategori --</option>';
+            domainChoice.innerHTML = `<option value="">Gagal memuat domain</option>`;
+            showToast(error.message || 'Gagal mengambil daftar domain.');
         }
     }
 
-    // --- Create Subdomain ---
-    createDomainForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        if (!userApiKey) {
-            showToast('API Key belum diverifikasi. Silakan verifikasi API Key Anda terlebih dahulu.', 'error');
-            return;
+    verifyKeyBtn.addEventListener('click', async () => {
+        const key = apiKeyInput.value.trim();
+        if (!key) return showToast('API Key tidak boleh kosong.');
+
+        verifyKeyBtn.textContent = 'Memverifikasi...';
+        verifyKeyBtn.disabled = true;
+        try {
+            const res = await fetch(`${API_BASE_URL}/validateApiKey`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message);
+            
+            showToast('API Key valid!', 'success');
+            currentApiKey = key;
+            userIdentifier.textContent = data.identifier;
+            apiKeyScreen.style.display = 'none';
+            createDomainScreen.style.display = 'block';
+            await loadAvailableDomains();
+        } catch (error) {
+            showToast(error.message || 'Terjadi kesalahan.');
+        } finally {
+            verifyKeyBtn.textContent = 'Verifikasi';
+            verifyKeyBtn.disabled = false;
         }
+    });
+    
+    createDomainBtn.addEventListener('click', async () => {
+        const subdomain = document.getElementById('subdomain-name').value.trim().toLowerCase();
+        const domain = domainChoice.value;
+        const ip = document.getElementById('vps-ip').value.trim();
 
-        const host = hostInput.value.trim();
-        const domainCategory = domainCategorySelect.value;
-        const ip = ipInput.value.trim();
-
-        if (!host || !domainCategory || !ip) {
-            showToast('Semua kolom wajib diisi.', 'error');
-            return;
+        if (!subdomain || !domain || !ip) {
+            return showToast('Semua kolom wajib diisi.');
+        }
+        if (!/^[a-z0-9-]+$/.test(subdomain)) {
+             return showToast('Nama subdomain hanya boleh berisi huruf kecil, angka, dan strip (-).');
         }
         if (!/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(ip)) {
-            showToast('Format IP tidak valid.', 'error');
-            return;
+             return showToast('Format IP VPS tidak valid.');
         }
 
-        createSubdomainBtn.textContent = 'Membuat...';
-        createSubdomainBtn.disabled = true;
+        createDomainBtn.textContent = 'Memproses...';
+        createDomainBtn.disabled = true;
 
         try {
             const res = await fetch(`${API_BASE_URL}/createSubdomain`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ apiKey: userApiKey, host, domainCategory, ip })
+                body: JSON.stringify({ subdomain, domain, ip, apiKey: currentApiKey })
             });
-            const result = await res.json();
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message);
 
-            if (!res.ok) {
-                const errorDetail = result.message || await res.text();
-                throw new Error(errorDetail);
-            }
+            resultContent.innerHTML = `
+                <p>Domain Anda:</p>
+                <code>${data.created_domain}</code>
+                <p>Node Domain Anda:</p>
+                <code>${data.created_node_domain}</code>
+            `;
+            resultModal.classList.add('is-visible');
 
-            showToast('Subdomain berhasil dibuat!', 'success');
-            
-            // Tampilkan popup sukses
-            displayDomainName.textContent = result.domain;
-            displayNodeName.textContent = result.node;
-            domainSuccessModal.classList.add('is-visible');
-
-            // Tidak perlu saveCreatedDomainLocally lagi, karena sudah disimpan di backend
-            // Cukup muat ulang daftar jika user beralih ke tab "Daftar Domain Dibuat"
-            
-            // Reset form
-            hostInput.value = '';
-            ipInput.value = '';
-            domainCategorySelect.value = '';
-            
         } catch (error) {
-            console.error('Error creating subdomain:', error);
-            showToast(error.message || 'Gagal membuat subdomain.', 'error');
+            showToast(error.message || 'Gagal membuat subdomain.');
         } finally {
-            createSubdomainBtn.textContent = 'Buat Domain';
-            createSubdomainBtn.disabled = false;
+            createDomainBtn.textContent = 'Buat Domain';
+            createDomainBtn.disabled = false;
         }
     });
 
-    // NEW: Fungsi untuk memuat domain yang dibuat dari backend
-    async function loadCreatedDomains() {
-        createdDomainList.innerHTML = '<p>Memuat domain yang dibuat...</p>';
-        try {
-            const res = await fetch(`${API_BASE_URL}/createdDomains`);
-            if (!res.ok) {
-                const errorText = await res.text();
-                throw new Error(`Gagal memuat domain yang dibuat: Status ${res.status}. Detail: ${errorText.substring(0, 100)}...`);
-            }
-            const domains = await res.json();
-            renderCreatedDomains(domains);
-        } catch (error) {
-            console.error('Error loading created domains:', error);
-            showToast(error.message || 'Gagal memuat daftar domain yang dibuat.', 'error');
-            createdDomainList.innerHTML = `<p>Gagal memuat daftar domain yang dibuat. ${error.message || ''}</p>`;
-        }
-    }
-
-    // Fungsi untuk merender domain yang dibuat ke UI
-    function renderCreatedDomains(domains) {
-        createdDomainList.innerHTML = '';
-
-        if (domains.length === 0) {
-            createdDomainList.innerHTML = '<p>Anda belum membuat domain apapun.</p>';
-            return;
-        }
-
-        domains.forEach(domain => {
-            const item = document.createElement('div');
-            item.className = 'domain-item';
-            item.dataset.id = domain.id; // Simpan ID domain untuk penghapusan
-
-            item.innerHTML = `
-                <div class="domain-display"><b>Domain:</b> ${domain.fullDomain}</div>
-                <div class="domain-display"><b>Node:</b> ${domain.fullNode}</div>
-                <div class="domain-meta">IP: ${domain.ip} | Kategori: ${domain.domainCategory} | Dibuat: ${new Date(domain.createdAt).toLocaleString('id-ID')}</div>
-                <div class="item-actions">
-                    <button type="button" class="copy-button" data-copy-text="${domain.fullDomain}"><i class="fas fa-copy"></i> Salin Domain</button>
-                    <button type="button" class="copy-button" data-copy-text="${domain.fullNode}" style="margin-left: 10px;"><i class="fas fa-copy"></i> Salin Node</button>
-                    <button type="button" class="delete-btn" data-id="${domain.id}" style="margin-left: 10px;"><i class="fas fa-trash-alt"></i> Hapus</button>
-                </div>
-            `;
-            createdDomainList.appendChild(item);
-        });
-
-        // Event listener untuk tombol salin di daftar domain
-        createdDomainList.querySelectorAll('.copy-button').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const textToCopy = e.currentTarget.dataset.copyText;
-                if (textToCopy) {
-                    navigator.clipboard.writeText(textToCopy).then(() => {
-                        showToast('Berhasil disalin!', 'success');
-                    }).catch(err => {
-                        console.error('Gagal menyalin:', err);
-                        showToast('Gagal menyalin.', 'error');
-                    });
-                }
-            });
-        });
-
-        // NEW: Event listener untuk tombol hapus di daftar domain
-        createdDomainList.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                const domainIdToDelete = e.currentTarget.dataset.id;
-                const parentItem = e.currentTarget.closest('.domain-item');
-                const domainName = parentItem.querySelector('.domain-display').textContent.replace('Domain: ', '');
-
-                const confirmMessageHtml = `Apakah Anda yakin ingin menghapus domain <b>${domainName}</b>?`;
-                const userConfirmed = await showCustomConfirm(confirmMessageHtml);
-
-                if (!userConfirmed) {
-                    showToast('Penghapusan domain dibatalkan.', 'info');
-                    return;
-                }
-
-                showToast('Menghapus domain...', 'info', 5000);
-                try {
-                    const res = await fetch(`${API_BASE_URL}/deleteCreatedDomain`, {
-                        method: 'DELETE',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id: domainIdToDelete })
-                    });
-                    const result = await res.json();
-                    if (!res.ok) {
-                        const errorDetail = result.message || await res.text();
-                        throw new Error(errorDetail);
-                    }
-                    showToast(result.message, 'success');
-                    parentItem.remove(); // Hapus dari UI langsung
-                    if (createdDomainList.children.length === 0) {
-                        createdDomainList.innerHTML = '<p>Anda belum membuat domain apapun.</p>';
-                    }
-                } catch (error) {
-                    console.error('Error deleting domain:', error);
-                    showToast(error.message || 'Gagal menghapus domain.', 'error');
-                }
-            });
-        });
-    }
-
-    // --- Initial Check ---
-    if (userApiKey) {
-        apikeyScreen.style.display = 'none';
-        domainManagementScreen.style.display = 'block';
-        loadDomainCategoriesForSelect();
-        document.querySelector('.tab-button[data-tab="createDomain"]').click();
-    }
+    closeResultModal.addEventListener('click', () => {
+        resultModal.classList.remove('is-visible');
+    });
 });

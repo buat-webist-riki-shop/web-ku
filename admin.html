@@ -11,7 +11,6 @@
 <body class="light-mode">
     <div id="toast-container"></div>
 
-    <!-- Login Screen -->
     <div id="login-screen" class="main-container">
         <div class="form-card login-card">
             <div class="login-header">
@@ -30,7 +29,6 @@
         </div>
     </div>
 
-    <!-- Product Form Screen -->
     <div id="product-form-screen" class="main-container" style="display: none;">
         <header class="admin-header">
             <img src="logo.jpg" alt="Rikishopreal" class="profile-pic">
@@ -43,10 +41,9 @@
         <nav class="admin-tabs">
             <button type="button" class="tab-button active" data-tab="addProduct">Tambah Produk</button>
             <button type="button" class="tab-button" data-tab="manageProducts">Kelola Produk</button>
-            <button type="button" class="tab-button" data-tab="manageDomains">Domain & API Keys</button>
+            <button type="button" class="tab-button" data-tab="manageDomains">Kelola Domain & API</button>
         </nav>
         
-        <!-- Tambah Produk -->
         <div id="addProduct" class="admin-tab-content active">
             <form class="admin-form" id="addProductForm">
                 <h2><i class="fas fa-plus-circle"></i> Tambah Produk</h2>
@@ -70,11 +67,11 @@
                 <label for="product-price">Harga Produk (hanya angka):</label>
                 <input type="number" id="product-price" placeholder="Contoh: 3000">
 
+                <label for="product-whatsapp">Nomor WhatsApp (Opsional, cth: 62812xxxx):</label>
+                <input type="text" id="product-whatsapp" placeholder="Hanya angka, diawali kode negara">
+
                 <label for="product-description">Deskripsi Produk (Tekan Enter untuk baris baru):</label>
                 <textarea id="product-description" rows="5" placeholder="Tulis deskripsi di sini..."></textarea>
-
-                <label for="product-contact-number">Nomor Kontak Produk (opsional, ex: 62812...):</label>
-                <input type="tel" id="product-contact-number" placeholder="Contoh: 6281234567890">
 
                 <div id="scriptMenuSection" style="display: none;">
                     <label for="script-menu-content">Konten Menu Script:</label>
@@ -90,7 +87,6 @@
             </form>
         </div>
         
-        <!-- Kelola Produk -->
         <div id="manageProducts" class="admin-tab-content">
             <form class="admin-form">
                 <h2><i class="fas fa-cogs"></i> Kelola Produk</h2>
@@ -110,72 +106,60 @@
                 <div id="manage-product-list"></div>
                 <button type="button" id="save-order-button" style="display:none;">Simpan Urutan</button>
 
-                <!-- Fitur Edit Harga Massal per Kategori -->
-                <div id="bulk-price-edit-container" class="bulk-price-edit-container" style="display: none;">
-                    <label for="bulk-price-input">Ubah Harga Semua Produk di Kategori Ini:</label>
-                    <div class="bulk-price-input-group">
-                        <input type="number" id="bulk-price-input" placeholder="Masukkan harga baru (contoh: 5000)">
-                        <button type="button" id="apply-bulk-price-btn">Terapkan Harga</button>
+                <div id="bulk-edit-sections" style="display: none;">
+                    <div class="bulk-price-edit-container">
+                        <label for="bulk-price-input">Ubah Harga Semua Produk di Kategori Ini:</label>
+                        <div class="bulk-price-input-group">
+                            <input type="number" id="bulk-price-input" placeholder="Masukkan harga baru (cth: 5000)">
+                            <button type="button" id="apply-bulk-price-btn">Terapkan Harga</button>
+                        </div>
                     </div>
-                    <button type="button" id="reset-bulk-price-btn" class="reset-price-btn" style="display:none;">Kembalikan Harga Awal</button>
-                </div>
-
-                <!-- Fitur Edit Nomor Kontak Massal per Kategori -->
-                <div id="bulk-contact-edit-container" class="bulk-price-edit-container" style="display: none;">
-                    <label for="bulk-contact-input">Ubah Nomor Kontak Semua Produk di Kategori Ini:</label>
-                    <div class="bulk-price-input-group">
-                        <input type="tel" id="bulk-contact-input" placeholder="Masukkan nomor baru (contoh: 62812...) atau kosongkan untuk menghapus">
-                        <button type="button" id="apply-bulk-contact-btn">Terapkan Nomor</button>
+                    <div class="bulk-price-edit-container">
+                        <label for="bulk-whatsapp-input">Ubah No. WhatsApp Semua Produk di Kategori Ini:</label>
+                        <div class="bulk-price-input-group">
+                            <input type="text" id="bulk-whatsapp-input" placeholder="Masukkan No. WA baru (cth: 62812xxxx)">
+                            <button type="button" id="apply-bulk-whatsapp-btn">Terapkan No. WA</button>
+                        </div>
                     </div>
                 </div>
             </form>
         </div>
 
-        <!-- Kelola Domain & API Keys -->
         <div id="manageDomains" class="admin-tab-content">
-            <div class="admin-form">
-                <h2><i class="fas fa-globe"></i> Kelola Kategori Domain</h2>
-                <form id="addDomainCategoryForm">
-                    <label for="domain-category-name">Nama Kategori Domain (contoh: rikishop.my.id):</label>
-                    <input type="text" id="domain-category-name" placeholder="rikishop.my.id">
-                    <label for="domain-category-zone">Cloudflare Zone ID:</label>
-                    <input type="text" id="domain-category-zone" placeholder="Zone ID Anda">
-                    <label for="domain-category-apitoken">Cloudflare API Token:</label>
-                    <input type="text" id="domain-category-apitoken" placeholder="API Token Anda">
-                    <button type="submit" id="add-domain-category-btn">Tambah Kategori Domain</button>
-                </form>
-
-                <h3>Daftar Kategori Domain</h3>
-                <div id="domain-category-list" class="delete-list">
-                    <p>Memuat kategori domain...</p>
+             <div class="admin-form">
+                <h2><i class="fas fa-key"></i> Kelola API Key</h2>
+                <div class="api-key-form">
+                    <label for="api-user-identifier">Nama Pengguna / Identifier:</label>
+                    <input type="text" id="api-user-identifier" placeholder="Contoh: riki_reseller">
+                    <label for="api-duration">Masa Aktif (hari):</label>
+                    <input type="number" id="api-duration" placeholder="Contoh: 30">
+                    <button type="button" id="generate-api-key-btn">Buat API Key</button>
                 </div>
+                <h3>Daftar API Key Aktif</h3>
+                <div id="api-key-list">Memuat...</div>
             </div>
 
             <div class="admin-form" style="margin-top: 20px;">
-                <h2><i class="fas fa-key"></i> Kelola API Keys</h2>
-                <form id="createApiKeyForm">
-                    <label for="api-key-name">Nama API Key (contoh: Reseller A):</label>
-                    <input type="text" id="api-key-name" placeholder="Nama untuk API Key ini">
-                    <label for="api-key-duration">Masa Aktif:</label>
-                    <select id="api-key-duration">
-                        <option value="day">1 Hari</option>
-                        <option value="week">1 Minggu</option>
-                        <option value="month">1 Bulan</option>
-                        <option value="year">1 Tahun</option>
-                        <option value="permanent">Permanen</option>
-                    </select>
-                    <button type="submit" id="add-api-key-btn">Buat API Key</button>
-                </form>
-
-                <h3>Daftar API Keys</h3>
-                <div id="api-key-list" class="delete-list">
-                    <p>Memuat API Keys...</p>
+                <h2><i class="fas fa-globe"></i> Kelola Domain</h2>
+                 <p style="font-size: 0.8em; text-align: left;">Tambahkan domain yang akan tersedia untuk pembuatan subdomain oleh reseller. Dapatkan Zone ID dan API Token dari dashboard Cloudflare Anda.</p>
+                <div class="domain-manager-form">
+                    <label for="domain-name">Nama Domain:</label>
+                    <input type="text" id="domain-name" placeholder="contoh.com">
+                    <label for="domain-zone-id">Cloudflare Zone ID:</label>
+                    <input type="text" id="domain-zone-id" placeholder="ID Zona dari Cloudflare">
+                    <label for="domain-api-token">Cloudflare API Token:</label>
+                    <input type="text" id="domain-api-token" placeholder="Token API Cloudflare (dengan izin Edit DNS)">
+                    <button type="button" id="add-domain-btn">Tambah Domain</button>
                 </div>
+                <h3>Daftar Domain Tersedia</h3>
+                <div id="domain-list">Memuat...</div>
+                 <h3>Daftar Subdomain Dibuat</h3>
+                 <div id="subdomain-list">Memuat...</div>
             </div>
         </div>
+
     </div>
     
-    <!-- Modal Edit Produk -->
     <div id="editProductModal" class="modal">
         <div class="modal-content">
             <form class="admin-form" id="editProductForm">
@@ -190,12 +174,12 @@
                 
                 <label for="edit-price">Harga Produk:</label>
                 <input type="number" id="edit-price">
+
+                <label for="edit-whatsapp">Nomor WhatsApp (Opsional):</label>
+                <input type="text" id="edit-whatsapp" placeholder="Hanya angka, cth: 62812xxxx">
                 
                 <label for="edit-desc">Deskripsi Produk:</label>
                 <textarea id="edit-desc" rows="5"></textarea>
-
-                <label for="edit-contact-number">Nomor Kontak Produk (opsional, ex: 62812...):</label>
-                <input type="tel" id="edit-contact-number" placeholder="Contoh: 6281234567890">
                 
                 <div id="edit-photo-section" style="display: none;">
                     <label>Kelola Foto:</label>
@@ -216,7 +200,6 @@
         </div>
     </div>
 
-    <!-- Custom Confirmation Modal (Pengganti window.confirm) -->
     <div id="customConfirmModal" class="modal">
         <div class="modal-content confirm-modal-content">
             <div class="confirm-message" id="confirmMessage"></div>
@@ -224,6 +207,15 @@
                 <button type="button" id="confirmCancelBtn" class="confirm-cancel-btn">Batal</button>
                 <button type="button" id="confirmOkBtn" class="confirm-ok-btn">Oke</button>
             </div>
+        </div>
+    </div>
+
+     <div id="apiKeyResultModal" class="modal">
+        <div class="modal-content confirm-modal-content">
+            <h3>API Key Berhasil Dibuat!</h3>
+            <p>Harap simpan API Key ini di tempat yang aman. Anda tidak dapat melihatnya lagi setelah menutup jendela ini.</p>
+            <div id="apiKeyResult" style="background-color: var(--secondary-color); padding: 15px; border-radius: 8px; margin: 15px 0; word-wrap: break-word; text-align: left;"></div>
+            <button type="button" id="closeApiKeyModal" class="confirm-ok-btn">Tutup</button>
         </div>
     </div>
     

@@ -5,8 +5,8 @@ function onYouTubeIframeAPIReady() { isYouTubeApiReady = true; }
 (function() { const tag = document.createElement('script'); tag.src = "https://www.youtube.com/iframe_api"; const firstScriptTag = document.getElementsByTagName('script')[0]; firstScriptTag.parentNode.insertBefore(tag, firstScriptTag); })();
 
 // --- Konfigurasi ---
-const WA_ADMIN_NUMBER = "6285771555374"; // Sudah dalam format 62...
-const WA_SELLER_NUMBER = "6285771555374"; // Sudah dalam format 62...
+const WA_ADMIN_NUMBER = "6285771555374";
+const WA_SELLER_NUMBER = "6285771555374";
 const CREATOR_USERNAME = "Riki Shop Real";
 const SOSMED_LINK = "https://rikishopreal.vercel.app";
 const TESTIMONI_LINK = "https://rikishopreal.vercel.app/testimoni";
@@ -369,7 +369,7 @@ function showProductDetail(product, serviceType) {
         productId: product.id,
         productName: product.nama,
         productPrice: product.harga,
-        serviceType: serviceType
+        serviceType: serviceType // Menyimpan tipe layanan untuk logika keranjang
     });
     addToCartBtn.addEventListener('click', addToCart);
     detailProductActions.appendChild(addToCartBtn);
@@ -378,10 +378,6 @@ function showProductDetail(product, serviceType) {
     buyNowLink.className = 'buy-now';
     buyNowLink.textContent = 'Beli Sekarang';
 
-    // Gunakan nomor kontak produk jika ada, fallback ke WA_ADMIN_NUMBER
-    // Pastikan nomor diawali dengan '+' untuk link WhatsApp
-    const targetWhatsAppNumber = product.contactNumber ? `+${product.contactNumber}` : `+${WA_ADMIN_NUMBER}`;
-    
     let buyNowMessage = '';
     if (serviceType === 'Stock Akun' && product.images && product.images.length > 0) {
         buyNowMessage = `Halo Kak Admin Rikishopreal ✨\n\nSaya tertarik untuk memesan Akun ini:\n\nProduk: *${product.nama}*\nHarga: *${formatRupiah(product.harga)}*\n\nSebagai referensi, ini link gambarnya:\n${product.images[0]}\n\nMohon info ketersediaan dan panduan pembayarannya ya. Terima kasih! 🙏`;
@@ -391,7 +387,7 @@ function showProductDetail(product, serviceType) {
         buyNowMessage = `Halo Kak Admin Rikishopreal ✨\n\nSaya tertarik untuk memesan produk ini:\n\nProduk: *${product.nama}*\nHarga: *${formatRupiah(product.harga)}*\n\nMohon info selanjutnya untuk proses pembayaran ya. Terima kasih! 🙏`;
     }
     
-    buyNowLink.href = `https://wa.me/${targetWhatsAppNumber.replace(/^\+/, '')}?text=${encodeURIComponent(buyNowMessage)}`; // Hapus '+' lagi untuk URL
+    buyNowLink.href = `https://wa.me/${WA_ADMIN_NUMBER}?text=${encodeURIComponent(buyNowMessage)}`;
     buyNowLink.target = "_blank";
     detailProductActions.appendChild(buyNowLink);
 
@@ -401,6 +397,7 @@ function showProductDetail(product, serviceType) {
         cekMenuBtn.textContent = 'Cek Menu';
         cekMenuBtn.addEventListener('click', () => {
             genericScriptMenuTitle.textContent = `Menu ${product.nama}`;
+            // Memformat menuContent dengan benar dari string ke tampilan
             genericScriptMenuContent.innerHTML = product.menuContent.replace(/\n/g, '<br>');
             genericScriptMenuModal.style.display = 'flex';
         });

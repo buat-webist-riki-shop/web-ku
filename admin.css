@@ -205,14 +205,6 @@ h2 i {
     margin-right: 10px;
     color: var(--primary-color);
 }
-h3 { /* Untuk sub-judul di dalam tab */
-    color: var(--text-color);
-    font-weight: 600;
-    margin-top: 25px;
-    margin-bottom: 15px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--border-color);
-}
 p {
     text-align: center;
     color: var(--light-text-color);
@@ -315,7 +307,7 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
 .tab-button {
     flex: 1; 
     min-width: 120px; 
-    /* max-width: 50%;  Batasi lebar maksimal tombol tab agar tidak terlalu besar */
+    max-width: 50%; /* Batasi lebar maksimal tombol tab agar tidak terlalu besar */
     border: none;
     background-color: transparent;
     padding: 10px 15px;
@@ -340,6 +332,21 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
 .admin-tab-content.active {
     display: block;
     animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Form admin - Pastikan selalu di tengah dan tidak lewat */
+.admin-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 600px; 
+    margin: 0 auto; 
+    background: var(--white-color);
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-sizing: border-box;
 }
 
 /* ============================================== */
@@ -527,8 +534,7 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
     flex-wrap: wrap; 
 }
 .original-price del { color: var(--light-text-color); font-size: 0.9em; }
-.discounted-price { font-weight: bold; color: var(--error-color); } /* Tambahkan warna untuk harga diskon */
-
+.discounted-price { font-weight: bold; }
 .add-photo-container { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
 .add-photo-container input { flex-grow: 1; min-width: 150px; } 
 .add-photo-container button { width: auto; margin-top: 0; } 
@@ -648,74 +654,6 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
     flex-shrink: 0;
 }
 
-.reset-price-btn {
-    background-color: #6c757d; /* Warna abu-abu */
-    color: white;
-    margin-top: 10px; /* Sedikit jarak dari tombol terapkan harga */
-}
-.reset-price-btn:hover {
-    background-color: #5a6268;
-}
-
-/* API Key & Domain Categories List Styling */
-.key-item, .domain-category-item {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    background: var(--secondary-color);
-    margin: 10px 0;
-    padding: 15px;
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 2px 5px var(--shadow-color);
-    word-break: break-all; /* Agar teks panjang tidak overflow */
-}
-
-.key-item .key-display, .domain-category-item .category-name {
-    font-weight: 500;
-    color: var(--text-color);
-    margin-bottom: 5px;
-}
-
-.key-item .key-meta, .domain-category-item .category-meta {
-    font-size: 0.85em;
-    color: var(--light-text-color);
-    margin-bottom: 10px;
-}
-
-.key-item .item-actions, .domain-category-item .item-actions {
-    display: flex;
-    gap: 10px;
-    width: 100%;
-    margin-top: 10px;
-    justify-content: flex-end; /* Pindahkan tombol ke kanan */
-}
-
-.key-item .delete-btn, .domain-category-item .delete-btn {
-    background-color: var(--error-color);
-    color: white;
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 0.85em;
-    margin-top: 0;
-    flex: none; /* Jangan biarkan flex grow */
-    width: auto; /* Sesuaikan lebar dengan konten */
-}
-
-.key-item .copy-btn {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 0.85em;
-    margin-top: 0;
-    flex: none; /* Jangan biarkan flex grow */
-    width: auto; /* Sesuaikan lebar dengan konten */
-}
-.key-item .copy-btn:hover, .domain-category-item .delete-btn:hover {
-    filter: brightness(1.1);
-}
-
 
 /* Media Queries untuk Responsivitas */
 @media (max-width: 768px) {
@@ -745,7 +683,7 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
         justify-content: center;
         gap: 5px;
     }
-    .edit-btn, .delete-btn, .key-item .delete-btn, .key-item .copy-btn, .domain-category-item .delete-btn {
+    .edit-btn, .delete-btn {
         width: calc(50% - 5px); 
         flex: none; 
     }
@@ -764,9 +702,6 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
     }
     .bulk-price-input-group button {
         width: 100%;
-    }
-    .key-item .item-actions, .domain-category-item .item-actions {
-        justify-content: space-around;
     }
 }
 
@@ -797,7 +732,7 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
     .item-actions {
         flex-direction: column; 
     }
-    .edit-btn, .delete-btn, .key-item .delete-btn, .key-item .copy-btn, .domain-category-item .delete-btn {
+    .edit-btn, .delete-btn {
         width: 100%; 
     }
 }
