@@ -11,7 +11,6 @@
 <body class="light-mode">
     <div id="toast-container"></div>
 
-    <!-- Login Screen -->
     <div id="login-screen" class="main-container">
         <div class="form-card login-card">
             <div class="login-header">
@@ -24,20 +23,15 @@
                 <span class="password-toggle" id="passwordToggle"><i class="fas fa-eye-slash"></i></span>
             </div>
             <button type="button" id="login-button">Masuk</button>
-            <div class="theme-switch" id="themeSwitchBtnLogin">
-                <i class="fas fa-moon"></i>
-            </div>
+            <div class="theme-switch" id="themeSwitchBtnLogin"><i class="fas fa-moon"></i></div>
         </div>
     </div>
 
-    <!-- Product Form Screen -->
     <div id="product-form-screen" class="main-container" style="display: none;">
         <header class="admin-header">
             <img src="logo.jpg" alt="Rikishopreal" class="profile-pic">
             <h2>Admin Website</h2>
-            <div class="theme-switch" id="themeSwitchBtnPanel">
-                <i class="fas fa-moon"></i>
-            </div>
+            <div class="theme-switch" id="themeSwitchBtnPanel"><i class="fas fa-moon"></i></div>
         </header>
         
         <nav class="admin-tabs">
@@ -46,11 +40,9 @@
             <button type="button" class="tab-button" data-tab="settings">Pengaturan</button>
         </nav>
         
-        <!-- Tambah Produk -->
         <div id="addProduct" class="admin-tab-content active">
             <form class="admin-form" id="addProductForm">
                 <h2><i class="fas fa-plus-circle"></i> Tambah Produk</h2>
-
                 <label for="category">Kategori Produk:</label>
                 <select id="category">
                     <option value="Panel">Panel</option>
@@ -63,34 +55,26 @@
                     <option value="Logo">Logo</option>
                     <option value="Suntik Sosmed">Suntik Sosmed</option>
                 </select>
-
                 <label for="product-name">Nama Produk:</label>
                 <input type="text" id="product-name" placeholder="Contoh: Panel Ram 1GB">
-
-                <label for="product-price">Harga Produk (hanya angka):</label>
-                <input type="number" id="product-price" placeholder="Contoh: 3000">
-
-                <label for="product-description">Deskripsi Produk (Tekan Enter untuk baris baru):</label>
+                <label for="product-price">Harga Asli Produk (hanya angka):</label>
+                <input type="number" id="product-price" placeholder="Contoh: 10000">
+                <label for="product-description">Deskripsi Produk:</label>
                 <textarea id="product-description" rows="5" placeholder="Tulis deskripsi di sini..."></textarea>
-                
                 <label for="product-whatsapp-number">Nomor WA Spesifik (Opsional):</label>
-                <input type="text" id="product-whatsapp-number" placeholder="Kosongkan untuk pakai nomor default">
-
+                <input type="text" id="product-whatsapp-number" placeholder="Contoh: 628123456789">
                 <div id="scriptMenuSection" style="display: none;">
                     <label for="script-menu-content">Konten Menu Script:</label>
                     <textarea id="script-menu-content" rows="10" placeholder="Tulis menu script di sini..."></textarea>
                 </div>
-
                 <div id="stock-photo-section" style="display: none;">
                     <label for="product-photos">Link Foto (pisahkan dengan koma):</label>
                     <input type="text" id="product-photos" placeholder="https://url.com/foto1.jpg, https://url.com/foto2.jpg">
                 </div>
-
                 <button type="button" id="add-product-button">Tambah Produk</button>
             </form>
         </div>
         
-        <!-- Kelola Produk -->
         <div id="manageProducts" class="admin-tab-content">
             <form class="admin-form">
                 <h2><i class="fas fa-cogs"></i> Kelola Produk</h2>
@@ -109,59 +93,50 @@
                 </select>
                 <div id="manage-product-list"></div>
                 <button type="button" id="save-order-button" style="display:none;">Simpan Urutan</button>
-
                 <div id="bulk-price-edit-container" class="bulk-price-edit-container" style="display: none;">
-                    <label for="bulk-price-input">Ubah Harga Semua Produk di Kategori Ini:</label>
+                    <label>Manajemen Harga Kategori</label>
                     <div class="bulk-price-input-group">
-                        <input type="number" id="bulk-price-input" placeholder="Masukkan harga baru (contoh: 5000)">
-                        <button type="button" id="apply-bulk-price-btn">Terapkan Harga</button>
+                        <input type="number" id="bulk-price-input" placeholder="Harga baru untuk semua">
+                        <button type="button" id="apply-bulk-price-btn">Terapkan</button>
                     </div>
+                    <button type="button" id="reset-prices-btn" class="secondary-button">Kembalikan Harga Awal</button>
                 </div>
             </form>
         </div>
 
-        <!-- Pengaturan -->
         <div id="settings" class="admin-tab-content">
             <form class="admin-form" id="settingsForm">
                 <h2><i class="fas fa-globe"></i> Pengaturan Nomor WhatsApp</h2>
-                
                 <label for="global-whatsapp-number">Nomor WA Global (Wajib diisi):</label>
-                <input type="text" id="global-whatsapp-number">
+                <input type="text" id="global-whatsapp-number" placeholder="Contoh: 628123456789">
                 <small>Nomor ini akan digunakan jika nomor lain tidak diatur.</small>
-
                 <div id="category-whatsapp-numbers-container">
                     <h3><i class="fas fa-list-alt"></i> Nomor WA per Kategori (Opsional)</h3>
-                    <!-- Input untuk nomor kategori akan dibuat oleh JavaScript -->
                 </div>
-                
                 <button type="button" id="save-settings-button">Simpan Pengaturan</button>
             </form>
         </div>
-
     </div>
     
-    <!-- Modal Edit Produk -->
     <div id="editProductModal" class="modal">
         <div class="modal-content">
             <form class="admin-form" id="editProductForm">
                 <span class="close-button" id="closeEditModal">&times;</span>
                 <h2 id="editModalTitle">Edit Produk</h2>
-                
                 <input type="hidden" id="edit-product-id">
                 <input type="hidden" id="edit-product-category">
-                
                 <label for="edit-name">Nama Produk:</label>
                 <input type="text" id="edit-name">
-                
-                <label for="edit-price">Harga Produk:</label>
+                <label for="edit-price">Harga Asli:</label>
                 <input type="number" id="edit-price">
-                
+                <label for="edit-discount-price">Harga Diskon (Opsional):</label>
+                <input type="number" id="edit-discount-price" placeholder="Kosongkan jika tidak ada diskon">
+                <label for="edit-discount-date">Tanggal Berakhir Diskon (Opsional):</label>
+                <input type="datetime-local" id="edit-discount-date">
                 <label for="edit-desc">Deskripsi Produk:</label>
                 <textarea id="edit-desc" rows="5"></textarea>
-
                 <label for="edit-whatsapp-number">Nomor WA Spesifik (Opsional):</label>
-                <input type="text" id="edit-whatsapp-number" placeholder="Kosongkan untuk pakai nomor default">
-                
+                <input type="text" id="edit-whatsapp-number" placeholder="Contoh: 628123456789">
                 <div id="edit-photo-section" style="display: none;">
                     <label>Kelola Foto:</label>
                     <div class="photo-grid" id="edit-photo-grid"></div>
@@ -170,18 +145,15 @@
                         <button type="button" id="add-photo-btn">Tambah</button>
                     </div>
                 </div>
-                
                 <div id="edit-script-menu-section" style="display: none;">
                     <label for="edit-script-menu-content">Konten Menu Script:</label>
                     <textarea id="edit-script-menu-content" rows="10"></textarea>
                 </div>
-                
                 <button type="button" id="save-edit-btn">Simpan Perubahan</button>
             </form>
         </div>
     </div>
 
-    <!-- Custom Confirmation Modal -->
     <div id="customConfirmModal" class="modal">
         <div class="modal-content confirm-modal-content">
             <div class="confirm-message" id="confirmMessage"></div>
