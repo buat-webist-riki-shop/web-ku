@@ -330,22 +330,22 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
     box-sizing: border-box;
 }
 
-/* ============================================== */
-/* MODAL & TOAST                                */
-/* ============================================== */
-/* CHANGED: Positioned toast at the top */
 #toast-container {
     position: fixed;
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 9999;
-    width: 90%;
+    width: auto;
     max-width: 500px;
     pointer-events: none;
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
 }
 .toast {
-    width: 100%;
+    width: max-content; 
+    max-width: 100%;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -364,6 +364,7 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
     box-sizing: border-box;
     margin-bottom: 10px;
 }
+
 .toast.success { background-color: rgba(52, 199, 89, 0.9); color: white; }
 .toast.error { background-color: rgba(255, 59, 48, 0.9); color: white; }
 .toast.info { background-color: rgba(0, 122, 255, 0.9); color: white; }

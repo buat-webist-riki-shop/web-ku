@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // ... (elemen-elemen yang sudah ada) ...
+    // ... (elemen-elemen yang sudah ada, tidak perlu diubah) ...
     const loginScreen = document.getElementById('login-screen');
     const productFormScreen = document.getElementById('product-form-screen');
     const toastContainer = document.getElementById('toast-container');
@@ -34,8 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const globalWhatsappNumberInput = document.getElementById('global-whatsapp-number');
     const categoryWhatsappNumbersContainer = document.getElementById('category-whatsapp-numbers-container');
     const editWhatsappNumberInput = document.getElementById('edit-whatsapp-number');
-    
-    // ADDED: Elemen baru untuk reset harga
     const resetPricesBtn = document.getElementById('reset-prices-btn');
 
     const API_BASE_URL = '/api';
@@ -126,15 +124,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ADDED: Phone number validation function
+    // --- CHANGED: Updated phone number validation logic ---
     function validatePhoneNumber(number) {
-        if (!number) return true; // Allow empty optional fields
-        const phoneRegex = /^\d+$/; // Regex to check if it contains only digits
+        if (!number) return true; // Biarkan kosong jika opsional
+        // Regex: Harus diawali angka 1-9, diikuti oleh angka lainnya.
+        // Ini secara otomatis menolak '0' di awal dan simbol seperti '+'
+        const phoneRegex = /^[1-9]\d*$/;
         return phoneRegex.test(number);
     }
+    // --- END CHANGED ---
 
     const handleLogin = async () => {
-        // ... (fungsi login tidak berubah) ...
         const password = passwordInput.value;
         if (!password) {
             showToast('Password tidak boleh kosong.', 'error');
@@ -183,9 +183,10 @@ document.addEventListener('DOMContentLoaded', () => {
     addButton.addEventListener('click', async (e) => { 
         e.preventDefault(); 
         const waNumber = productWhatsappNumberInput.value.trim();
-        // CHANGED: Added validation
+        
+        // CHANGED: Updated error message
         if (!validatePhoneNumber(waNumber)) {
-            return showToast('Format Nomor WA salah. Gunakan angka saja (contoh: 628123...).', 'error');
+            return showToast("Format Nomor WA salah. Harus diawali kode negara (contoh: 628...)", 'error');
         }
 
         const productData = {
@@ -300,7 +301,6 @@ document.addEventListener('DOMContentLoaded', () => {
             item.setAttribute('draggable', 'true');
             item.dataset.id = prod.id;
             
-            // CHANGED: Updated price display logic for discounts
             let priceDisplay = `<span>${formatRupiah(prod.harga)}</span>`;
             if (prod.hargaAsli && prod.hargaAsli > prod.harga) {
                 priceDisplay = `<span class="original-price"><del>${formatRupiah(prod.hargaAsli)}</del></span> <span class="discounted-price">${formatRupiah(prod.harga)}</span>`;
@@ -366,8 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const editProductId = document.getElementById('edit-product-id');
         const editProductCategory = document.getElementById('edit-product-category');
         const editNameInput = document.getElementById('edit-name');
-        // CHANGED: New elements for discount
-        const editPriceInput = document.getElementById('edit-price'); // This is now HargaAsli
+        const editPriceInput = document.getElementById('edit-price');
         const editDiscountPriceInput = document.getElementById('edit-discount-price');
         const editDiscountDateInput = document.getElementById('edit-discount-date');
         const editDescInput = document.getElementById('edit-desc');
@@ -392,8 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 editProductCategory.value = category;
                 editModalTitle.innerHTML = `<i class="fas fa-edit"></i> Edit Produk: ${product.nama}`;
                 editNameInput.value = product.nama;
-                // CHANGED: Populate discount fields
-                editPriceInput.value = product.hargaAsli || product.harga; // Harga Asli
+                editPriceInput.value = product.hargaAsli || product.harga;
                 editDiscountPriceInput.value = product.discountPrice || '';
                 editDiscountDateInput.value = product.discountEndDate ? product.discountEndDate.slice(0, 16) : '';
                 editDescInput.value = product.deskripsiPanjang ? product.deskripsiPanjang.replace(/ \|\| /g, '\n') : '';
@@ -453,9 +451,10 @@ document.addEventListener('DOMContentLoaded', () => {
         saveEditBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             const newWaNumber = editWhatsappNumberInput.value.trim();
-            // CHANGED: Added validation
+            
+            // CHANGED: Updated error message
             if (!validatePhoneNumber(newWaNumber)) {
-                return showToast('Format Nomor WA salah. Gunakan angka saja (contoh: 628...).', 'error');
+                return showToast("Format Nomor WA salah. Harus diawali kode negara (contoh: 628...)", 'error');
             }
 
             const id = parseInt(editProductId.value);
@@ -463,7 +462,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const newName = editNameInput.value.trim();
             const newDesc = editDescInput.value.trim().replace(/\n/g, ' || ');
             
-            // CHANGED: Logic for handling discount prices
             const hargaAsli = parseInt(editPriceInput.value, 10);
             const discountPrice = editDiscountPriceInput.value ? parseInt(editDiscountPriceInput.value, 10) : null;
             const discountEndDate = editDiscountDateInput.value ? new Date(editDiscountDateInput.value).toISOString() : null;
@@ -491,7 +489,6 @@ document.addEventListener('DOMContentLoaded', () => {
             saveEditBtn.disabled = true;
 
             try {
-                // CHANGED: Send all new price fields to the backend
                 const res = await fetch(`${API_BASE_URL}/updateProduct`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -605,9 +602,7 @@ document.addEventListener('DOMContentLoaded', () => {
             applyBulkPriceBtn.disabled = true;
 
             try {
-                // NOTE: Endpoint 'updateProductsInCategory' now only sets the current price 'harga'.
-                // It does not change 'hargaAsli'.
-                const res = await fetch(`${API_BASE_URL}/updateProduct`, { 
+                const res = await fetch(`${API_BASE_URL}/updateProductsInCategory`, { 
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ category, newPrice: newBulkPrice })
@@ -626,7 +621,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // ADDED: Event listener for the reset prices button
         resetPricesBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             const category = manageCategorySelect.value;
@@ -706,9 +700,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     saveSettingsButton.addEventListener('click', async () => {
         const globalNumber = globalWhatsappNumberInput.value.trim();
-        // CHANGED: Added validation
+        
+        // CHANGED: Updated error message
         if (!validatePhoneNumber(globalNumber)) {
-            return showToast('Format Nomor WA Global salah. Gunakan angka saja (contoh: 628...).', 'error');
+            return showToast("Format Nomor WA Global salah. Harus diawali kode negara (contoh: 628...)", 'error');
         }
         if (!globalNumber) {
             return showToast('Nomor WA Global wajib diisi.', 'error');
@@ -719,9 +714,10 @@ document.addEventListener('DOMContentLoaded', () => {
         categoryWhatsappNumbersContainer.querySelectorAll('input[data-category]').forEach(input => {
             const cat = input.dataset.category;
             const num = input.value.trim();
-            // CHANGED: Added validation
+            
+            // CHANGED: Updated error message
             if (num && !validatePhoneNumber(num)) {
-                showToast(`Format Nomor WA untuk kategori ${cat} salah. Gunakan angka saja.`, 'error');
+                showToast(`Format Nomor WA untuk kategori ${cat} salah. Harus diawali kode negara.`, 'error');
                 isCategoryValid = false;
             }
             categoryNumbers[cat] = num;

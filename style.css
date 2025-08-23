@@ -231,6 +231,8 @@ h3 { font-size: 1.2em; color: var(--primary-color); margin-bottom: 15px; border-
 .cart-summary { margin-top: 20px; padding: 18px 15px; font-size: 1.2em; font-weight: 600; display: flex; justify-content: space-between; align-items: center; background-color: var(--white-color); border-radius: 12px; box-shadow: 0 -2px 8px var(--shadow-color); border: 1px solid var(--border-color); }
 .checkout-button { display: block; width: 100%; margin: 25px auto 0; padding: 14px; background-color: var(--success-color); color: white; border: none; border-radius: 8px; font-size: 1.2em; font-weight: 600; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
 
+/* ... (kode CSS lainnya tetap sama) ... */
+
 #toast-notification {
     position: fixed;
     top: 20px;
@@ -253,8 +255,9 @@ h3 { font-size: 1.2em; color: var(--primary-color); margin-bottom: 15px; border-
     align-items: center;
     gap: 8px;
     pointer-events: none;
-    width: 90%;
-    max-width: 400px;
+    width: auto; 
+    min-width: 200px; 
+    max-width: 90%; 
     justify-content: center;
     box-sizing: border-box;
 }
@@ -263,7 +266,6 @@ h3 { font-size: 1.2em; color: var(--primary-color); margin-bottom: 15px; border-
     transform: translateX(-50%) translateY(0);
 }
 
-/* Gaya Harga Diskon */
 .price-display {
     display: flex;
     align-items: baseline;
