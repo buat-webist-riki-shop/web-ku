@@ -70,10 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- Logika Utama ---
     async function initializePage() {
         try {
-            // Muat pengaturan dari server, tambahkan cache-busting
             const res = await fetch(`/settings.json?v=${Date.now()}`);
             if (res.ok) {
                 siteSettings = await res.json();
@@ -82,8 +80,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (e) {
             console.error("Gagal memuat settings.json", e);
-            // Jangan tampilkan error di sini, biarkan populateApiKeyPrices yang menanganinya
         }
+
+        document.getElementById('proxy-status').checked = false;
 
         const savedUserApiKey = localStorage.getItem('userApiKey');
         if (savedUserApiKey) {
