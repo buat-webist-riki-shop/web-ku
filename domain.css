@@ -223,12 +223,11 @@ input:checked + .slider:before { transform: translateX(20px); }
 /* Daftar Harga API Key di Modal */
 #api-key-price-list-container .price-item {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    background-color: var(--secondary-color);
-    padding: 12px 15px;
-    border-radius: 20px;
-    margin-bottom: 10px;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
 }
 }
 .price-info { text-align: left; }
