@@ -1,16 +1,16 @@
 {
-  "routes": [
+  "rewrites": [
     {
-      "src": "/apikeys.json",
-      "status": 404
+      "source": "/apikeys.json",
+      "destination": "/404"
     },
     {
-      "src": "/domains.json",
-      "status": 404
+      "source": "/domains.json",
+      "destination": "/404"
     },
     {
-      "src": "/settings.json",
-      "status": 404
+      "source": "/settings.json",
+      "destination": "/404"
     }
   ]
 }
