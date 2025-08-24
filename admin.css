@@ -13,7 +13,7 @@
     --success-color: #34c759;
 }
 
-.dark-mode {
+body.dark-mode {
     --primary-color: #0a84ff;
     --secondary-color: #1c1c1e;
     --text-color: #f2f2f7;
@@ -29,7 +29,7 @@
 /* ANIMASI                                      */
 /* ============================================== */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); } /* CHANGED: Animation from top */
+    from { opacity: 0; transform: translateY(-20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 @keyframes fadeOut {
@@ -127,10 +127,7 @@ body {
     color: var(--text-color);
 }
 
-#login-screen .theme-switch {
-    position: absolute;
-    top: 15px;
-    right: 15px;
+.theme-switch {
     width: 40px; 
     height: 40px;
     border-radius: 50%;
@@ -141,17 +138,8 @@ body {
     cursor: pointer;
     box-shadow: 0 2px 5px var(--shadow-color); 
 }
-.admin-header .theme-switch {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background-color: var(--secondary-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 2px 5px var(--shadow-color);
-}
+#login-screen .theme-switch { position: absolute; top: 15px; right: 15px; }
+.admin-header .theme-switch { width: 38px; height: 38px; }
 
 /* ============================================== */
 /* FORM CARD & GENERAL ELEMENTS                 */
@@ -330,6 +318,9 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
     box-sizing: border-box;
 }
 
+/* ============================================== */
+/* TOAST NOTIFICATION                           */
+/* ============================================== */
 #toast-container {
     position: fixed;
     top: 20px;
@@ -370,6 +361,9 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
 .toast.info { background-color: rgba(0, 122, 255, 0.9); color: white; }
 .toast.fade-out { animation: fadeOut 0.5s ease forwards; }
 
+/* ============================================== */
+/* MODAL / POPUP                                */
+/* ============================================== */
 .modal {
     position: fixed;
     z-index: 2000;
@@ -384,34 +378,43 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
     padding: 15px;
     visibility: hidden;
     opacity: 0;
-    transition: visibility 0s, opacity 0.3s ease;
+    transition: visibility 0s 0.3s, opacity 0.3s ease;
     box-sizing: border-box;
 }
-.modal.is-visible { visibility: visible; opacity: 1; }
+.modal.is-visible { 
+    visibility: visible; 
+    opacity: 1; 
+    transition-delay: 0s;
+}
 .modal-content {
     background-color: var(--white-color);
-    border-radius: 12px;
-    width: 90%; 
-    max-width: 550px; 
+    border-radius: 20px;
+    width: 100%; 
+    max-width: 500px; 
     margin: auto;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-    padding: 25px;
+    box-shadow: 0 10px 30px var(--shadow-color);
+    padding: 30px 25px;
     position: relative;
-    transform: scale(0.95);
+    transform: scale(0.9) translateY(20px);
     transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
     box-sizing: border-box; 
     max-height: 90vh; 
     overflow-y: auto; 
 }
-.modal.is-visible .modal-content { transform: scale(1); }
-.close-button {
-    font-size: 2rem;
+.modal.is-visible .modal-content { 
+    transform: scale(1) translateY(0); 
+}
+.modal .close-button {
+    font-size: 1.8rem;
+    font-weight: 300;
     color: var(--light-text-color);
     position: absolute;
-    top: 10px;
-    right: 15px;
+    top: 15px;
+    right: 20px;
     cursor: pointer;
+    transition: transform 0.2s;
 }
+.modal .close-button:hover { transform: rotate(90deg); }
 
 .confirm-modal-content {
     text-align: center;
@@ -450,8 +453,8 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
     padding: 15px;
     border-radius: 10px;
     border: 1px solid var(--border-color);
-    cursor: grab;
 }
+.delete-item[draggable="true"] { cursor: grab; }
 .delete-item.dragging { opacity: 0.7; transform: scale(1.02); }
 .item-header {
     display: flex;
@@ -471,7 +474,6 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
 }
 .edit-btn { background-color: var(--primary-color); }
 .delete-btn { background-color: var(--error-color); }
-/* ADDED: Styles for discount display */
 .original-price del {
     color: var(--light-text-color);
     font-weight: normal;
@@ -517,15 +519,10 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
 .bulk-price-input-group input { flex-grow: 1; margin-top: 0; }
 .bulk-price-input-group button { width: auto; margin-top: 0; padding: 10px 15px; }
 
-/* ADDED: Style for reset price button */
 .secondary-button {
-    background-color: #ff9500; /* Apple Orange */
+    background-color: #ff9500;
     color: white;
 }
-.dark-mode .secondary-button {
-    background-color: #ff9f0a;
-}
-
 
 #category-whatsapp-numbers-container .category-wa-input {
     display: grid;
@@ -542,6 +539,32 @@ button:disabled { background-color: var(--light-text-color); cursor: not-allowed
 #category-whatsapp-numbers-container input {
     margin: 0;
 }
+
+/* ============================================== */
+/* MANAJER DOMAIN                               */
+/* ============================================== */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+.section-header h2 { margin: 0; text-align: left; }
+button.add-new-btn {
+    width: auto;
+    font-size: 0.9em;
+    padding: 10px 18px;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.modal .admin-form { padding: 0; box-shadow: none; border: none; }
+.duration-group { display: flex; gap: 10px; }
+.permanent-key-toggle { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.permanent-key-toggle label { margin: 0; }
 
 /* Media Queries */
 @media (max-width: 768px) {

@@ -2,29 +2,34 @@
     "Panel": [
         {
             "id": 69,
-            "nama": "Panel || 40gb",
-            "harga": 5000,
-            "hargaAsli": 50000,
-            "deskripsiPanjang": "Bagus lah",
-            "createdAt": "2025-08-23T12:27:26.362Z",
-            "nomorWA": "",
+            "nama": "Panel",
+            "harga": 1000,
+            "hargaAsli": 1000,
+            "deskripsiPanjang": "Akaka",
+            "createdAt": "2025-08-23T17:47:01.519Z",
+            "nomorWA": "6285891142486",
+            "images": [],
+            "menuContent": "",
             "discountPrice": null,
             "discountEndDate": null
         },
         {
             "id": 1,
             "nama": "Panel Ram 1GB",
-            "harga": 5000,
+            "harga": 3000,
             "hargaAsli": 3000,
             "deskripsiPanjang": "Syarat & Ketentuan : Server private & kualitas terbaik! || Script bot dijamin aman (anti drama/maling) | masa aktif panel 30 hari || Garansi 15 hari (1x replace) || Server anti delay/lemot! || Claim garansi wajib bawa bukti transaksi dan data panel yang lengkap",
             "nomorWA": "",
             "discountPrice": null,
-            "discountEndDate": null
+            "discountEndDate": null,
+            "category": "Panel",
+            "images": [],
+            "menuContent": ""
         },
         {
             "id": 2,
             "nama": "Panel Ram 2GB",
-            "harga": 5000,
+            "harga": 4000,
             "hargaAsli": 4000,
             "deskripsiPanjang": "Syarat & Ketentuan : Server private & kualitas terbaik! || Script bot dijamin aman (anti drama/maling) | masa aktif panel 30 hari || Garansi 15 hari (1x replace) || Server anti delay/lemot! || Claim garansi wajib bawa bukti transaksi dan data panel yang lengkap",
             "nomorWA": "",
@@ -44,7 +49,7 @@
         {
             "id": 4,
             "nama": "Panel Ram 4GB",
-            "harga": 5000,
+            "harga": 6000,
             "hargaAsli": 6000,
             "deskripsiPanjang": "Syarat & Ketentuan : Server private & kualitas terbaik! || Script bot dijamin aman (anti drama/maling) | masa aktif panel 30 hari || Garansi 15 hari (1x replace) || Server anti delay/lemot! || Claim garansi wajib bawa bukti transaksi dan data panel yang lengkap",
             "nomorWA": "",
@@ -54,7 +59,7 @@
         {
             "id": 5,
             "nama": "Panel Ram 5GB",
-            "harga": 5000,
+            "harga": 7000,
             "hargaAsli": 7000,
             "deskripsiPanjang": "Syarat & Ketentuan : Server private & kualitas terbaik! || Script bot dijamin aman (anti drama/maling) | masa aktif panel 30 hari || Garansi 15 hari (1x replace) || Server anti delay/lemot! || Claim garansi wajib bawa bukti transaksi dan data panel yang lengkap",
             "nomorWA": "",
@@ -64,7 +69,7 @@
         {
             "id": 6,
             "nama": "Panel Ram 6GB",
-            "harga": 5000,
+            "harga": 8000,
             "hargaAsli": 8000,
             "deskripsiPanjang": "Syarat & Ketentuan : Server private & kualitas terbaik! || Script bot dijamin aman (anti drama/maling) | masa aktif panel 30 hari || Garansi 15 hari (1x replace) || Server anti delay/lemot! || Claim garansi wajib bawa bukti transaksi dan data panel yang lengkap",
             "nomorWA": "",
@@ -74,7 +79,7 @@
         {
             "id": 7,
             "nama": "Panel Ram 7GB",
-            "harga": 5000,
+            "harga": 9000,
             "hargaAsli": 9000,
             "deskripsiPanjang": "Syarat & Ketentuan : Server private & kualitas terbaik! || Script bot dijamin aman (anti drama/maling) | masa aktif panel 30 hari || Garansi 15 hari (1x replace) || Server anti delay/lemot! || Claim garansi wajib bawa bukti transaksi dan data panel yang lengkap",
             "nomorWA": "",
@@ -84,7 +89,7 @@
         {
             "id": 8,
             "nama": "Panel Ram 8GB",
-            "harga": 5000,
+            "harga": 10000,
             "hargaAsli": 10000,
             "deskripsiPanjang": "Syarat & Ketentuan : Server private & kualitas terbaik! || Script bot dijamin aman (anti drama/maling) | masa aktif panel 30 hari || Garansi 15 hari (1x replace) || Server anti delay/lemot! || Claim garansi wajib bawa bukti transaksi dan data panel yang lengkap",
             "nomorWA": "",
@@ -94,7 +99,7 @@
         {
             "id": 9,
             "nama": "Panel Ram 9GB",
-            "harga": 5000,
+            "harga": 11000,
             "hargaAsli": 11000,
             "deskripsiPanjang": "Syarat & Ketentuan : Server private & kualitas terbaik! || Script bot dijamin aman (anti drama/maling) | masa aktif panel 30 hari || Garansi 15 hari (1x replace) || Server anti delay/lemot! || Claim garansi wajib bawa bukti transaksi dan data panel yang lengkap",
             "nomorWA": "",
@@ -104,7 +109,7 @@
         {
             "id": 10,
             "nama": "Panel Ram 10GB",
-            "harga": 5000,
+            "harga": 12000,
             "hargaAsli": 12000,
             "deskripsiPanjang": "Syarat & Ketentuan : Server private & kualitas terbaik! || Script bot dijamin aman (anti drama/maling) | masa aktif panel 30 hari || Garansi 15 hari (1x replace) || Server anti delay/lemot! || Claim garansi wajib bawa bukti transaksi dan data panel yang lengkap",
             "nomorWA": "",
@@ -114,7 +119,7 @@
         {
             "id": 11,
             "nama": "Panel Ram 11GB",
-            "harga": 5000,
+            "harga": 13000,
             "hargaAsli": 13000,
             "deskripsiPanjang": "Syarat & Ketentuan : Server private & kualitas terbaik! || Script bot dijamin aman (anti drama/maling) | masa aktif panel 30 hari || Garansi 15 hari (1x replace) || Server anti delay/lemot! || Claim garansi wajib bawa bukti transaksi dan data panel yang lengkap",
             "nomorWA": "",
@@ -124,9 +129,20 @@
         {
             "id": 12,
             "nama": "Panel Ram UNLIMITED",
-            "harga": 5000,
+            "harga": 15000,
             "hargaAsli": 15000,
             "deskripsiPanjang": "Syarat & Ketentuan : Server private & kualitas terbaik! || Script bot dijamin aman (anti drama/maling) | masa aktif panel 30 hari || Garansi 15 hari (1x replace) || Server anti delay/lemot! || Claim garansi wajib bawa bukti transaksi dan data panel yang lengkap",
+            "nomorWA": "",
+            "discountPrice": null,
+            "discountEndDate": null
+        },
+        {
+            "id": 66,
+            "nama": "Panel 15gb || yah",
+            "harga": 300000,
+            "hargaAsli": 300000,
+            "deskripsiPanjang": "Oke min",
+            "createdAt": "2025-08-21T13:47:35.208Z",
             "nomorWA": "",
             "discountPrice": null,
             "discountEndDate": null
@@ -140,28 +156,18 @@
             "hargaAsli": 20000,
             "deskripsiPanjang": "Bonus Buy Vps: Free Install Panel 1x ram 8/16 || Free Instal Wings/Node 1x ram 8/16 || Free Pasang Egg Bot/Mc || Free Install Thema Buy Ram 8/16 || Garansi 15 Hari Nego? = Nogar || Vps On 30 Hari || Garansi Hanya 1x Ambil",
             "nomorWA": "",
-            "discountPrice": 1000,
-            "discountEndDate": "2025-08-22T14:06:00.000Z",
-            "category": "VPS",
-            "newName": "VPS Ram:1GB Cpu:1",
-            "newDesc": "Bonus Buy Vps: Free Install Panel 1x ram 8/16 || Free Instal Wings/Node 1x ram 8/16 || Free Pasang Egg Bot/Mc || Free Install Thema Buy Ram 8/16 || Garansi 15 Hari Nego? = Nogar || Vps On 30 Hari || Garansi Hanya 1x Ambil",
-            "newImages": [],
-            "newMenuContent": ""
+            "discountPrice": null,
+            "discountEndDate": null
         },
         {
             "id": 14,
             "nama": "VPS Ram:2GB Cpu:1",
-            "harga": 10,
+            "harga": 25000,
             "hargaAsli": 25000,
             "deskripsiPanjang": "Bonus Buy Vps: Free Install Panel 1x ram 8/16 || Free Instal Wings/Node 1x ram 8/16 || Free Pasang Egg Bot/Mc || Free Install Thema Buy Ram 8/16 || Garansi 15 Hari Nego? = Nogar || Vps On 30 Hari || Garansi Hanya 1x Ambil",
             "nomorWA": "",
-            "discountPrice": 10,
-            "discountEndDate": "2025-08-23T13:04:00.000Z",
-            "category": "VPS",
-            "newName": "VPS Ram:2GB Cpu:1",
-            "newDesc": "Bonus Buy Vps: Free Install Panel 1x ram 8/16 || Free Instal Wings/Node 1x ram 8/16 || Free Pasang Egg Bot/Mc || Free Install Thema Buy Ram 8/16 || Garansi 15 Hari Nego? = Nogar || Vps On 30 Hari || Garansi Hanya 1x Ambil",
-            "newImages": [],
-            "newMenuContent": ""
+            "discountPrice": null,
+            "discountEndDate": null
         },
         {
             "id": 15,
@@ -411,16 +417,6 @@
             "discountEndDate": null
         },
         {
-            "id": 39,
-            "nama": "Jasa pembuatan script",
-            "harga": 50000,
-            "hargaAsli": 50000,
-            "deskripsiPanjang": "jasa pembuatan ini tergantung fitur ya, harga mulai dari 20k - 50k dan seterusnya, semua sudah free raname dan request",
-            "nomorWA": "",
-            "discountPrice": null,
-            "discountEndDate": null
-        },
-        {
             "id": 34,
             "nama": "Jasa install tema",
             "harga": 10000,
@@ -466,6 +462,16 @@
             "harga": 15000,
             "hargaAsli": 15000,
             "deskripsiPanjang": "untuk tampil website nya silahkan salin link di bawah ini. https://rikishopreal.vercel.app",
+            "nomorWA": "",
+            "discountPrice": null,
+            "discountEndDate": null
+        },
+        {
+            "id": 39,
+            "nama": "Jasa pembuatan script",
+            "harga": 50000,
+            "hargaAsli": 50000,
+            "deskripsiPanjang": "jasa pembuatan ini tergantung fitur ya, harga mulai dari 20k - 50k dan seterusnya, semua sudah free raname dan request",
             "nomorWA": "",
             "discountPrice": null,
             "discountEndDate": null
