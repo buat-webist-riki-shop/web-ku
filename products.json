@@ -479,6 +479,17 @@
     ],
     "murid": [
         {
+            "id": 70,
+            "nama": "Ygunn",
+            "harga": 66899,
+            "hargaAsli": 66899,
+            "deskripsiPanjang": "Ygjn",
+            "createdAt": "2025-08-24T13:27:03.260Z",
+            "nomorWA": "",
+            "images": [],
+            "menuContent": ""
+        },
+        {
             "id": 40,
             "nama": "Murid unbend",
             "harga": 15000,
