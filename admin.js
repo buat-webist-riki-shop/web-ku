@@ -794,67 +794,58 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // [MODIFIKASI] Event Listener untuk tombol Buat API Key
-    createApiKeyBtn.addEventListener('click', async () => {
-        const key = document.getElementById('new-apikey-name').value.trim();
-        const duration = parseInt(document.getElementById('new-apikey-duration').value, 10);
-        const unit = document.getElementById('new-apikey-unit').value;
-        const isPermanent = permanentKeyCheckbox.checked;
 
-        if (!key || (!isPermanent && (isNaN(duration) || duration <= 0))) {
-            return showToast('Nama Key dan Durasi harus valid.', 'error');
-        }
+createApiKeyBtn.addEventListener('click', async () => {
+    const key = document.getElementById('new-apikey-name').value.trim();
+    const duration = parseInt(document.getElementById('new-apikey-duration').value, 10);
+    const unit = document.getElementById('new-apikey-unit').value;
+    const isPermanent = permanentKeyCheckbox.checked;
 
-        createApiKeyBtn.textContent = 'Membuat...';
-        createApiKeyBtn.disabled = true;
+    if (!key || (!isPermanent && (isNaN(duration) || duration <= 0))) {
+        return showToast('Nama Key dan Durasi harus valid.', 'error');
+    }
 
-        try {
-            const result = await fetchAdminApi('createApiKey', { key, duration, unit, isPermanent });
-            showToast(result.message, 'success');
-            document.getElementById('addApiKeyForm').reset();
-            loadApiKeys();
-            closeModal(addApiKeyModal);
+    createApiKeyBtn.textContent = 'Membuat...';
+    createApiKeyBtn.disabled = true;
 
-            // Tampilkan modal sukses dengan detail yang diformat
+    try {
+        const result = await fetchAdminApi('createApiKey', { key, duration, unit, isPermanent });
+        showToast(result.message, 'success');
+        document.getElementById('addApiKeyForm').reset();
+        loadApiKeys();
+        closeModal(addApiKeyModal);
+
+        // --- INI BAGIAN PERBAIKANNYA ---
+        // Cek dulu apakah 'details' dari server itu ada atau tidak
+        if (result.details && typeof result.details === 'object') {
             const keyData = result.details;
-            const createdAt = new Date(keyData.created_at).toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' });
-            const expiresAt = keyData.expires_at === 'permanent' ? 'Permanen' : new Date(keyData.expires_at).toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' });
-            
-            const detailsText = `✨ API Key Telah Dibuat! ✨
+            // Cek juga apakah properti 'created_at' dan 'expires_at' ada di dalam details
+            if (keyData.created_at && keyData.expires_at) {
+                const createdAt = new Date(keyData.created_at).toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' });
+                const expiresAt = keyData.expires_at === 'permanent' ? 'Permanen' : new Date(keyData.expires_at).toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' });
+                
+                const detailsText = `✨ API Key Telah Dibuat! ✨
 -------------------------
 🔑 Kunci API   : ${key}
 🗓️ Dibuat Pada : ${createdAt}
 ⏳ Kedaluwarsa : ${expiresAt}
 -------------------------
 Harap simpan dan berikan kunci ini kepada pengguna.`;
-            
-            apiKeyDetailsTextarea.value = detailsText;
-            openModal(apiKeySuccessModal);
-
-        } catch (err) {
-            showToast(err.message, 'error');
-        } finally {
-            createApiKeyBtn.textContent = 'Buat API Key';
-            createApiKeyBtn.disabled = false;
+                
+                apiKeyDetailsTextarea.value = detailsText;
+                openModal(apiKeySuccessModal);
+            }
         }
-    });
+        // Jika 'details' tidak ada, tidak akan terjadi apa-apa dan tidak akan error.
+        // Notifikasi "success" dari showToast() di atas sudah cukup.
 
-    // [MODIFIKASI] Event Listener untuk tombol salin di modal sukses
-    copyApiKeyDetailsBtn.addEventListener('click', () => {
-        apiKeyDetailsTextarea.select();
-        // Gunakan document.execCommand untuk kompatibilitas yang lebih luas di dalam iframe
-        try {
-            document.execCommand('copy');
-            showToast('Detail berhasil disalin!', 'success');
-        } catch (err) {
-            // Fallback jika execCommand gagal
-            navigator.clipboard.writeText(apiKeyDetailsTextarea.value).then(() => {
-                showToast('Detail berhasil disalin!', 'success');
-            }, () => {
-                showToast('Gagal menyalin detail.', 'error');
-            });
-        }
-    });
+    } catch (err) {
+        showToast(err.message, 'error');
+    } finally {
+        createApiKeyBtn.textContent = 'Buat API Key';
+        createApiKeyBtn.disabled = false;
+    }
+});
 
     addDomainBtn.addEventListener('click', async () => {
         const domain = document.getElementById('new-domain-name').value.trim();
