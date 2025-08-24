@@ -6,7 +6,7 @@
     <title>Selamat Datang di Rikishopreal</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="data/style.css">
 </head>
 <body>
   <div id="toast-notification" class="toast-notification"></div>
@@ -44,17 +44,21 @@
       </div>
   </div>
 
-  <div id="welcomeScreen">
-      <div class="logo-wrapper">
-          <img src="logo.jpg" alt="Rikishopreal Logo">
-      </div>
-      <h1 class="welcome-title">Selamat Datang di <span>Rikishopreal</span><p>Platform layanan digital terbaik</p></h1>
-      <p id="recoText">🔄 loading</p>
-      <div class="progress-container">
-          <div class="progress-bar" id="progressBar"></div>
-      </div>
-      <div id="progress-text">0%</div>
-  </div>
+<div id="welcomeScreen">
+    <div class="logo-wrapper">
+        <img src="logo.jpg" alt="Rikishopreal Logo">
+    </div>
+    <h1 class="welcome-title">Selamat Datang di <span>Rikishopreal</span><p>Platform layanan digital terbaik</p></h1>
+
+    <div class="loading-status">
+        <div class="spinner"></div>
+        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" style="display: none;">
+            <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+            <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+        </svg>
+        <p id="loadingStatusText">Memuat data...</p>
+    </div>
+</div>
 
     <div class="offcanvas-menu" id="offcanvasMenu">
         <div class="menu-header">
@@ -66,10 +70,11 @@
             <li><a href="#" id="openAboutUsModal"><i class="fas fa-info-circle"></i> Tentang Kami</a></li>
             <li><a href="#" id="openChatAiModal"><i class="fas fa-robot"></i> Asisten AI</a></li>
             <li class="menu-section-title">Informasi & Bantuan</li>
+            <li><a href="admin.html" target="_blank"><i class="fas fa-cogs"></i>Page Admin</a></li>
             <li><a href="#" data-page="chat-seller-page"><i class="fas fa-comment-dots"></i> Chat Seller</a></li>
             <li><a href="#" data-page="hubungi-kami-page"><i class="fas fa-headset"></i> Hubungi Kami</a></li>
-            <li class="menu-section-title">Halaman Khusus Admin</li>
-            <li><a href="admin.html" target="_blank"><i class="fas fa-cogs"></i>Page Admin</a></li>
+            <li class="menu-section-title">layanan reseller</li>
+            <li><a href="domain.html" target="_blank"><i class="fab fa-cloudflare"></i>Reseller Subdomain</a></li>
         </ul>
     </div>
 
@@ -247,6 +252,6 @@
         document.dispatchEvent(new CustomEvent('firebaseFailed'));
     }
 </script>
-<script src="rikishop.js"></script>
+<script src="data/rikishop.js"></script>
 </body>
 </html>

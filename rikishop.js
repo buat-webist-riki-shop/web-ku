@@ -755,11 +755,19 @@ function playBackgroundMusic() {
 // --- Inisialisasi Aplikasi ---
 async function initializeApp() {
     mainContainer.style.display = 'none';
+    welcomeScreen.style.display = 'flex';
+
+    // Ambil elemen baru dari HTML
+    const loadingStatusText = document.getElementById('loadingStatusText');
+    const spinner = document.querySelector('.spinner');
+    const checkmark = document.querySelector('.checkmark');
+
     try {
         const timestamp = new Date().getTime();
+        // Memuat data produk dan pengaturan secara bersamaan
         const [productsResponse, settingsResponse] = await Promise.all([
             fetch(`products.json?v=${timestamp}`),
-            fetch(`settings.json?v=${timestamp}`)
+            fetch(`/api/getSettings?v=${timestamp}`) // Gunakan API Endpoint
         ]);
 
         if (!productsResponse.ok) throw new Error(`Gagal memuat produk: ${productsResponse.status}`);
@@ -771,9 +779,29 @@ async function initializeApp() {
             console.warn("Gagal memuat settings.json, menggunakan nomor fallback.");
         }
 
+        // --- SUKSES ---
+        // Sembunyikan spinner, tampilkan centang, dan ubah teks
+        spinner.style.display = 'none';
+        checkmark.style.display = 'block';
+        loadingStatusText.textContent = 'Berhasil!';
+
+        // Tunggu sejenak agar pengguna melihat centang
+        setTimeout(() => {
+            welcomeScreen.classList.add("fade-out");
+            welcomeScreen.addEventListener('transitionend', () => {
+                welcomeScreen.style.display = "none";
+                mainContainer.style.display = "flex";
+                showPage('home-page');
+                setupBannerCarousel();
+            }, { once: true });
+        }, 1200); // 1.2 detik
+
     } catch (error) {
+        // --- GAGAL ---
         console.error("Gagal memuat data awal:", error);
-        document.querySelector('.main-content').innerHTML = `<p style="text-align:center; color:red;">Gagal memuat data. Coba muat ulang halaman.</p>`;
+        spinner.style.display = 'none'; // Sembunyikan spinner
+        loadingStatusText.textContent = 'Gagal memuat. Coba lagi.';
+        // Anda bisa menambahkan ikon 'X' merah di sini jika mau
     }
     updateDateTime();
     setInterval(updateDateTime, 1000);
