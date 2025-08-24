@@ -10,5 +10,14 @@
         "Stock Akun": "",
         "Logo": "",
         "Suntik Sosmed": ""
-    }
+    },
+    "apiKeyPurchaseNumber": "62814003373536",
+    "apiKeyPrices": [
+        {
+            "tier": "Paket apikey  1 minggu",
+            "price": 5000,
+            "discountPrice": null,
+            "discountEndDate": null
+        }
+    ]
 }
