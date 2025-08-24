@@ -227,8 +227,9 @@ input:checked + .slider:before { transform: translateX(20px); }
     align-items: center;
     background-color: var(--secondary-color);
     padding: 12px 15px;
-    border-radius: 10px;
+    border-radius: 20px;
     margin-bottom: 10px;
+}
 }
 .price-info { text-align: left; }
 .tier-name { font-weight: 500; font-size: 1.05em; }
