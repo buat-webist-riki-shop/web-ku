@@ -847,6 +847,32 @@ Harap simpan dan berikan kunci ini kepada pengguna.`;
     }
 });
 
+// [PERBAIKAN] Event Listener untuk tombol salin di modal sukses (Metode Modern)
+copyApiKeyDetailsBtn.addEventListener('click', () => {
+    const textToCopy = apiKeyDetailsTextarea.value;
+
+    // Cek apakah browser mendukung Clipboard API modern dan berada di konteks aman (HTTPS)
+    if (navigator.clipboard && window.isSecureContext) {
+        // Gunakan metode modern
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            showToast('Detail berhasil disalin!', 'success');
+        }).catch(err => {
+            console.error('Gagal menyalin via Navigator API:', err);
+            showToast('Gagal menyalin secara otomatis.', 'error');
+        });
+    } else {
+        // Fallback untuk browser sangat lama atau konteks non-aman (HTTP)
+        apiKeyDetailsTextarea.select();
+        try {
+            document.execCommand('copy');
+            showToast('Detail berhasil disalin! (mode fallback)', 'success');
+        } catch (e) {
+            console.error('Gagal menyalin via execCommand:', e);
+            showToast('Gagal menyalin secara otomatis.', 'error');
+        }
+    }
+});
+
     addDomainBtn.addEventListener('click', async () => {
         const domain = document.getElementById('new-domain-name').value.trim();
         const zone = document.getElementById('new-domain-zone').value.trim();
