@@ -1,19 +1,6 @@
 {
     "Panel": [
         {
-            "id": 69,
-            "nama": "Panel",
-            "harga": 1000,
-            "hargaAsli": 1000,
-            "deskripsiPanjang": "Akaka",
-            "createdAt": "2025-08-23T17:47:01.519Z",
-            "nomorWA": "6285891142486",
-            "images": [],
-            "menuContent": "",
-            "discountPrice": null,
-            "discountEndDate": null
-        },
-        {
             "id": 1,
             "nama": "Panel Ram 1GB",
             "harga": 3000,
@@ -133,6 +120,19 @@
             "hargaAsli": 15000,
             "deskripsiPanjang": "Syarat & Ketentuan : Server private & kualitas terbaik! || Script bot dijamin aman (anti drama/maling) | masa aktif panel 30 hari || Garansi 15 hari (1x replace) || Server anti delay/lemot! || Claim garansi wajib bawa bukti transaksi dan data panel yang lengkap",
             "nomorWA": "",
+            "discountPrice": null,
+            "discountEndDate": null
+        },
+        {
+            "id": 69,
+            "nama": "Panel",
+            "harga": 1000,
+            "hargaAsli": 1000,
+            "deskripsiPanjang": "Akaka",
+            "createdAt": "2025-08-23T17:47:01.519Z",
+            "nomorWA": "6285891142486",
+            "images": [],
+            "menuContent": "",
             "discountPrice": null,
             "discountEndDate": null
         },
