@@ -3,7 +3,6 @@ export default function handler(request, response) {
         return response.status(405).json({ message: 'Metode tidak diizinkan' });
     }
 
-    // Ambil password dari Environment Variable yang aman di server Vercel
     const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
     const { password } = request.body;
 
