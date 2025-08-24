@@ -3,8 +3,8 @@ import fetch from "node-fetch";
 
 // --- Konfigurasi GitHub ---
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
-const owner = "web-payment";   // 🔧 ganti sesuai repo kamu
-const repo = "webwebweb";      // 🔧 ganti sesuai repo kamu
+const owner = "buat-webist-riki-shop";   // 🔧 ganti sesuai repo kamu
+const repo = "web-ku";      // 🔧 ganti sesuai repo kamu
 const branch = "main";         // 🔧 ganti jika branch beda
 
 // --- Helper GitHub ---
