@@ -48,7 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Variabel Modal Edit
     const editWhatsappNumberInput = document.getElementById('edit-whatsapp-number');
 
-    // Variabel Manajer Domain
+    // --- Variabel Baru untuk Manajer Domain ---
+    const domainManagerTab = document.querySelector('.tab-button[data-tab="domainManager"]');
     const apiKeyListContainer = document.getElementById('apiKeyListContainer');
     const createApiKeyBtn = document.getElementById('create-apikey-btn');
     const rootDomainListContainer = document.getElementById('rootDomainListContainer');
@@ -56,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const permanentKeyCheckbox = document.getElementById('permanent-key');
     const durationSection = document.getElementById('duration-section');
     
-    // Variabel Modal Baru
+    // -- Variabel Modal Baru --
     const showAddApiKeyModalBtn = document.getElementById('show-add-apikey-modal-btn');
     const showAddDomainModalBtn = document.getElementById('show-add-domain-modal-btn');
     const addApiKeyModal = document.getElementById('addApiKeyModal');
@@ -65,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const apiKeyDetailsTextarea = document.getElementById('apiKeyDetails');
     const copyApiKeyDetailsBtn = document.getElementById('copyApiKeyDetailsBtn');
 
-    // Alamat API
+    // --- Alamat API ---
     const API_PRODUCTS_URL = '/api/products';
     const API_CLOUDFLARE_URL = '/api/cloudflare';
     const API_BASE_URL = '/api'; 
@@ -551,9 +552,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!res.ok) throw new Error('Gagal memuat pengaturan.');
             siteSettings = await res.json();
             
+            // Pengaturan Nomor WA
             globalWhatsappNumberInput.value = siteSettings.globalPhoneNumber || '';
             apikeyWhatsappNumberInput.value = siteSettings.apiKeyPurchaseNumber || '';
 
+            // Pengaturan Nomor WA per Kategori
             categoryWhatsappNumbersContainer.innerHTML = '<h3><i class="fas fa-list-alt"></i> Nomor WA per Kategori (Opsional)</h3>';
             const categoriesInSettings = siteSettings.categoryPhoneNumbers || {};
             [...manageCategorySelect.options].filter(opt => opt.value).forEach(opt => {
@@ -566,6 +569,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 categoryWhatsappNumbersContainer.appendChild(div);
             });
             
+            // Pengaturan Harga API Key
             renderApiKeyPriceSettings(siteSettings.apiKeyPrices || []);
 
         } catch (err) {
@@ -582,8 +586,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const div = document.createElement('div');
             div.className = 'price-tier-item'; 
             div.innerHTML = `
-                <input type="text" class="tier-name" placeholder="Nama Paket (e.g., 7 Hari)" value="${price.tier || ''}">
-                <input type="number" class="tier-price" placeholder="Harga Asli (e.g., 10000)" value="${price.price || ''}">
+                <input type="text" class="tier-name" placeholder="Nama (e.g., 7 Hari)" value="${price.tier || ''}">
+                <input type="number" class="tier-price" placeholder="Harga Asli" value="${price.price || ''}">
                 <input type="number" class="tier-discount-price" placeholder="Harga Diskon (Opsional)" value="${price.discountPrice || ''}">
                 <input type="datetime-local" class="tier-discount-date" value="${price.discountEndDate ? price.discountEndDate.slice(0, 16) : ''}">
                 <button type="button" class="delete-tier-btn">&times;</button>
@@ -594,10 +598,10 @@ document.addEventListener('DOMContentLoaded', () => {
         apiKeyPriceSettingsContainer.querySelectorAll('.delete-tier-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 btn.parentElement.remove();
-                if (apiKeyPriceSettingsContainer.children.length === 0 || apiKeyPriceSettingsContainer.children.length === 1 && apiKeyPriceSettingsContainer.querySelector('p')) {
+                if (apiKeyPriceSettingsContainer.children.length === 0) {
                     apiKeyPriceSettingsContainer.innerHTML = '<p>Belum ada tingkatan harga. Klik tombol di bawah untuk menambahkan.</p>';
                 }
-                showToast('Paket harga dihapus. Klik "Simpan" untuk konfirmasi.', 'info');
+                showToast('Tingkatan harga dihapus. Klik "Simpan" untuk konfirmasi.', 'info');
             });
         });
     }
@@ -618,64 +622,73 @@ document.addEventListener('DOMContentLoaded', () => {
             const discountPrice = item.querySelector('.tier-discount-price').value ? parseInt(item.querySelector('.tier-discount-price').value, 10) : null;
             const discountEndDate = item.querySelector('.tier-discount-date').value ? new Date(item.querySelector('.tier-discount-date').value).toISOString() : null;
             
-            if (tier && !isNaN(price) && price > 0) {
+            if (tier || !isNaN(price) || discountPrice || discountEndDate) {
                 prices.push({ tier, price, discountPrice, discountEndDate });
             }
         });
         return prices;
     }
 
-    saveSettingsButton.addEventListener('click', async () => {
-        const globalNumber = globalWhatsappNumberInput.value.trim();
-        const apiKeyNumber = apikeyWhatsappNumberInput.value.trim();
+    // GANTI BLOK LAMA DENGAN YANG INI
+saveSettingsButton.addEventListener('click', async () => {
+    // Mengumpulkan semua data dari form
+    const globalNumber = globalWhatsappNumberInput.value.trim();
+    const apiKeyNumber = apikeyWhatsappNumberInput.value.trim();
 
-        if (!validatePhoneNumber(globalNumber) || !globalNumber) return showToast("Nomor WA Global wajib diisi dengan format kode negara (contoh: 628...)", 'error');
-        if (!validatePhoneNumber(apiKeyNumber) || !apiKeyNumber) return showToast("Nomor WA Beli API Key wajib diisi.", 'error');
+    // Validasi nomor WA
+    if (!validatePhoneNumber(globalNumber) || !globalNumber) return showToast("Nomor WA Global wajib diisi dengan format kode negara (contoh: 628...)", 'error');
+    if (!validatePhoneNumber(apiKeyNumber) || !apiKeyNumber) return showToast("Nomor WA Beli API Key wajib diisi.", 'error');
 
-        const categoryNumbers = {};
-        let isCategoryValid = true;
-        categoryWhatsappNumbersContainer.querySelectorAll('input[data-category]').forEach(input => {
-            const num = input.value.trim();
-            if (num && !validatePhoneNumber(num)) {
-                showToast(`Format Nomor WA kategori ${input.dataset.category} salah.`, 'error');
-                isCategoryValid = false;
-            }
-            categoryNumbers[input.dataset.category] = num;
-        });
-        if (!isCategoryValid) return;
-
-        const apiKeyPrices = collectApiKeyPrices();
-        if (apiKeyPriceSettingsContainer.querySelectorAll('.price-tier-item').length > apiKeyPrices.length) {
-             return showToast('Pastikan semua Nama Paket dan Harga Asli pada tingkatan harga API Key terisi dengan benar.', 'error');
+    // Mengumpulkan nomor WA per kategori
+    const categoryNumbers = {};
+    let isCategoryValid = true;
+    categoryWhatsappNumbersContainer.querySelectorAll('input[data-category]').forEach(input => {
+        const num = input.value.trim();
+        if (num && !validatePhoneNumber(num)) {
+            showToast(`Format Nomor WA kategori ${input.dataset.category} salah.`, 'error');
+            isCategoryValid = false;
         }
-
-        saveSettingsButton.disabled = true;
-        saveSettingsButton.textContent = 'Menyimpan...';
-
-        try {
-            const settingsData = {
-                globalPhoneNumber: globalNumber,
-                categoryPhoneNumbers: categoryNumbers,
-                apiKeyPurchaseNumber: apiKeyNumber,
-                apiKeyPrices: apiKeyPrices
-            };
-
-            const result = await fetch(`${API_BASE_URL}/updateSettings`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Admin-Password': sessionStorage.getItem('adminPassword') },
-                body: JSON.stringify(settingsData)
-            }).then(res => res.json());
-
-            if (result.message !== 'Pengaturan berhasil disimpan!') throw new Error(result.message);
-            showToast('Pengaturan berhasil disimpan!', 'success');
-
-        } catch (err) {
-            showToast(err.message, 'error');
-        } finally {
-            saveSettingsButton.disabled = false;
-            saveSettingsButton.textContent = 'Simpan Semua Pengaturan';
-        }
+        categoryNumbers[input.dataset.category] = num;
     });
+    if (!isCategoryValid) return;
+
+    // PENTING: Mengumpulkan data harga API Key
+    const apiKeyPrices = collectApiKeyPrices();
+    if (collectApiKeyPrices().length > 0 && apiKeyPrices.length === 0) {
+         return showToast('Pastikan semua Nama dan Harga Asli pada tingkatan harga API Key terisi.', 'error');
+    }
+
+    // Menonaktifkan tombol saat proses
+    saveSettingsButton.disabled = true;
+    saveSettingsButton.textContent = 'Menyimpan...';
+
+    try {
+        // Membuat objek data yang LENGKAP untuk dikirim
+        const settingsData = {
+            globalPhoneNumber: globalNumber,
+            categoryPhoneNumbers: categoryNumbers,
+            apiKeyPurchaseNumber: apiKeyNumber,
+            apiKeyPrices: apiKeyPrices
+        };
+
+        // Mengirim data ke server
+        const result = await fetch(`${API_BASE_URL}/updateSettings`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Admin-Password': sessionStorage.getItem('adminPassword') },
+            body: JSON.stringify(settingsData)
+        }).then(res => res.json());
+
+        if (result.message !== 'Pengaturan berhasil disimpan!') throw new Error(result.message);
+        showToast('Pengaturan berhasil disimpan!', 'success');
+
+    } catch (err) {
+        showToast(err.message, 'error');
+    } finally {
+        // Mengaktifkan tombol kembali
+        saveSettingsButton.disabled = false;
+        saveSettingsButton.textContent = 'Simpan Semua Pengaturan';
+    }
+});
 
     if (sessionStorage.getItem('isAdminAuthenticated')) {
         loginScreen.style.display = 'none';
@@ -689,6 +702,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const deleteBtn = e.target.closest('.delete-btn');
         if (!deleteBtn) return;
 
+        // Hapus Produk
         if (deleteBtn.classList.contains('delete-product-btn')) {
             const parent = deleteBtn.closest('.delete-item');
             const id = parseInt(parent.dataset.id);
@@ -709,6 +723,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
+        // Hapus API Key
         else if (deleteBtn.classList.contains('delete-apikey-btn')) {
             const key = deleteBtn.dataset.key;
             if (await showCustomConfirm(`Yakin menghapus API Key "<b>${key}</b>"?`)) {
@@ -721,6 +736,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
+        // Hapus Domain
         else if (deleteBtn.classList.contains('delete-domain-btn')) {
             const domain = deleteBtn.dataset.domain;
             if (await showCustomConfirm(`Yakin menghapus Domain "<b>${domain}</b>"?`)) {
@@ -794,7 +810,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // [MODIFIKASI] Event Listener untuk tombol Buat API Key
     createApiKeyBtn.addEventListener('click', async () => {
         const key = document.getElementById('new-apikey-name').value.trim();
         const duration = parseInt(document.getElementById('new-apikey-duration').value, 10);
@@ -815,16 +830,15 @@ document.addEventListener('DOMContentLoaded', () => {
             loadApiKeys();
             closeModal(addApiKeyModal);
 
-            // Tampilkan modal sukses dengan detail yang diformat
             const keyData = result.details;
-            const createdAt = new Date(keyData.created_at).toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' });
-            const expiresAt = keyData.expires_at === 'permanent' ? 'Permanen' : new Date(keyData.expires_at).toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' });
+            const createdAt = new Date(keyData.created_at).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' });
+            const expiresAt = keyData.expires_at === 'permanent' ? 'Permanen' : new Date(keyData.expires_at).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' });
             
-            const detailsText = `✨ API Key Telah Dibuat! ✨
+            const detailsText = `API Key Telah Dibuat!
 -------------------------
-🔑 Kunci API   : ${key}
-🗓️ Dibuat Pada : ${createdAt}
-⏳ Kedaluwarsa : ${expiresAt}
+Kunci API   : ${key}
+Dibuat Pada : ${createdAt}
+Kedaluwarsa : ${expiresAt}
 -------------------------
 Harap simpan dan berikan kunci ini kepada pengguna.`;
             
@@ -839,21 +853,13 @@ Harap simpan dan berikan kunci ini kepada pengguna.`;
         }
     });
 
-    // [MODIFIKASI] Event Listener untuk tombol salin di modal sukses
     copyApiKeyDetailsBtn.addEventListener('click', () => {
         apiKeyDetailsTextarea.select();
-        // Gunakan document.execCommand untuk kompatibilitas yang lebih luas di dalam iframe
-        try {
-            document.execCommand('copy');
+        navigator.clipboard.writeText(apiKeyDetailsTextarea.value).then(() => {
             showToast('Detail berhasil disalin!', 'success');
-        } catch (err) {
-            // Fallback jika execCommand gagal
-            navigator.clipboard.writeText(apiKeyDetailsTextarea.value).then(() => {
-                showToast('Detail berhasil disalin!', 'success');
-            }, () => {
-                showToast('Gagal menyalin detail.', 'error');
-            });
-        }
+        }, () => {
+            showToast('Gagal menyalin detail.', 'error');
+        });
     });
 
     addDomainBtn.addEventListener('click', async () => {
