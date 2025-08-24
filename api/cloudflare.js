@@ -1,11 +1,11 @@
 import { Octokit } from "@octokit/rest";
 import fetch from "node-fetch";
 
-// --- Konfigurasi GitHub ---
+// --- Konfigurasi GitHub (semua lewat ENV) ---
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
-const owner = "buat-webist-riki-shop";   // 🔧 ganti sesuai repo kamu
-const repo = "web-ku";      // 🔧 ganti sesuai repo kamu
-const branch = "main";         // 🔧 ganti jika branch beda
+const owner = process.env.REPO_OWNER;
+const repo  = process.env.REPO_NAME;
+const branch = process.env.REPO_BRANCH || "main"; // bisa tambah REPO_BRANCH di .env kalau mau fleksibel
 
 // --- Helper GitHub ---
 async function readJsonFromGithub(path) {
@@ -14,7 +14,7 @@ async function readJsonFromGithub(path) {
         const content = Buffer.from(data.content, "base64").toString();
         return JSON.parse(content);
     } catch (err) {
-        if (err.status === 404) return {}; // kalau file belum ada → return object kosong
+        if (err.status === 404) return {};
         throw err;
     }
 }
@@ -38,7 +38,6 @@ async function writeJsonToGithub(path, json) {
         branch
     });
 }
-
 // --- Handler utama ---
 export default async function handler(request, response) {
     // ✅ CORS
@@ -165,9 +164,21 @@ export default async function handler(request, response) {
                     if (unit === "years") now.setFullYear(now.getFullYear() + d);
                     expires_at = now.toISOString();
                 }
-                apiKeys[key] = { created_at: new Date().toISOString(), expires_at };
+                
+                // Simpan data key yang baru ke dalam variabel
+                const newKeyData = { created_at: new Date().toISOString(), expires_at };
+                
+                // Masukkan ke daftar semua key
+                apiKeys[key] = newKeyData;
+                
+                // Tulis ke file apikeys.json
                 await writeJsonToGithub("apikeys.json", apiKeys);
-                return response.status(200).json({ message: "API Key berhasil dibuat." });
+                
+                // Kirim kembali respons dengan menyertakan "details"
+                return response.status(200).json({
+                    message: "API Key berhasil dibuat.",
+                    details: newKeyData
+                });
             }
             case "deleteApiKey": {
                 const { key } = data;
